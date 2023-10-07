@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Taggloo4.Web.Controllers;
 
-[Authorize]
+//[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
