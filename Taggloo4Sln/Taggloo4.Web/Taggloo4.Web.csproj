@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
         <SpaRoot>ClientApp\</SpaRoot>
@@ -9,6 +9,7 @@
         <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
         <ImplicitUsings>enable</ImplicitUsings>
       <UserSecretsId>c432025f-c1d4-4db1-8060-ab1ba0934cb8</UserSecretsId>
+      <LangVersion>12</LangVersion>
   </PropertyGroup>
 
     <ItemGroup>
