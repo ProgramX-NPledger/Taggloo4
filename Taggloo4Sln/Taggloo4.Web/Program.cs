@@ -8,10 +8,9 @@ using Taggloo4.Web.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-                       throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-	options.UseSqlite(connectionString));
+	options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -25,6 +24,7 @@ builder.Services.AddAuthentication()
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddOpenApiDocument();
 
 var app = builder.Build();
 
@@ -32,6 +32,14 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
 	app.UseMigrationsEndPoint();
+	
+	// Add OpenAPI 3.0 document serving middleware
+	// Available at: http://localhost:<port>/swagger/v1/swagger.json
+	app.UseOpenApi();
+
+	// Add web UIs to interact with the document
+	// Available at: http://localhost:<port>/swagger
+	app.UseSwaggerUi3();
 }
 else
 {

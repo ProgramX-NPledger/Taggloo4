@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Taggloo4.Web.Controllers;
 
-[Authorize]
+//[Authorize]
 [ApiController]
-[Route("[controller]")]
+[Route("api/v4/[controller]")]
 public class WeatherForecastController : ControllerBase
 {
 	private static readonly string[] Summaries = new[]
