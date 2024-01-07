@@ -13,7 +13,7 @@ namespace API.Controllers;
 /// <summary>
 /// User operations. All methods require authorisation.
 /// </summary>
-[Authorize]
+//[Authorize]
 public class UsersController : BaseApiController
 {
 	private readonly DataContext _dataContext;
@@ -33,7 +33,7 @@ public class UsersController : BaseApiController
 	public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
 	{
 		List<AppUser> users = await _dataContext.Users.ToListAsync();
-		return users;
+		return users; // TODO use RESTful DTO
 	}
 
 	/// <summary>
@@ -44,11 +44,12 @@ public class UsersController : BaseApiController
 	/// <response code="200">User is found.</response>
 	/// <response code="404">User is not found.</response>
 	[HttpGet("{id}")]
+	[Authorize]
 	public async Task<ActionResult<AppUser?>> GetUser(int id)
 	{
 		AppUser? user = await _dataContext.Users.FindAsync(id);
 		if (user == null) return NotFound();
-		return user;
+		return user; // TODO use RESTful DTO
 	}
 
 	/// <summary>
