@@ -11,12 +11,17 @@ public class TokenService : ITokenService
 {
 	private readonly IConfiguration _configuration;
 	private readonly SymmetricSecurityKey _symmetricSecurityKey;
+
+	/// <summary>
+	/// Returns the key used to locate the configuration for the token key for JWT tokens
+	/// </summary>
+	public const string JWT_TOKEN_KEY_CONFIG_KEY = "Security:JwtPolicy:TokenKey";
 	
 	public TokenService(IConfiguration configuration)
 	{
 		_configuration = configuration;
-		string? jwtTokenKey = _configuration["JwtTokenKey"];
-		if (jwtTokenKey == null) throw new ArgumentNullException("jwtTokenKey is null");
+		string? jwtTokenKey = _configuration[JWT_TOKEN_KEY_CONFIG_KEY];
+		if (jwtTokenKey == null) throw new ArgumentNullException($"{JWT_TOKEN_KEY_CONFIG_KEY} is invalid");
 		
 		_symmetricSecurityKey =
 			new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenKey));

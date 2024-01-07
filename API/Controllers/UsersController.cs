@@ -4,12 +4,16 @@ using API.Data;
 using API.DTO;
 using API.Helper;
 using API.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-
+/// <summary>
+/// User operations. All methods require authorisation.
+/// </summary>
+[Authorize]
 public class UsersController : BaseApiController
 {
 	private readonly DataContext _dataContext;
