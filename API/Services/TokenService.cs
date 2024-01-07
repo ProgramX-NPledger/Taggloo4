@@ -9,11 +9,13 @@ namespace API.Services;
 
 public class TokenService : ITokenService
 {
+	private readonly IConfiguration _configuration;
 	private readonly SymmetricSecurityKey _symmetricSecurityKey;
 	
 	public TokenService(IConfiguration configuration)
 	{
-		string? jwtTokenKey = configuration["JwtTokenKey"];
+		_configuration = configuration;
+		string? jwtTokenKey = _configuration["JwtTokenKey"];
 		if (jwtTokenKey == null) throw new ArgumentNullException("jwtTokenKey is null");
 		
 		_symmetricSecurityKey =
@@ -30,10 +32,13 @@ public class TokenService : ITokenService
 
 		SigningCredentials credentials = new SigningCredentials(_symmetricSecurityKey, SecurityAlgorithms.HmacSha512Signature);
 
+		string securityJwtPolicyExpirationSecsConfigKey = "Security:JwtPolicy:ExpirationSecs";
+		int jwtExpirationSecs=_configuration.GetValue<int>(securityJwtPolicyExpirationSecsConfigKey);
+
 		SecurityTokenDescriptor tokenDescripter = new SecurityTokenDescriptor
 		{
 			Subject = new ClaimsIdentity(claims),
-			Expires = DateTime.Now.AddDays(7), // TODO configuration
+			Expires = DateTime.Now.AddSeconds(jwtExpirationSecs),
 			SigningCredentials = credentials
 		};
 
