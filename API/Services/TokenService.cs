@@ -40,7 +40,7 @@ public class TokenService : ITokenService
 		string securityJwtPolicyExpirationSecsConfigKey = "Security:JwtPolicy:ExpirationSecs";
 		int jwtExpirationSecs=_configuration.GetValue<int>(securityJwtPolicyExpirationSecsConfigKey);
 
-		SecurityTokenDescriptor tokenDescripter = new SecurityTokenDescriptor
+		SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
 		{
 			Subject = new ClaimsIdentity(claims),
 			Expires = DateTime.Now.AddSeconds(jwtExpirationSecs),
@@ -49,7 +49,7 @@ public class TokenService : ITokenService
 
 		JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
 
-		SecurityToken? token = jwtSecurityTokenHandler.CreateToken(tokenDescripter);
+		SecurityToken? token = jwtSecurityTokenHandler.CreateToken(tokenDescriptor);
 
 		return jwtSecurityTokenHandler.WriteToken(token);
 		
