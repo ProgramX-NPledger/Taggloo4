@@ -9,5 +9,5 @@ public interface ITokenService
 	/// </summary>
 	/// <param name="user">The user requiring authentication.</param>
 	/// <returns>The token representing the authentication.</returns>
-	string CreateToken(AppUser user);
+	Task<string> CreateToken(AppUser user);
 }

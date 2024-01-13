@@ -1,11 +1,13 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using API.Contract;
 using API.Data;
 using API.DTO;
 using API.Helper;
 using API.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,14 +16,14 @@ namespace API.Controllers;
 /// <summary>
 /// User operations. All methods require authorisation.
 /// </summary>
-//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class UsersController : BaseApiController
 {
-	private readonly DataContext _dataContext;
+	private readonly UserManager<AppUser> _userManager;
 
-	public UsersController(DataContext dataContext)
+	public UsersController(UserManager<AppUser> userManager)
 	{
-		_dataContext = dataContext;
+		_userManager = userManager;
 	}
 
 	/// <summary>
@@ -33,8 +35,8 @@ public class UsersController : BaseApiController
 	// TODO: Add parameters to allow filtering, paging, return 400 if bad request
 	public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
 	{
-		List<AppUser> users = await _dataContext.Users.ToListAsync();
-		return users; // TODO use RESTful DTO
+		return Ok(await _userManager.Users.ToListAsync());
+//		return users; // TODO use RESTful DTO
 	}
 
 	
@@ -47,31 +49,43 @@ public class UsersController : BaseApiController
 	/// <response code="200">User is found.</response>
 	/// <response code="403">Not permitted.</response>
 	/// <response code="404">User is not found.</response>
+	[Authorize(Roles="administrator")]
 	[HttpGet("{userName}")]
 	public async Task<ActionResult<GetUserResult>> GetUser(string userName)
 	{
-		string lowerUserName = userName.ToLower();
-		if (_dataContext.Users != null)
-		{
-			AppUser? user = await _dataContext.Users.SingleOrDefaultAsync(q => q.UserName == lowerUserName);
-			if (user == null) return NotFound();
-			return new GetUserResult()
-			{
-				UserName = user.UserName,
-				Links = new []
-				{
-					new Link()
-					{
-						Action = "get",
-						Rel = "self",
-						Types = new string[] { JSON_MIME_TYPE },
-						HRef = $"{GetBaseApiPath()}/users/{user.UserName}" 
-					}
-				}
-			};
-		}
+		string upperedUserName = userName.ToUpper();
+		AppUser? user = await _userManager.Users.SingleOrDefaultAsync(q => q.NormalizedUserName == upperedUserName);
+		if (user == null) return NotFound();
 
-		throw new NullReferenceException("_dataContext.Users");
+		List<Link> links = new List<Link>
+		{
+			new Link()
+			{
+				Action = "get",
+				Rel = "self",
+				Types = new string[] { JSON_MIME_TYPE },
+				HRef = $"{GetBaseApiPath()}/users/{user.UserName}" 
+			}
+		};
+
+		IList<string> roles = await _userManager.GetRolesAsync(user);
+		roles.ToList().ForEach(x =>
+		{
+			links.Add(new Link()
+			{
+				Action = "get",
+				Rel = "role",
+				Types = new string[] { JSON_MIME_TYPE },
+				HRef = $"{GetBaseApiPath()}/roles/{x}"
+			});
+		});
+		
+		return new GetUserResult()
+		{
+			UserName = user.UserName ?? string.Empty,
+			HasRoles = await _userManager.GetRolesAsync(user),
+			Links = links
+		};
 	}
 	
     /// <summary>
@@ -83,45 +97,42 @@ public class UsersController : BaseApiController
 	/// <response code="400">One or more validation errors prevented successful creation.</response>
 	/// <response code="403">Not permitted.</response>
 	[HttpPost]
+	[Authorize(Roles="administrator")]
 	public async Task<ActionResult<AppUser>> CreateUser(CreateUser createUser)
 	{
 		if (!PasswordStrength.IsPasswordStrongEnough(createUser.Password)) return BadRequest("Password does not meet minimum strength requirements");
 		
 		if (await IsUserExisting(createUser.UserName)) return BadRequest("UserName already in use");
 		
-		using (HMACSHA512 hmacSha512 = new HMACSHA512())
+		AppUser newUser = new AppUser()
 		{
-			AppUser newUser = new AppUser()
-			{
-				UserName = createUser.UserName.ToLower(), // all usernames are lowered for comparison
-				PasswordHash = hmacSha512.ComputeHash(Encoding.UTF8.GetBytes(createUser.Password)),
-				PasswordSalt = hmacSha512.Key
-			};
-			_dataContext.Users?.Add(newUser);
-			await _dataContext.SaveChangesAsync();
+			UserName = createUser.UserName
+		};
 
-			string url = $"{GetBaseApiPath()}/users/{newUser.UserName}";
-			CreateUserResult createUserResult = new CreateUserResult()
+		var result = await _userManager.CreateAsync(newUser, createUser.Password);
+		if (!result.Succeeded) return BadRequest(result.Errors);
+
+		string url = $"{GetBaseApiPath()}/users/{newUser.UserName}";
+		CreateUserResult createUserResult = new CreateUserResult()
+		{
+			UserName = newUser.UserName,
+			Links = new []
 			{
-				UserName = newUser.UserName,
-				Links = new []
+				new Link()
 				{
-					new Link()
-					{
-						Action = "get",
-						Rel = "self",
-						Types = new []{ JSON_MIME_TYPE },
-						HRef = url
-					}
+					Action = "get",
+					Rel = "self",
+					Types = new []{ JSON_MIME_TYPE },
+					HRef = url
 				}
-			};
-			return Created(url, createUserResult);
-		}
+			}
+		};
+		return Created(url, createUserResult);
 	}
 
 	private async Task<bool> IsUserExisting(string userName)
 	{
-		string lowerUserName = userName.ToLower();
-		return _dataContext.Users != null && await _dataContext.Users.AnyAsync(q => q.UserName==lowerUserName);
+		string loweredUserName = userName.ToLower();
+		return await _userManager.Users.AnyAsync(q => q.UserName == loweredUserName);
 	}
 }
