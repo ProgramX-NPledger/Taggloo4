@@ -7,35 +7,59 @@ namespace API.Data;
 public class Seed
 {
 
-	public static async Task SeedUsers(UserManager<AppUser> userManager)
+	public static async Task SeedUsers(UserManager<AppUser> userManager,
+		RoleManager<AppRole> roleManager)
 	{
 		// TODO Remove these seeded users
 		if (await userManager.Users.AnyAsync()) return;
 
+		var roles = new List<AppRole>
+		{
+			new AppRole()
+			{
+				Name = "dataImporter"
+			},
+			new AppRole()
+			{
+				Name = "dataExporter"
+			},
+			new AppRole()
+			{
+				Name = "translator"
+			},
+			new AppRole()
+			{
+				Name = "administrator"
+			}
+		};
+
+		foreach (AppRole role in roles)
+		{
+			await roleManager.CreateAsync(role);
+		}
+		
 		string password = "AReallyStrongPa$$w0rd123";
-		await userManager.CreateAsync(new AppUser()
+		AppUser guestUser = new AppUser()
 		{
 			UserName = "guestUser"
-		}, password);
+		};
+		await userManager.CreateAsync(guestUser,password);
 
-		await userManager.CreateAsync(new AppUser()
+		string[] defaultUsers = new string[]
 		{
-			UserName = "dataExporter"
-		}, password);
-
-		await userManager.CreateAsync(new AppUser()
+			"dataExporter",
+			"dataImporter",
+			"translator",
+			"administrator"
+		};
+		foreach (string defaultUser in defaultUsers)
 		{
-			UserName = "dataImporter"
-		}, password);
-
-		await userManager.CreateAsync(new AppUser()
-		{
-			UserName = "translator"
-		}, password);
-
-		await userManager.CreateAsync(new AppUser()
-		{
-			UserName = "administrator",
-		}, password);
+			AppUser dataExporterUser = new AppUser()
+			{
+				UserName = defaultUser
+			};
+			await userManager.CreateAsync(dataExporterUser,password);
+			await userManager.AddToRoleAsync(dataExporterUser,defaultUser);
+		}
 	}
 }
