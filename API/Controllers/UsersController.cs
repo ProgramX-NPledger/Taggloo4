@@ -7,6 +7,7 @@ using API.Helper;
 using API.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,11 +19,11 @@ namespace API.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class UsersController : BaseApiController
 {
-	private readonly IUserRepository _userRepository;
+	private readonly UserManager<AppUser> _userManager;
 
-	public UsersController(IUserRepository userRepository)
+	public UsersController(UserManager<AppUser> userManager)
 	{
-		_userRepository = userRepository;
+		_userManager = userManager;
 	}
 
 	/// <summary>
@@ -34,7 +35,7 @@ public class UsersController : BaseApiController
 	// TODO: Add parameters to allow filtering, paging, return 400 if bad request
 	public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
 	{
-		return Ok(await _userRepository.GetUsersAsync());
+		return Ok(await _userManager.Users.ToListAsync());
 //		return users; // TODO use RESTful DTO
 	}
 
@@ -51,8 +52,10 @@ public class UsersController : BaseApiController
 	[HttpGet("{userName}")]
 	public async Task<ActionResult<GetUserResult>> GetUser(string userName)
 	{
-		AppUser? user = await _userRepository.GetUserByUserNameAsync(userName);
+		string upperedUserName = userName.ToUpper();
+		AppUser? user = await _userManager.Users.SingleOrDefaultAsync(q => q.NormalizedUserName == upperedUserName);
 		if (user == null) return NotFound();
+		
 		return new GetUserResult()
 		{
 			UserName = user.UserName,
@@ -86,39 +89,35 @@ public class UsersController : BaseApiController
 		
 		if (await IsUserExisting(createUser.UserName)) return BadRequest("UserName already in use");
 		
-		// using (HMACSHA512 hmacSha512 = new HMACSHA512())
-		// {
-			AppUser newUser = new AppUser()
-			{
-				UserName = createUser.UserName.ToLower(), // all usernames are lowered for comparison
-				// PasswordHash = hmacSha512.ComputeHash(Encoding.UTF8.GetBytes(createUser.Password)),
-				// PasswordSalt = hmacSha512.Key
-			};
-			_userRepository.Update(newUser);
-			await _userRepository.SaveAllAsync();
+		AppUser newUser = new AppUser()
+		{
+			UserName = createUser.UserName.ToLower(), // all usernames are lowered for comparison
+		};
 
-			string url = $"{GetBaseApiPath()}/users/{newUser.UserName}";
-			CreateUserResult createUserResult = new CreateUserResult()
+		var result = await _userManager.CreateAsync(newUser, createUser.Password);
+		if (!result.Succeeded) return BadRequest(result.Errors);
+
+		string url = $"{GetBaseApiPath()}/users/{newUser.UserName}";
+		CreateUserResult createUserResult = new CreateUserResult()
+		{
+			UserName = newUser.UserName,
+			Links = new []
 			{
-				UserName = newUser.UserName,
-				Links = new []
+				new Link()
 				{
-					new Link()
-					{
-						Action = "get",
-						Rel = "self",
-						Types = new []{ JSON_MIME_TYPE },
-						HRef = url
-					}
+					Action = "get",
+					Rel = "self",
+					Types = new []{ JSON_MIME_TYPE },
+					HRef = url
 				}
-			};
-			return Created(url, createUserResult);
-		// }
+			}
+		};
+		return Created(url, createUserResult);
 	}
 
 	private async Task<bool> IsUserExisting(string userName)
 	{
-		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-		return await _userRepository.GetUserByUserNameAsync(userName)!=null;
+		string loweredUserName = userName.ToLower();
+		return await _userManager.Users.AnyAsync(q => q.UserName == loweredUserName);
 	}
 }

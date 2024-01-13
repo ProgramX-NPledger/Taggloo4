@@ -1,10 +1,8 @@
-﻿namespace API.Model;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class AppUser
+namespace API.Model;
+
+public class AppUser : IdentityUser<int>
 {
-	public string UserName { get; set; }
-	public int Id { get; set; }
-	public byte[] PasswordHash { get; set; }
-	public byte[] PasswordSalt { get; set; }
-	
+	public ICollection<AppUserRole> UserRoles { get; set; }	
 }

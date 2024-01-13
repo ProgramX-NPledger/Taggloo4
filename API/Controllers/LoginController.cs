@@ -5,6 +5,7 @@ using API.Data;
 using API.DTO;
 using API.Model;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,12 +17,12 @@ namespace API.Controllers;
 [Authorize]
 public class LoginController : BaseApiController
 {
-	private readonly DataContext _dataContext;
+	private readonly UserManager<AppUser> _userManager;
 	private readonly ITokenService _tokenService;
 
-	public LoginController(DataContext dataContext, ITokenService tokenService)
+	public LoginController(UserManager<AppUser> userManager, ITokenService tokenService)
 	{
-		_dataContext = dataContext;
+		_userManager = userManager;
 		_tokenService = tokenService;
 	}
 
@@ -38,21 +39,14 @@ public class LoginController : BaseApiController
 	[HttpPost]
 	public async Task<ActionResult<LoggedInUser>> Post(LoginUser loginUser)
 	{
-		AppUser appUser =
-			await _dataContext.Users.SingleOrDefaultAsync(q => q.UserName == loginUser.UserName.ToLower());
+		string upperedUserName = loginUser.UserName.ToUpper();
+		AppUser? appUser = await _userManager.Users.SingleOrDefaultAsync(q => q.NormalizedUserName == upperedUserName);
 		if (appUser == null) return Unauthorized();
 
-		// using (HMACSHA512 hmacSha512 = new HMACSHA512(appUser.PasswordSalt))
-		// {
-		// 	byte[] hashedPasswordBytes = hmacSha512.ComputeHash(Encoding.UTF8.GetBytes(loginUser.Password));
-
-		// 	if (hashedPasswordBytes.Length != appUser.PasswordHash.Length) return Unauthorized();
-		// 	for (int i = 0; i < hashedPasswordBytes.Length; i++)
-		// 	{
-		// 		if (hashedPasswordBytes[i] != appUser.PasswordHash[i]) return Unauthorized();
-		// 	}
-		//
-		// }
+		if (appUser.UserName == null) throw new NullReferenceException("appUser.UserName");
+		
+		bool isPasswordValid = await _userManager.CheckPasswordAsync(appUser, loginUser.Password);
+		if (!isPasswordValid) return Unauthorized();
 
 		return new LoggedInUser()
 		{

@@ -3,8 +3,10 @@ using System.Text;
 using API.Contract;
 using API.Data;
 using API.Extension;
+using API.Model;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -54,4 +56,22 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    IServiceProvider services = scope.ServiceProvider;
+    try
+    {
+        var dataContext = services.GetRequiredService<DataContext>();
+        await dataContext.Database.MigrateAsync();
+        UserManager<AppUser> userManager = services.GetRequiredService<UserManager<AppUser>>();
+        await Seed.SeedUsers(userManager);
+    }
+    catch (Exception ex)
+    {
+        ILogger<Program>? logger = services.GetService<ILogger<Program>>();
+        if (logger != null) logger.LogError(ex, "An error occurred during migration");
+        else throw;
+    }
+}
 app.Run();
