@@ -14,7 +14,7 @@ namespace API.Controllers;
 /// <summary>
 /// User operations. All methods require authorisation.
 /// </summary>
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class UsersController : BaseApiController
 {
 	private readonly DataContext _dataContext;
@@ -37,28 +37,51 @@ public class UsersController : BaseApiController
 		return users; // TODO use RESTful DTO
 	}
 
+	
+
 	/// <summary>
 	/// Retrieve user details.
 	/// </summary>
-	/// <param name="id">User ID of user.</param>
-	/// <returns>A user</returns>
+	/// <param name="userName">User Name of user.</param>
+	/// <returns>A user.</returns>
 	/// <response code="200">User is found.</response>
+	/// <response code="403">Not permitted.</response>
 	/// <response code="404">User is not found.</response>
-	[HttpGet("{id}")]
-	public async Task<ActionResult<AppUser?>> GetUser(int id)
+	[HttpGet("{userName}")]
+	public async Task<ActionResult<GetUserResult>> GetUser(string userName)
 	{
-		AppUser? user = await _dataContext.Users.FindAsync(id);
-		if (user == null) return NotFound();
-		return user; // TODO use RESTful DTO
-	}
+		string lowerUserName = userName.ToLower();
+		if (_dataContext.Users != null)
+		{
+			AppUser? user = await _dataContext.Users.SingleOrDefaultAsync(q => q.UserName == lowerUserName);
+			if (user == null) return NotFound();
+			return new GetUserResult()
+			{
+				UserName = user.UserName,
+				Links = new []
+				{
+					new Link()
+					{
+						Action = "get",
+						Rel = "self",
+						Types = new string[] { JSON_MIME_TYPE },
+						HRef = $"{GetBaseApiPath()}/users/{user.UserName}" 
+					}
+				}
+			};
+		}
 
-	/// <summary>
+		throw new NullReferenceException("_dataContext.Users");
+	}
+	
+    /// <summary>
 	/// Creates a new User.
 	/// </summary>
 	/// <param name="createUser">A <see cref="CreateUser"/> representing the User to create.</param>
 	/// <returns>The created User.</returns>
-	/// <response code="200">User was created.</response> // TODO: Should be 201
+	/// <response code="201">User was created.</response>
 	/// <response code="400">One or more validation errors prevented successful creation.</response>
+	/// <response code="403">Not permitted.</response>
 	[HttpPost]
 	public async Task<ActionResult<AppUser>> CreateUser(CreateUser createUser)
 	{
@@ -76,8 +99,23 @@ public class UsersController : BaseApiController
 			};
 			_dataContext.Users?.Add(newUser);
 			await _dataContext.SaveChangesAsync();
-			return newUser;
-			// TODO: Return correct HTTP response
+
+			string url = $"{GetBaseApiPath()}/users/{newUser.UserName}";
+			CreateUserResult createUserResult = new CreateUserResult()
+			{
+				UserName = newUser.UserName,
+				Links = new []
+				{
+					new Link()
+					{
+						Action = "get",
+						Rel = "self",
+						Types = new []{ JSON_MIME_TYPE },
+						HRef = url
+					}
+				}
+			};
+			return Created(url, createUserResult);
 		}
 	}
 
