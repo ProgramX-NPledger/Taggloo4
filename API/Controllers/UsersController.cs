@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using API.Contract;
 using API.Data;
 using API.DTO;
 using API.Helper;
@@ -14,14 +15,14 @@ namespace API.Controllers;
 /// <summary>
 /// User operations. All methods require authorisation.
 /// </summary>
-//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class UsersController : BaseApiController
 {
-	private readonly DataContext _dataContext;
+	private readonly IUserRepository _userRepository;
 
-	public UsersController(DataContext dataContext)
+	public UsersController(IUserRepository userRepository)
 	{
-		_dataContext = dataContext;
+		_userRepository = userRepository;
 	}
 
 	/// <summary>
@@ -33,8 +34,8 @@ public class UsersController : BaseApiController
 	// TODO: Add parameters to allow filtering, paging, return 400 if bad request
 	public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
 	{
-		List<AppUser> users = await _dataContext.Users.ToListAsync();
-		return users; // TODO use RESTful DTO
+		return Ok(await _userRepository.GetUsersAsync());
+//		return users; // TODO use RESTful DTO
 	}
 
 	
@@ -50,26 +51,22 @@ public class UsersController : BaseApiController
 	[HttpGet("{userName}")]
 	public async Task<ActionResult<GetUserResult>> GetUser(string userName)
 	{
-		string lowerUserName = userName.ToLower();
-		if (_dataContext.Users != null)
+		AppUser? user = await _userRepository.GetUserByUserNameAsync(userName);
+		if (user == null) return NotFound();
+		return new GetUserResult()
 		{
-			AppUser? user = await _dataContext.Users.SingleOrDefaultAsync(q => q.UserName == lowerUserName);
-			if (user == null) return NotFound();
-			return new GetUserResult()
+			UserName = user.UserName,
+			Links = new []
 			{
-				UserName = user.UserName,
-				Links = new []
+				new Link()
 				{
-					new Link()
-					{
-						Action = "get",
-						Rel = "self",
-						Types = new string[] { JSON_MIME_TYPE },
-						HRef = $"{GetBaseApiPath()}/users/{user.UserName}" 
-					}
+					Action = "get",
+					Rel = "self",
+					Types = new string[] { JSON_MIME_TYPE },
+					HRef = $"{GetBaseApiPath()}/users/{user.UserName}" 
 				}
-			};
-		}
+			}
+		};
 
 		throw new NullReferenceException("_dataContext.Users");
 	}
@@ -89,16 +86,16 @@ public class UsersController : BaseApiController
 		
 		if (await IsUserExisting(createUser.UserName)) return BadRequest("UserName already in use");
 		
-		using (HMACSHA512 hmacSha512 = new HMACSHA512())
-		{
+		// using (HMACSHA512 hmacSha512 = new HMACSHA512())
+		// {
 			AppUser newUser = new AppUser()
 			{
 				UserName = createUser.UserName.ToLower(), // all usernames are lowered for comparison
-				PasswordHash = hmacSha512.ComputeHash(Encoding.UTF8.GetBytes(createUser.Password)),
-				PasswordSalt = hmacSha512.Key
+				// PasswordHash = hmacSha512.ComputeHash(Encoding.UTF8.GetBytes(createUser.Password)),
+				// PasswordSalt = hmacSha512.Key
 			};
-			_dataContext.Users?.Add(newUser);
-			await _dataContext.SaveChangesAsync();
+			_userRepository.Update(newUser);
+			await _userRepository.SaveAllAsync();
 
 			string url = $"{GetBaseApiPath()}/users/{newUser.UserName}";
 			CreateUserResult createUserResult = new CreateUserResult()
@@ -116,12 +113,12 @@ public class UsersController : BaseApiController
 				}
 			};
 			return Created(url, createUserResult);
-		}
+		// }
 	}
 
 	private async Task<bool> IsUserExisting(string userName)
 	{
-		string lowerUserName = userName.ToLower();
-		return _dataContext.Users != null && await _dataContext.Users.AnyAsync(q => q.UserName==lowerUserName);
+		// ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+		return await _userRepository.GetUserByUserNameAsync(userName)!=null;
 	}
 }

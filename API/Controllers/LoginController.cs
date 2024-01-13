@@ -42,17 +42,17 @@ public class LoginController : BaseApiController
 			await _dataContext.Users.SingleOrDefaultAsync(q => q.UserName == loginUser.UserName.ToLower());
 		if (appUser == null) return Unauthorized();
 
-		using (HMACSHA512 hmacSha512 = new HMACSHA512(appUser.PasswordSalt))
-		{
-			byte[] hashedPasswordBytes = hmacSha512.ComputeHash(Encoding.UTF8.GetBytes(loginUser.Password));
+		// using (HMACSHA512 hmacSha512 = new HMACSHA512(appUser.PasswordSalt))
+		// {
+		// 	byte[] hashedPasswordBytes = hmacSha512.ComputeHash(Encoding.UTF8.GetBytes(loginUser.Password));
 
-			if (hashedPasswordBytes.Length != appUser.PasswordHash.Length) return Unauthorized();
-			for (int i = 0; i < hashedPasswordBytes.Length; i++)
-			{
-				if (hashedPasswordBytes[i] != appUser.PasswordHash[i]) return Unauthorized();
-			}
-
-		}
+		// 	if (hashedPasswordBytes.Length != appUser.PasswordHash.Length) return Unauthorized();
+		// 	for (int i = 0; i < hashedPasswordBytes.Length; i++)
+		// 	{
+		// 		if (hashedPasswordBytes[i] != appUser.PasswordHash[i]) return Unauthorized();
+		// 	}
+		//
+		// }
 
 		return new LoggedInUser()
 		{
