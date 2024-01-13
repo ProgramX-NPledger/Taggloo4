@@ -4,6 +4,7 @@ using API.Data;
 using API.DTO;
 using API.Helper;
 using API.Model;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ namespace API.Controllers;
 /// <summary>
 /// User operations. All methods require authorisation.
 /// </summary>
-//[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class UsersController : BaseApiController
 {
 	private readonly DataContext _dataContext;
@@ -44,7 +45,6 @@ public class UsersController : BaseApiController
 	/// <response code="200">User is found.</response>
 	/// <response code="404">User is not found.</response>
 	[HttpGet("{id}")]
-	[Authorize]
 	public async Task<ActionResult<AppUser?>> GetUser(int id)
 	{
 		AppUser? user = await _dataContext.Users.FindAsync(id);
