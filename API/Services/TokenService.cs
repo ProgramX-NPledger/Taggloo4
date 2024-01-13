@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using API.Contract;
 using API.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services;
@@ -10,6 +11,7 @@ namespace API.Services;
 public class TokenService : ITokenService
 {
 	private readonly IConfiguration _configuration;
+	private readonly UserManager<AppUser> _userManager;
 	private readonly SymmetricSecurityKey _symmetricSecurityKey;
 
 	/// <summary>
@@ -17,9 +19,10 @@ public class TokenService : ITokenService
 	/// </summary>
 	public const string JWT_TOKEN_KEY_CONFIG_KEY = "Security:JwtPolicy:TokenKey";
 	
-	public TokenService(IConfiguration configuration)
+	public TokenService(IConfiguration configuration, UserManager<AppUser> userManager)
 	{
 		_configuration = configuration;
+		_userManager = userManager;
 		string? jwtTokenKey = _configuration[JWT_TOKEN_KEY_CONFIG_KEY];
 		if (jwtTokenKey == null) throw new ArgumentNullException($"{JWT_TOKEN_KEY_CONFIG_KEY} is invalid");
 		
@@ -27,7 +30,7 @@ public class TokenService : ITokenService
 			new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenKey));
 	}
 	
-	public string CreateToken(AppUser user)
+	public async Task<string> CreateToken(AppUser user)
 	{
 		List<Claim> claims = new List<Claim>
 		{
@@ -35,6 +38,9 @@ public class TokenService : ITokenService
 			// could use claims to identify roles
 		};
 
+		IList<string> roles = await _userManager.GetRolesAsync(user);
+		claims.AddRange(roles.Select(q=>new Claim(ClaimTypes.Role, q)));
+		
 		SigningCredentials credentials = new SigningCredentials(_symmetricSecurityKey, SecurityAlgorithms.HmacSha512Signature);
 
 		string securityJwtPolicyExpirationSecsConfigKey = "Security:JwtPolicy:ExpirationSecs";

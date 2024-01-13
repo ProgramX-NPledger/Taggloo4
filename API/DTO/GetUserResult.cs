@@ -15,6 +15,10 @@ public class GetUserResult
 	/// <summary>
 	/// A list of Links referring to related Entities.
 	/// </summary>
-	[JsonPropertyName("links")]
 	public IEnumerable<Link> Links { get; set; }
+	
+	/// <summary>
+	/// The roles the user is a member of
+	/// </summary>
+	public IEnumerable<string> HasRoles { get; set; }
 }

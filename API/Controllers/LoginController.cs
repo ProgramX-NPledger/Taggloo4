@@ -51,7 +51,7 @@ public class LoginController : BaseApiController
 		return new LoggedInUser()
 		{
 			UserName = appUser.UserName,
-			Token = _tokenService.CreateToken(appUser)
+			Token = await _tokenService.CreateToken(appUser)
 		};
 	}
 }
