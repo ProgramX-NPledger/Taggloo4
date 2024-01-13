@@ -97,6 +97,7 @@ public class UsersController : BaseApiController
 	/// <response code="400">One or more validation errors prevented successful creation.</response>
 	/// <response code="403">Not permitted.</response>
 	[HttpPost]
+	[Authorize(Roles="administrator")]
 	public async Task<ActionResult<AppUser>> CreateUser(CreateUser createUser)
 	{
 		if (!PasswordStrength.IsPasswordStrongEnough(createUser.Password)) return BadRequest("Password does not meet minimum strength requirements");
