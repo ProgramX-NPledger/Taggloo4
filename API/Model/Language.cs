@@ -11,6 +11,7 @@ public class Language
 	
 	[Required] 
 	public string Name { get; set; }
-	
+
+	public ICollection<Dictionary> Dictionaries { get; set; }
 	
 }

@@ -18,6 +18,7 @@ public static class ApplicationServiceExtensions
 		services.AddScoped<ITokenService, TokenService>();
 		services.AddScoped<IUserRepository, UserRepository>();
 		services.AddScoped<ILanguageRepository, LanguageRepository>();
+		services.AddScoped<IDictionaryRepository, DictionaryRepository>();
 		
 		return services;
 	}

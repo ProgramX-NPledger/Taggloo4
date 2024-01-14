@@ -15,6 +15,7 @@ public class DataContext : IdentityDbContext<AppUser,
 	IdentityUserToken<int>>
 {
 	public DbSet<Language> Languages { get; set; }
+	public DbSet<Dictionary> Dictionaries { get; set; }
 	
 	public DataContext(DbContextOptions options) : base(options)
 	{
@@ -35,6 +36,13 @@ public class DataContext : IdentityDbContext<AppUser,
 			.WithOne(r => r.Role)
 			.HasForeignKey(ur => ur.RoleId)
 			.IsRequired();
+
+		builder.Entity<Language>()
+			.HasMany(l => l.Dictionaries)
+			.WithOne(d => d.Language)
+			.HasForeignKey(d => d.IetfLanguageTag)
+			.IsRequired();
+
 
 	}
 }

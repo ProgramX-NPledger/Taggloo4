@@ -124,6 +124,47 @@ namespace API.Data.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
+            modelBuilder.Entity("API.Model.Dictionary", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedByUserName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedOn")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IetfLanguageTag")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IetfLanguageTag");
+
+                    b.ToTable("Dictionaries");
+                });
+
             modelBuilder.Entity("API.Model.Language", b =>
                 {
                     b.Property<string>("IetfLanguageTag")
@@ -242,6 +283,17 @@ namespace API.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("API.Model.Dictionary", b =>
+                {
+                    b.HasOne("API.Model.Language", "Language")
+                        .WithMany("Dictionaries")
+                        .HasForeignKey("IetfLanguageTag")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Language");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("API.Model.AppRole", null)
@@ -286,6 +338,11 @@ namespace API.Data.Migrations
             modelBuilder.Entity("API.Model.AppUser", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("API.Model.Language", b =>
+                {
+                    b.Navigation("Dictionaries");
                 });
 #pragma warning restore 612, 618
         }
