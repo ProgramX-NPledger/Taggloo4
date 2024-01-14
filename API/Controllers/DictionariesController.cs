@@ -98,7 +98,7 @@ public class DictionariesController : BaseApiController
 	/// <response code="400">One or more validation errors prevented successful creation.</response>
 	/// <response code="403">Not permitted.</response>
 	[HttpPost]
-	[Authorize(Roles="administrator")]
+	[Authorize(Roles="administrator,dataImporter")]
 	public async Task<ActionResult<CreateDictionaryResult>> CreateDictionary(CreateDictionary createDictionary)
 	{
 		Language? language = await _languageRepository.GetLanguageByIetfLanguageTag(createDictionary.IetfLanguageTag);
