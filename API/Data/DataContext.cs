@@ -14,6 +14,8 @@ public class DataContext : IdentityDbContext<AppUser,
 	IdentityRoleClaim<int>,
 	IdentityUserToken<int>>
 {
+	public DbSet<Language> Languages { get; set; }
+	
 	public DataContext(DbContextOptions options) : base(options)
 	{
 	}
