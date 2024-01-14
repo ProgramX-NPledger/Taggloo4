@@ -28,6 +28,12 @@ public class DictionaryRepository : IDictionaryRepository
 		return await _dataContext.SaveChangesAsync() > 0;
 	}
 
+	public async Task<Dictionary?> GetById(int id)
+	{
+		return await _dataContext.Dictionaries.SingleOrDefaultAsync(q => q.Id == id);
+	}
+
+
 	// public async Task<IEnumerable<Language>> GetAllLanguagesAsync()
 	// {
 	// 	return await _dataContext.Languages.ToListAsync();

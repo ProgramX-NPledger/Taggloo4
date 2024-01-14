@@ -180,6 +180,40 @@ namespace API.Data.Migrations
                     b.ToTable("Languages");
                 });
 
+            modelBuilder.Entity("API.Model.Word", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedByUserName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedOn")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("DictionaryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TheWord")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DictionaryId");
+
+                    b.HasIndex("TheWord")
+                        .IsUnique();
+
+                    b.ToTable("Words");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
@@ -294,6 +328,17 @@ namespace API.Data.Migrations
                     b.Navigation("Language");
                 });
 
+            modelBuilder.Entity("API.Model.Word", b =>
+                {
+                    b.HasOne("API.Model.Dictionary", "Dictionary")
+                        .WithMany("Words")
+                        .HasForeignKey("DictionaryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dictionary");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("API.Model.AppRole", null)
@@ -338,6 +383,11 @@ namespace API.Data.Migrations
             modelBuilder.Entity("API.Model.AppUser", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("API.Model.Dictionary", b =>
+                {
+                    b.Navigation("Words");
                 });
 
             modelBuilder.Entity("API.Model.Language", b =>

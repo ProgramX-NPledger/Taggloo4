@@ -9,11 +9,10 @@ namespace API.DTO;
 public class CreateWord
 {
 	/// <summary>
-	/// The international code for the Language of the Word.
-	/// This is a combination of ISO 639, ISO 15924m ISO 3166-1 anf UN M.49. 
+	/// Identifier of the Dictionary that will contain the Word
 	/// </summary>
-	[Required]
-	public required string IetfLanguageTag { get; set; }
+	public int DictionaryId { get; set; }
+	
 	
 	/// <summary>
 	/// The Word to create, in the language specified by <c>IetfLanguageTag</c>.

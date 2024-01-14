@@ -16,6 +16,7 @@ public class DataContext : IdentityDbContext<AppUser,
 {
 	public DbSet<Language> Languages { get; set; }
 	public DbSet<Dictionary> Dictionaries { get; set; }
+	public DbSet<Word> Words { get; set; }
 	
 	public DataContext(DbContextOptions options) : base(options)
 	{
@@ -43,6 +44,11 @@ public class DataContext : IdentityDbContext<AppUser,
 			.HasForeignKey(d => d.IetfLanguageTag)
 			.IsRequired();
 
+		builder.Entity<Dictionary>()
+			.HasMany(d => d.Words)
+			.WithOne(w => w.Dictionary)
+			.HasForeignKey(w => w.DictionaryId)
+			.IsRequired();
 
 	}
 }

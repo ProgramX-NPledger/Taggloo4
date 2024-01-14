@@ -23,5 +23,9 @@ public class Dictionary
 	public required string CreatedOn { get; set; }
 
 	public Language Language { get; set; }
+
+	public ICollection<Word> Words { get; set; }
+
+	
 	
 }
