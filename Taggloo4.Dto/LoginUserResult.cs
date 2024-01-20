@@ -1,10 +1,10 @@
-﻿namespace API.DTO;
+﻿namespace Taggloo4.Dto;
 
 /// <summary>
 /// Represents a successful log in for a User, including a JWT Token that must be
 /// provided for all authenticated requests.
 /// </summary>
-public class LoggedInUser
+public class LoginUserResult
 {
 	/// <summary>
 	/// UserName of the User.
