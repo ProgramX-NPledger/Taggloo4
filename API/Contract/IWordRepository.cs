@@ -8,7 +8,9 @@ public interface IWordRepository
 	void Create(Word word);
 	Task<bool> SaveAllAsync();
 
-	Task<Word> GetWordByWord(string word);
+	Task<Word?> GetWordByWordWithinDictionary(string word, int dictionaryId);
+
+	Task<Word?> GetById(int id);
 	
 	//Task<IEnumerable<Word>> GetAllWordsAsync();
 	// Task<AppUser> GetUserByIdAsync(int id);

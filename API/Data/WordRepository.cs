@@ -28,10 +28,13 @@ public class WordRepository : IWordRepository
 		return await _dataContext.SaveChangesAsync() > 0;
 	}
 
-	public async Task<Word> GetWordByWord(string word)
+	public async Task<Word?> GetWordByWordWithinDictionary(string word, int dictionaryId)
 	{
-		return await _dataContext.Words.SingleOrDefaultAsync(q => q.TheWord == word);
+		return await _dataContext.Words.SingleOrDefaultAsync(q => q.TheWord == word && q.DictionaryId==dictionaryId);
 	}
 
-
+	public async Task<Word?> GetById(int id)
+	{
+		return await _dataContext.Words.SingleOrDefaultAsync(q => q.Id == id);
+	}
 }

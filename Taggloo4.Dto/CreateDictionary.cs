@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
-
-namespace API.DTO;
+﻿namespace Taggloo4.Dto;
 
 /// <summary>
 /// Represents a Dictionary to be created using the POST Dictonaries method.
@@ -16,12 +13,12 @@ public class CreateDictionary
 	/// <summary>
 	/// Description of the Dictionary.
 	/// </summary>
-	public string Description { get; set; }
+	public required string Description { get; set; }
 
 	/// <summary>
 	/// URL of the source of the Dictionary.
 	/// </summary>
-	public string SourceUrl { get; set; }
+	public required string SourceUrl { get; set; }
 
 	/// <summary>
 	/// IETF Language Tag for the Dictionary.

@@ -26,6 +26,7 @@ public class Dictionary
 
 	public ICollection<Word> Words { get; set; }
 
+	public ICollection<WordTranslation> WordTranslations { get; set; }
 	
 	
 }

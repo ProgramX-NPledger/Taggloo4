@@ -11,7 +11,7 @@ Parser.Default.ParseArguments<ImportOptions>(args)
 			Importer importer = new Importer(importOptions);
 			try
 			{
-				return importer.Process();
+				return importer.Process().Result;
 			}
 			catch (Exception? ex)
 			{
@@ -27,9 +27,6 @@ Parser.Default.ParseArguments<ImportOptions>(args)
 		errors=>1
 	);
 
-static int ImportOptions(ImportOptions options)
-{
-	
-}
+
 
 	

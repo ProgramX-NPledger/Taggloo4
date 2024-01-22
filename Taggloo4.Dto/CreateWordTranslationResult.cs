@@ -1,14 +1,14 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace API.DTO;
+namespace Taggloo4.Dto;
 
 /// <summary>
 /// Result of a Word creation request.
 /// </summary>
-public class CreateWordResult
+public class CreateWordTranslationResult
 {
 	/// <summary>
-	/// Internal identification of Word
+	/// Internal identification of Word Translation
 	/// </summary>
 	public int Id { get; set; }
 	

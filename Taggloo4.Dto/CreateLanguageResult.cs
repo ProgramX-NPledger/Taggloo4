@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace API.DTO;
+namespace Taggloo4.Dto;
 
 /// <summary>
 /// Result of a Language creation request.

@@ -206,12 +206,47 @@ namespace API.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DictionaryId");
-
-                    b.HasIndex("TheWord")
+                    b.HasIndex("DictionaryId", "TheWord")
                         .IsUnique();
 
                     b.ToTable("Words");
+                });
+
+            modelBuilder.Entity("API.Model.WordTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedByUserName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedOn")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("DictionaryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FromWordId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ToWordId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DictionaryId");
+
+                    b.HasIndex("FromWordId");
+
+                    b.HasIndex("ToWordId");
+
+                    b.ToTable("WordTranslation");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -339,6 +374,33 @@ namespace API.Data.Migrations
                     b.Navigation("Dictionary");
                 });
 
+            modelBuilder.Entity("API.Model.WordTranslation", b =>
+                {
+                    b.HasOne("API.Model.Dictionary", "Dictionary")
+                        .WithMany("WordTranslations")
+                        .HasForeignKey("DictionaryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Model.Word", "FromWord")
+                        .WithMany("Translations")
+                        .HasForeignKey("FromWordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Model.Word", "ToWord")
+                        .WithMany()
+                        .HasForeignKey("ToWordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dictionary");
+
+                    b.Navigation("FromWord");
+
+                    b.Navigation("ToWord");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("API.Model.AppRole", null)
@@ -387,12 +449,19 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Model.Dictionary", b =>
                 {
+                    b.Navigation("WordTranslations");
+
                     b.Navigation("Words");
                 });
 
             modelBuilder.Entity("API.Model.Language", b =>
                 {
                     b.Navigation("Dictionaries");
+                });
+
+            modelBuilder.Entity("API.Model.Word", b =>
+                {
+                    b.Navigation("Translations");
                 });
 #pragma warning restore 612, 618
         }

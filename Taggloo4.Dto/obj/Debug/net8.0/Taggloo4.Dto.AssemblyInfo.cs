@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Taggloo4.Dto")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+adb4485190ec3b23dbe5d28159b3b4db851c67be")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eb2c2bf5382d2fe81d351f0c9d85b6d4db630c26")]
 [assembly: System.Reflection.AssemblyProductAttribute("Taggloo4.Dto")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Taggloo4.Dto")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

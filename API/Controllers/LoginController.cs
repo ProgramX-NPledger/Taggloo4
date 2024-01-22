@@ -2,7 +2,6 @@
 using System.Text;
 using API.Contract;
 using API.Data;
-using API.DTO;
 using API.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

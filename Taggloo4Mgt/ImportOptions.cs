@@ -5,7 +5,7 @@ namespace Taggloo4Mgt;
 [Verb("import", HelpText = "Import from a Taggloo v2 SQL Server data source")]
 public class ImportOptions
 {
-	[Option(HelpText="Connection string of source MS SQL Server database", Required=tru)]
+	[Option(HelpText="Connection string of source MS SQL Server database", Required=true)]
 	public string SourceConnectionString { get; set; }
 	
 	[Option(HelpText="Username of Taggloo 4 API", Required=true)] 

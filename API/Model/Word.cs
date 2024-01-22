@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Model;
 
-[Index(nameof(TheWord),IsUnique = true)]
 public class Word
 {
 	public int Id { get; set; }
@@ -20,5 +20,8 @@ public class Word
 	public Dictionary Dictionary { get; set; }
 	
 	public int DictionaryId { get; set; }
+
+	public ICollection<WordTranslation> Translations { get; set; }
+	
 	
 }

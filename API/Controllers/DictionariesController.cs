@@ -1,11 +1,11 @@
 ﻿using API.Contract;
-using API.DTO;
 using API.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Taggloo4.Dto;
 
 namespace API.Controllers;
 
