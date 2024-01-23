@@ -6,17 +6,20 @@ namespace Taggloo4Mgt;
 public class ImportOptions
 {
 	[Option(HelpText="Connection string of source MS SQL Server database", Required=true)]
-	public string SourceConnectionString { get; set; }
+	public required string SourceConnectionString { get; set; }
 	
 	[Option(HelpText="Username of Taggloo 4 API", Required=true)] 
-	public string UserName { get; set; }
+	public required string UserName { get; set; }
 	
 	[Option(HelpText = "Password of Taggloo 4 API", Required=true)]
-	public string Password { get; set; }
+	public required string Password { get; set; }
 	
 	[Option(HelpText="Url of Taggloo 4 API",Required = true)]
-	public string Url { get; set; }
-	
-	
-	
+	public required string Url { get; set; }
+
+	[Option(HelpText = "Log processing")]
+	public bool Log { get; set; } = false;
+
+
+
 }
