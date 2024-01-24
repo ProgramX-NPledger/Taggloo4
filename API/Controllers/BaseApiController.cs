@@ -23,4 +23,10 @@ public class BaseApiController : ControllerBase
 	{
 		return User.FindFirstValue(ClaimTypes.NameIdentifier);
 	}
+
+	protected void AssertApiConstraints(int itemCount)
+	{
+		if (itemCount > Defaults.MaximumPermittedItemsPerRequest)
+			throw new BadHttpRequestException($"Requested item count exceeds maximum permitted value of {Defaults.MaximumPermittedItemsPerRequest}");
+	}
 }

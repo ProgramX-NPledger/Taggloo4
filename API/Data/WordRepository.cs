@@ -28,9 +28,20 @@ public class WordRepository : IWordRepository
 		return await _dataContext.SaveChangesAsync() > 0;
 	}
 
-	public async Task<Word?> GetWordByWordWithinDictionary(string word, int dictionaryId)
+	public async Task<IEnumerable<Word>> GetWords(string word, int? dictionaryId)
 	{
-		return await _dataContext.Words.SingleOrDefaultAsync(q => q.TheWord == word && q.DictionaryId==dictionaryId);
+		IQueryable<Word> query = _dataContext.Words.AsQueryable();
+		if (!string.IsNullOrWhiteSpace(word))
+		{
+			query = query.Where(q => q.TheWord == word);
+		}
+
+		if (dictionaryId.HasValue)
+		{
+			query = query.Where(q => q.DictionaryId == dictionaryId.Value);
+		}
+
+		return await query.ToArrayAsync();
 	}
 
 	public async Task<Word?> GetById(int id)

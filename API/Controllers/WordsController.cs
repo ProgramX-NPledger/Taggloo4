@@ -31,68 +31,55 @@ public class WordsController : BaseApiController
 		
 	}
 
-// 	/// <summary>
-// 	/// Gets all Users.
-// 	/// </summary>
-// 	/// <returns></returns>
-// 	/// <response code="200">Request was successful.</response>
-// 	[HttpGet]
-// 	// TODO: Add parameters to allow filtering, paging, return 400 if bad request
-// 	public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
-// 	{
-// 		return Ok(await _userManager.Users.ToListAsync());
-// //		return users; // TODO use RESTful DTO
-// 	}
-//
-	
+	[HttpGet("{word}")]
+	[Authorize(Roles="administrator, dataExporter")]
+	public async Task<ActionResult<GetWordsResult>> GetWords(string word, int? dictionaryId, int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
+	{
+		AssertApiConstraints(pageSize);
+		
+		IEnumerable<Word> words = (await _wordRepository.GetWords(word, dictionaryId)).ToArray();
 
-	// /// <summary>
-	// /// Retrieve user details.
-	// /// </summary>
-	// /// <param name="userName">User Name of user.</param>
-	// /// <returns>A user.</returns>
-	// /// <response code="200">User is found.</response>
-	// /// <response code="403">Not permitted.</response>
-	// /// <response code="404">User is not found.</response>
-	// [Authorize(Roles="administrator")]
-	// [HttpGet("{userName}")]
-	// public async Task<ActionResult<GetUserResult>> GetUser(string userName)
-	// {
-	// 	string upperedUserName = userName.ToUpper();
-	// 	AppUser? user = await _userManager.Users.SingleOrDefaultAsync(q => q.NormalizedUserName == upperedUserName);
-	// 	if (user == null) return NotFound();
-	//
-	// 	List<Link> links = new List<Link>
-	// 	{
-	// 		new Link()
-	// 		{
-	// 			Action = "get",
-	// 			Rel = "self",
-	// 			Types = new string[] { JSON_MIME_TYPE },
-	// 			HRef = $"{GetBaseApiPath()}/users/{user.UserName}" 
-	// 		}
-	// 	};
-	//
-	// 	IList<string> roles = await _userManager.GetRolesAsync(user);
-	// 	roles.ToList().ForEach(x =>
-	// 	{
-	// 		links.Add(new Link()
-	// 		{
-	// 			Action = "get",
-	// 			Rel = "role",
-	// 			Types = new string[] { JSON_MIME_TYPE },
-	// 			HRef = $"{GetBaseApiPath()}/roles/{x}"
-	// 		});
-	// 	});
-	// 	
-	// 	return new GetUserResult()
-	// 	{
-	// 		UserName = user.UserName ?? string.Empty,
-	// 		HasRoles = await _userManager.GetRolesAsync(user),
-	// 		Links = links
-	// 	};
-	// }
-	//
+		GetWordsResult getWordsResult = new GetWordsResult()
+		{
+			Results = words.Skip(offsetIndex).Take(pageSize).Select(w => new GetWordResultItem()
+			{
+				Id = w.Id,
+				Word = w.TheWord,
+				Links = new[]
+				{
+					new Link()
+					{
+						Action = "get",
+						Rel = "self",
+						Types = new[] { JSON_MIME_TYPE },
+						HRef = $"{GetBaseApiPath()}/words/{w.Id}"
+					},
+					new Link()
+					{
+						Action = "get",
+						Rel = "dictionary",
+						Types = new[] { JSON_MIME_TYPE },
+						HRef = $"{GetBaseApiPath()}/dictionary/{w.DictionaryId}"
+					}
+				}
+			}),
+			Links = new[]
+			{
+				new Link()
+				{
+					Action = "get",
+					Rel = "self",
+					Types = new[] { JSON_MIME_TYPE },
+					HRef = $"{GetBaseApiPath()}/api/v4/words/{word}?offsetIndex={offsetIndex}&pageSize={pageSize}"
+				}
+			},
+			FromIndex = offsetIndex,
+			PageSize = pageSize,
+			TotalItemsCount = words.Count()
+		};
+		return getWordsResult;
+	}
+	
 	
     /// <summary>
 	/// Creates a new Word.
@@ -111,8 +98,8 @@ public class WordsController : BaseApiController
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 		
 		// does the word for the language already exist? If so, reject - maybe a translation is required
-		Word? existingWord = await _wordRepository.GetWordByWordWithinDictionary(createWord.Word, dictionary.Id);
-		if (existingWord != null)
+		IEnumerable<Word> existingWord = await _wordRepository.GetWords(createWord.Word, dictionary.Id);
+		if (existingWord.Any())
 			return BadRequest("Word already exists, perhaps a Translation from the existing Word is appropriate?");
 		
 		Word newWord = new Word()
@@ -183,8 +170,8 @@ public class WordsController : BaseApiController
 		    !word.TheWord.Equals(updateWord.Word))
 		{
 			// changing the word is dangerous. Ensure the new word doesn't already exist
-			Word? newWord = await _wordRepository.GetWordByWordWithinDictionary(updateWord.Word,updateWord.DictionaryId);
-			if (newWord != null) return BadRequest("The word is being renamed to another Word that already exists within the Dictionary");
+			IEnumerable<Word>? newWord = await _wordRepository.GetWords(updateWord.Word,updateWord.DictionaryId);
+			if (newWord.Any()) return BadRequest("The word is being renamed to another Word that already exists within the Dictionary");
 
 			word.TheWord = updateWord.Word;
 		}
@@ -243,17 +230,4 @@ public class WordsController : BaseApiController
 	}
 
 	
-
-	private string EnsureCorrectlyCasedIetfLanguageTag(string ietfLanguageTag)
-	{
-		if (ietfLanguageTag.Contains("-"))
-		{
-			string[] split = ietfLanguageTag.Split(new char[] { '-' });
-			split[0] = split[0].ToLower();
-			string rejoined = string.Join('-', split);
-			return rejoined;
-		}
-
-		return ietfLanguageTag;
-	}
 }

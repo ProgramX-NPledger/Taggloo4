@@ -8,7 +8,8 @@ public interface IWordRepository
 	void Create(Word word);
 	Task<bool> SaveAllAsync();
 
-	Task<Word?> GetWordByWordWithinDictionary(string word, int dictionaryId);
+	Task<IEnumerable<Word>> GetWords(string word, int? dictionaryId);
+	
 
 	Task<Word?> GetById(int id);
 	

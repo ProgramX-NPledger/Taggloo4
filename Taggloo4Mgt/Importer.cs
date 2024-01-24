@@ -106,17 +106,34 @@ public class Importer
 								}
 							
 								// post word
-								CreateWordResult otherCreateWordResult=await PostWordToTarget(httpClient, translation.TheTranslation, dictionariesAtTargetDictionary[translation.LanguageCode]);
-							
-								// this will set the creation meta data for the target word to that of the Translation
-								await UpdateWordAtTargetWithMetaData(httpClient, otherCreateWordResult.Id, translation.CreatedByUserName,translation.CreatedAt);
-								Log($"\t\t\t\t\t\t\tWord ID {otherCreateWordResult.Id} created");
+								// we need to see if the word already exists. If it does, do not create another word, instead link the existing
+								GetWordsResult getOtherWordResult = await GetOtherWord(httpClient,
+									translation.TheTranslation, dictionariesAtTargetDictionary[languageCode]);
+								int otherWordId;
+								if (getOtherWordResult.TotalItemsCount == 0)
+								{
+									// the word doesn't already exist
+									CreateWordResult otherCreateWordResult = await PostWordToTarget(httpClient,
+										translation.TheTranslation,
+										dictionariesAtTargetDictionary[translation.LanguageCode]);
+									otherWordId = otherCreateWordResult.Id;
+
+									// this will set the creation meta data for the target word to that of the Translation
+									await UpdateWordAtTargetWithMetaData(httpClient, otherWordId, translation.CreatedByUserName,translation.CreatedAt);
+									Log($"\t\t\t\t\t\t\tWord ID {otherWordId} created");
+
+								}
+								else
+								{
+									otherWordId = getOtherWordResult.Results.First().Id;
+									Log($"\t\t\t\t\t\t\tWord ID {otherWordId} already exists, adding translation");
+								}
 								
 								// post translation
-								CreateWordTranslationResult? createWordTranslationResult = await PostTranslationBetweenWords(httpClient,createWordResult.Id,otherCreateWordResult.Id,dictionariesAtTargetDictionary[languageCode]);
+								CreateWordTranslationResult? createWordTranslationResult = await PostTranslationBetweenWords(httpClient,createWordResult.Id,otherWordId,dictionariesAtTargetDictionary[languageCode]);
 
 								await UpdateWordTranslationAtTargetWithMetaData(httpClient,
-									createWordTranslationResult.Id, translation.CreatedByUserName,
+									createWordTranslationResult!.Id, translation.CreatedByUserName,
 									translation.CreatedAt);
 								Log($"\t\t\t\t\t\t\tTranslation ID {createWordTranslationResult.Id} created");
 							}
@@ -154,6 +171,7 @@ public class Importer
 		return 0;
 
 	}
+
 
 	private void UpdateProgressBar(int wordsProcessed, int totalWords, string languageCode, string theWord)
 	{
@@ -244,6 +262,23 @@ public class Importer
 		return createDictionaryResult!;
 	}
 
+	private async Task<GetWordsResult> GetOtherWord(HttpClient httpClient, string word, int dictionaryId)
+	{
+		string url = $"/api/v4/words/{word}?dictionaryId={dictionaryId}";
+
+		HttpResponseMessage response = await httpClient.GetAsync(url);
+		if (!response.IsSuccessStatusCode)
+		{
+			throw new InvalidOperationException(
+				$"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
+		}
+
+		GetWordsResult? getWordsResult = await response.Content.ReadFromJsonAsync<GetWordsResult>();
+		return getWordsResult!;
+
+	}
+
+	
 	private async Task<IEnumerable<Translation>> GetTranslationsForWord(SqlConnection sqlConnection,
 		Word wordInLanguage, IEnumerable<string> sourceLanguageCodes)
 	{
