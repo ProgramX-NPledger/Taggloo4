@@ -108,7 +108,7 @@ public class Importer
 								// post word
 								// we need to see if the word already exists. If it does, do not create another word, instead link the existing
 								GetWordsResult getOtherWordResult = await GetOtherWord(httpClient,
-									translation.TheTranslation, dictionariesAtTargetDictionary[languageCode]);
+									translation.TheTranslation, dictionariesAtTargetDictionary[translation.LanguageCode]);
 								int otherWordId;
 								if (getOtherWordResult.TotalItemsCount == 0)
 								{
