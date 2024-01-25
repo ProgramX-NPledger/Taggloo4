@@ -3,6 +3,7 @@ using System;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240114113431_AddLanguage")]
+    partial class AddLanguage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.1");
@@ -124,47 +127,6 @@ namespace API.Data.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("API.Model.Dictionary", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedByUserName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedOn")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("IetfLanguageTag")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SourceUrl")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IetfLanguageTag");
-
-                    b.ToTable("Dictionaries");
-                });
-
             modelBuilder.Entity("API.Model.Language", b =>
                 {
                     b.Property<string>("IetfLanguageTag")
@@ -178,75 +140,6 @@ namespace API.Data.Migrations
                     b.HasKey("IetfLanguageTag");
 
                     b.ToTable("Languages");
-                });
-
-            modelBuilder.Entity("API.Model.Word", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedByUserName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedOn")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("DictionaryId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("TheWord")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DictionaryId", "TheWord")
-                        .IsUnique();
-
-                    b.ToTable("Words");
-                });
-
-            modelBuilder.Entity("API.Model.WordTranslation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedByUserName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedOn")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("DictionaryId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("FromWordId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ToWordId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DictionaryId");
-
-                    b.HasIndex("FromWordId");
-
-                    b.HasIndex("ToWordId");
-
-                    b.ToTable("WordTranslation");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -352,55 +245,6 @@ namespace API.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("API.Model.Dictionary", b =>
-                {
-                    b.HasOne("API.Model.Language", "Language")
-                        .WithMany("Dictionaries")
-                        .HasForeignKey("IetfLanguageTag")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Language");
-                });
-
-            modelBuilder.Entity("API.Model.Word", b =>
-                {
-                    b.HasOne("API.Model.Dictionary", "Dictionary")
-                        .WithMany("Words")
-                        .HasForeignKey("DictionaryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Dictionary");
-                });
-
-            modelBuilder.Entity("API.Model.WordTranslation", b =>
-                {
-                    b.HasOne("API.Model.Dictionary", "Dictionary")
-                        .WithMany("WordTranslations")
-                        .HasForeignKey("DictionaryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("API.Model.Word", "FromWord")
-                        .WithMany("Translations")
-                        .HasForeignKey("FromWordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("API.Model.Word", "ToWord")
-                        .WithMany()
-                        .HasForeignKey("ToWordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Dictionary");
-
-                    b.Navigation("FromWord");
-
-                    b.Navigation("ToWord");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("API.Model.AppRole", null)
@@ -445,23 +289,6 @@ namespace API.Data.Migrations
             modelBuilder.Entity("API.Model.AppUser", b =>
                 {
                     b.Navigation("UserRoles");
-                });
-
-            modelBuilder.Entity("API.Model.Dictionary", b =>
-                {
-                    b.Navigation("WordTranslations");
-
-                    b.Navigation("Words");
-                });
-
-            modelBuilder.Entity("API.Model.Language", b =>
-                {
-                    b.Navigation("Dictionaries");
-                });
-
-            modelBuilder.Entity("API.Model.Word", b =>
-                {
-                    b.Navigation("Translations");
                 });
 #pragma warning restore 612, 618
         }

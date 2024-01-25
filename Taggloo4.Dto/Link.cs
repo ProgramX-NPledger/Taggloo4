@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace API.DTO;
+namespace Taggloo4.Dto;
 
 /// <summary>
 /// Represents a link towards a related entity.

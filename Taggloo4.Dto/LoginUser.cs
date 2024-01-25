@@ -1,4 +1,4 @@
-﻿namespace API.DTO;
+﻿namespace Taggloo4.Dto;
 
 /// <summary>
 /// Request for a User's login using the POST Login method.

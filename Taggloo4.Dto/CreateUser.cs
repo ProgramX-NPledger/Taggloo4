@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace API.DTO;
+namespace Taggloo4.Dto;
 
 /// <summary>
 /// Represents a User to be created using the POST Users method.

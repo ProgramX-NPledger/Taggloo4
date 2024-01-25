@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 
-namespace API.DTO;
+namespace Taggloo4.Dto;
 
 /// <summary>
 /// Represents a Language to be created using the POST Languages method.

@@ -2,7 +2,6 @@
 using System.Text;
 using API.Contract;
 using API.Data;
-using API.DTO;
 using API.Helper;
 using API.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Taggloo4.Dto;
 
 namespace API.Controllers;
 
@@ -42,53 +42,37 @@ public class LanguagesController : BaseApiController
 //
 	
 
-	// /// <summary>
-	// /// Retrieve user details.
-	// /// </summary>
-	// /// <param name="userName">User Name of user.</param>
-	// /// <returns>A user.</returns>
-	// /// <response code="200">User is found.</response>
-	// /// <response code="403">Not permitted.</response>
-	// /// <response code="404">User is not found.</response>
-	// [Authorize(Roles="administrator")]
-	// [HttpGet("{userName}")]
-	// public async Task<ActionResult<GetUserResult>> GetUser(string userName)
-	// {
-	// 	string upperedUserName = userName.ToUpper();
-	// 	AppUser? user = await _userManager.Users.SingleOrDefaultAsync(q => q.NormalizedUserName == upperedUserName);
-	// 	if (user == null) return NotFound();
-	//
-	// 	List<Link> links = new List<Link>
-	// 	{
-	// 		new Link()
-	// 		{
-	// 			Action = "get",
-	// 			Rel = "self",
-	// 			Types = new string[] { JSON_MIME_TYPE },
-	// 			HRef = $"{GetBaseApiPath()}/users/{user.UserName}" 
-	// 		}
-	// 	};
-	//
-	// 	IList<string> roles = await _userManager.GetRolesAsync(user);
-	// 	roles.ToList().ForEach(x =>
-	// 	{
-	// 		links.Add(new Link()
-	// 		{
-	// 			Action = "get",
-	// 			Rel = "role",
-	// 			Types = new string[] { JSON_MIME_TYPE },
-	// 			HRef = $"{GetBaseApiPath()}/roles/{x}"
-	// 		});
-	// 	});
-	// 	
-	// 	return new GetUserResult()
-	// 	{
-	// 		UserName = user.UserName ?? string.Empty,
-	// 		HasRoles = await _userManager.GetRolesAsync(user),
-	// 		Links = links
-	// 	};
-	// }
-	//
+	/// <summary>
+	/// Retrieve Language details.
+	/// </summary>
+	/// <param name="ietfLanguageTag">The IETF Tag used for the Language.</param>
+	/// <returns>A user.</returns>
+	/// <response code="200">Language is found.</response>
+	/// <response code="403">Not permitted.</response>
+	/// <response code="404">Language is not found.</response>
+	[HttpGet("{ietfLanguageTag}")]
+	public async Task<ActionResult<GetLanguageResult>> GetLanguage(string ietfLanguageTag)
+	{
+		Language? language = await _languageRepository.GetLanguageByIetfLanguageTag(ietfLanguageTag);
+		if (language == null) return NotFound();
+		
+		return new GetLanguageResult()
+		{
+			IetfLanguageCode = language.IetfLanguageTag,
+			Links = new[]
+			{
+				new Link()
+				{
+					Action = "get",
+					Rel = "self",
+					Types = new[] { JSON_MIME_TYPE },
+					HRef = $"{GetBaseApiPath()}/languages/{language.IetfLanguageTag}"
+				}
+			},
+			Name = language.Name
+		};
+	}
+	
 	
     /// <summary>
 	/// Creates a new Language.

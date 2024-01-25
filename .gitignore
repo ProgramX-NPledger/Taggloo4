@@ -1,2 +1,10 @@
 ﻿/ConsoleApp1TestingDocker/bin/
 /ConsoleApp1TestingDocker/obj/
+/API/bin/Debug/net8.0
+/API/obj
+*.user
+/Taggloo4Mgt/obj
+/_ConsoleApp1TestingDocker
+/_Taggloo4Sln
+/.vs/Taggloo4/FileContentIndex
+/API/taggloo4.db

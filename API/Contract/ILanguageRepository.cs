@@ -8,7 +8,10 @@ public interface ILanguageRepository
 	void Create(Language language);
 	Task<bool> SaveAllAsync();
 	Task<IEnumerable<Language>> GetAllLanguagesAsync();
+
+	Task<Language?> GetLanguageByIetfLanguageTag(string ietfLanguageTag);
+	
 	// Task<AppUser> GetUserByIdAsync(int id);
 	// Task<AppUser> GetUserByUserNameAsync(string userName);
-	
+
 }

@@ -33,6 +33,10 @@ public class LanguageRepository : ILanguageRepository
 		return await _dataContext.Languages.ToListAsync();
 	}
 
+	public async Task<Language?> GetLanguageByIetfLanguageTag(string ietfLanguageTag)
+	{
+		return  await _dataContext.Languages.SingleOrDefaultAsync(q => q.IetfLanguageTag == ietfLanguageTag);
+	}
 
 
 	// public async Task<AppUser> GetUserByUserNameAsync(string userName)

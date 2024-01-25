@@ -2,12 +2,12 @@
 using System.Text;
 using API.Contract;
 using API.Data;
-using API.DTO;
 using API.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Taggloo4.Dto;
 
 namespace API.Controllers;
 
@@ -37,7 +37,7 @@ public class LoginController : BaseApiController
 	/// <response code="401">User is unauthorised either because of invalid username or password.</response>
 	[AllowAnonymous]
 	[HttpPost]
-	public async Task<ActionResult<LoggedInUser>> Post(LoginUser loginUser)
+	public async Task<ActionResult<LoginUserResult>> Post(LoginUser loginUser)
 	{
 		string upperedUserName = loginUser.UserName.ToUpper();
 		AppUser? appUser = await _userManager.Users.SingleOrDefaultAsync(q => q.NormalizedUserName == upperedUserName);
@@ -48,7 +48,7 @@ public class LoginController : BaseApiController
 		bool isPasswordValid = await _userManager.CheckPasswordAsync(appUser, loginUser.Password);
 		if (!isPasswordValid) return Unauthorized();
 
-		return new LoggedInUser()
+		return new LoginUserResult()
 		{
 			UserName = appUser.UserName,
 			Token = await _tokenService.CreateToken(appUser)

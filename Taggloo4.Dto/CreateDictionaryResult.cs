@@ -1,16 +1,16 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace API.DTO;
+namespace Taggloo4.Dto;
 
 /// <summary>
-/// Result of a Language creation request.
+/// Result of a Dictionary creation request.
 /// </summary>
-public class CreateLanguageResult
+public class CreateDictionaryResult
 {
 	/// <summary>
-	/// The IETF Language Tag chosen for the user.
+	/// The ID of the Dictionary.
 	/// </summary>
-	public string IetfLanguageTag { get; set; }
+	public int Id { get; set; }
 
 	/// <summary>
 	/// List of related Entities

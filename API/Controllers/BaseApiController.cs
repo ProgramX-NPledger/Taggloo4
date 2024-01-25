@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
@@ -12,5 +13,20 @@ public class BaseApiController : ControllerBase
 	{
 		return $"{Request.Scheme}://{Request.Host}{Request.PathBase}/api/v4";
 	}
-	
+
+	protected string GetRemoteHostAddress()
+	{
+		return Request.HttpContext.Connection.RemoteIpAddress!.ToString();
+	}
+
+	protected string GetCurrentUserName()
+	{
+		return User.FindFirstValue(ClaimTypes.NameIdentifier);
+	}
+
+	protected void AssertApiConstraints(int itemCount)
+	{
+		if (itemCount > Defaults.MaximumPermittedItemsPerRequest)
+			throw new BadHttpRequestException($"Requested item count exceeds maximum permitted value of {Defaults.MaximumPermittedItemsPerRequest}");
+	}
 }
