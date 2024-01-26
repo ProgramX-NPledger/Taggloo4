@@ -17,6 +17,41 @@ namespace API.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.1");
 
+            modelBuilder.Entity("API.Model.ApiLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RequestVerb")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ResponseCode")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ResponseText")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SafeUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("TimeMs")
+                        .HasColumnType("REAL");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ApiLogs");
+                });
+
             modelBuilder.Entity("API.Model.AppRole", b =>
                 {
                     b.Property<int>("Id")
@@ -246,7 +281,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("ToWordId");
 
-                    b.ToTable("WordTranslation");
+                    b.ToTable("WordTranslations");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

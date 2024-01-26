@@ -3,6 +3,7 @@ using System.Text;
 using API.Contract;
 using API.Data;
 using API.Extension;
+using API.Middleware;
 using API.Model;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,6 +21,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddApplicationService(builder.Configuration);
+// temporarily disabling logigng middleware
+//builder.Services.Add(new ServiceDescriptor(typeof(IApiLogRepository),typeof(ApiLogRepository),ServiceLifetime.Singleton)); 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -56,6 +59,8 @@ app.UseAuthorization();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
+app.UseMiddleware<HttpLoggingMiddleware>();
 app.MapControllers();
 
 

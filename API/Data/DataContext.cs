@@ -18,6 +18,8 @@ public class DataContext : IdentityDbContext<AppUser,
 	public DbSet<Dictionary> Dictionaries { get; set; }
 	public DbSet<Word> Words { get; set; }
 	public DbSet<WordTranslation> WordTranslations { get; set; }
+	public DbSet<ApiLog> ApiLogs { get; set; }
+	
 
 	
 	public DataContext(DbContextOptions options) : base(options)
