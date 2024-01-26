@@ -12,7 +12,7 @@ public class WordTranslation
 	// this breaks migrations
 	//public Word ToWord { get; set; }
 	public string CreatedOn { get; set; }
-	public string CreatedByUserName { get; set; }
+	public string? CreatedByUserName { get; set; }
 	public DateTime CreatedAt { get; set; }
 	public int DictionaryId { get; set; }
 	

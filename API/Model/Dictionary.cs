@@ -16,7 +16,7 @@ public class Dictionary
 
 	public string IetfLanguageTag { get; set; }
 	
-	public required string CreatedByUserName { get; set; }
+	public required string? CreatedByUserName { get; set; }
 
 	public required DateTime CreatedAt { get; set; }
 

@@ -11,7 +11,7 @@ public class Word
 	[Required] 
 	public string TheWord { get; set; }
 	
-	public required string CreatedByUserName { get; set; }
+	public required string? CreatedByUserName { get; set; }
 
 	public required DateTime CreatedAt { get; set; }
 
