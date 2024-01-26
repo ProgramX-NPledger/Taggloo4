@@ -6,9 +6,11 @@ public class WordTranslation
 {
 	public int Id { get; set; }
 	public int FromWordId { get; set; }
-	public Word FromWord { get; set; }
+	// this breaks migrations
+	//public Word FromWord { get; set; }
 	public int ToWordId { get; set; }
-	public Word ToWord { get; set; }
+	// this breaks migrations
+	//public Word ToWord { get; set; }
 	public string CreatedOn { get; set; }
 	public string CreatedByUserName { get; set; }
 	public DateTime CreatedAt { get; set; }
