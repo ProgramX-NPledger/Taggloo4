@@ -21,7 +21,9 @@ public class Word
 	
 	public int DictionaryId { get; set; }
 
-	public ICollection<WordTranslation> Translations { get; set; }
+	// this fails when building migrations
+//	public ICollection<WordTranslation> Translations { get; set; }
+
 	
 	
 }

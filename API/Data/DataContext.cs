@@ -66,24 +66,19 @@ public class DataContext : IdentityDbContext<AppUser,
 					a.TheWord
 				}).IsUnique();
 
-		builder.Entity<Word>()
-			.HasMany(w => w.Translations)
-			.WithOne(wt => wt.FromWord)
-			.HasForeignKey(wt => wt.FromWordId)
-			.IsRequired();
-
+		// this results in migration failure
+		// builder.Entity<Word>()
+		// 	.HasMany(w => w.Translations)
+		// 	.WithOne(wt => wt.FromWord)
+		// 	.HasForeignKey(wt => wt.FromWordId)
+		// 	.OnDelete(DeleteBehavior.NoAction);
+		//
 		// builder.Entity<Word>()
 		// 	.HasMany(w => w.Translations)
 		// 	.WithOne(wt => wt.ToWord)
 		// 	.HasForeignKey(wt => wt.ToWordId)
-		// 	.IsRequired();
-		
-		// builder.Entity<WordTranslation>()
-		// 	.HasOne(wt=>wt.Dictionary)
-		// 	.WithOne(d=>d. // TODO: Understand Many to one relationship
-		// 	
+		// 	.OnDelete(DeleteBehavior.NoAction);
 			
-		
 
 	}
 }
