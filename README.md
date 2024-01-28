@@ -6,3 +6,7 @@ Taggloo is a Manx Gaelic to English translation tool, designed to fill a hole in
 
 **Full documentation is available at [Wiki](https://github.com/ProgramX-NPledger/Taggloo4/wiki)**
 
+## Requirements
+
+* Microsoft SQL Server
+* .NET 8
