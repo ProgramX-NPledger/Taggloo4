@@ -14,7 +14,7 @@ using Taggloo4.Dto;
 namespace API.Controllers;
 
 /// <summary>
-/// User operations. All methods require authorisation.
+/// Translation operations. All methods require authorisation.
 /// </summary>
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class TranslationsController : BaseApiController
@@ -23,7 +23,12 @@ public class TranslationsController : BaseApiController
 	private readonly IDictionaryRepository _dictionaryRepository;
 	private readonly ITranslationRepository _translationRepository;
 
-
+	/// <summary>
+	/// Constructor with injected parameters.
+	/// </summary>
+	/// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
+	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
+	/// <param name="translationRepository">Implementation of <seealso cref="ITranslationRepository"/>.</param>
 	public TranslationsController(IWordRepository wordRepository, 
 		IDictionaryRepository dictionaryRepository,
 		ITranslationRepository translationRepository)
@@ -32,69 +37,6 @@ public class TranslationsController : BaseApiController
 		_dictionaryRepository = dictionaryRepository;
 		_translationRepository = translationRepository;
 	}
-
-// 	/// <summary>
-// 	/// Gets all Users.
-// 	/// </summary>
-// 	/// <returns></returns>
-// 	/// <response code="200">Request was successful.</response>
-// 	[HttpGet]
-// 	// TODO: Add parameters to allow filtering, paging, return 400 if bad request
-// 	public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
-// 	{
-// 		return Ok(await _userManager.Users.ToListAsync());
-// //		return users; // TODO use RESTful DTO
-// 	}
-//
-	
-
-	// /// <summary>
-	// /// Retrieve user details.
-	// /// </summary>
-	// /// <param name="userName">User Name of user.</param>
-	// /// <returns>A user.</returns>
-	// /// <response code="200">User is found.</response>
-	// /// <response code="403">Not permitted.</response>
-	// /// <response code="404">User is not found.</response>
-	// [Authorize(Roles="administrator")]
-	// [HttpGet("{userName}")]
-	// public async Task<ActionResult<GetUserResult>> GetUser(string userName)
-	// {
-	// 	string upperedUserName = userName.ToUpper();
-	// 	AppUser? user = await _userManager.Users.SingleOrDefaultAsync(q => q.NormalizedUserName == upperedUserName);
-	// 	if (user == null) return NotFound();
-	//
-	// 	List<Link> links = new List<Link>
-	// 	{
-	// 		new Link()
-	// 		{
-	// 			Action = "get",
-	// 			Rel = "self",
-	// 			Types = new string[] { JSON_MIME_TYPE },
-	// 			HRef = $"{GetBaseApiPath()}/users/{user.UserName}" 
-	// 		}
-	// 	};
-	//
-	// 	IList<string> roles = await _userManager.GetRolesAsync(user);
-	// 	roles.ToList().ForEach(x =>
-	// 	{
-	// 		links.Add(new Link()
-	// 		{
-	// 			Action = "get",
-	// 			Rel = "role",
-	// 			Types = new string[] { JSON_MIME_TYPE },
-	// 			HRef = $"{GetBaseApiPath()}/roles/{x}"
-	// 		});
-	// 	});
-	// 	
-	// 	return new GetUserResult()
-	// 	{
-	// 		UserName = user.UserName ?? string.Empty,
-	// 		HasRoles = await _userManager.GetRolesAsync(user),
-	// 		Links = links
-	// 	};
-	// }
-	//
 	
     /// <summary>
 	/// Creates a new Word Translation.
@@ -176,9 +118,10 @@ public class TranslationsController : BaseApiController
 	/// <summary>
 	/// Update an existing Word with meta-data.
 	/// </summary>
-	/// <param name="updateWord">A <see cref="UpdateWord"/> representing the Word to update.</param>
+	/// <param name="wordTranslationId">Identifier of Word Translation to update.</param>
+	/// <param name="updateWordTranslation">A <seealso cref="UpdateWordTranslation"/> representing the Word Translation to update.</param>
 	/// <returns>The updated Word.</returns>
-	/// <response code="201">Word was updated.</response>
+	/// <response code="200">Word was updated.</response>
 	/// <response code="400">One or more validation errors prevented successful updating.</response>
 	/// <response code="403">Not permitted.</response>
 	[HttpPatch("word/{wordTranslationId}")] // /api/v4/translations/word

@@ -47,7 +47,7 @@ public class DictionaryRepository : IDictionaryRepository
 		return await _dataContext.SaveChangesAsync() > 0;
 	}
 
-	// <summary>
+	/// <summary>
 	/// Retrieves a <seealso cref="Dictionary"/> by its ID.
 	/// </summary>
 	/// <param name="id">The ID of the <seealso cref="Dictionary"/>.</param>

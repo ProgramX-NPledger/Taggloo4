@@ -415,7 +415,7 @@ public class Importer
 		}
 		catch (SqlException sqlEx)
 		{
-			throw new InvalidOperationException($"Unable to connect to SQL Server");
+			throw new InvalidOperationException($"Unable to connect to SQL Server",sqlEx);
 		}
 		
 	}

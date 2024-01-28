@@ -30,13 +30,13 @@ public interface IUserRepository
 	/// </summary>
 	/// <param name="id">The ID of the <seealso cref="AppUser"/>.</param>
 	/// <returns>The requested <seealso cref="AppUser"/>, or <c>null</c> if no User could be found./</returns>
-	Task<AppUser> GetUserByIdAsync(int id);
+	Task<AppUser?> GetUserByIdAsync(int id);
 	
 	/// <summary>
 	/// Retrieves an <seealso cref="AppUser"/> by its UserName.
 	/// </summary>
-	/// <param name="id">The userName of the <seealso cref="AppUser"/>.</param>
+	/// <param name="userName">The userName of the <seealso cref="AppUser"/>.</param>
 	/// <returns>The requested <seealso cref="AppUser"/>, or <c>null</c> if no User could be found./</returns>
-	Task<AppUser> GetUserByUserNameAsync(string userName);
+	Task<AppUser?> GetUserByUserNameAsync(string userName);
 	
 }

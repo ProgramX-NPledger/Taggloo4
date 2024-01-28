@@ -14,7 +14,7 @@ using Taggloo4.Dto;
 namespace API.Controllers;
 
 /// <summary>
-/// User operations. All methods require authorisation.
+/// Language operations. All methods require authorisation.
 /// </summary>
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class LanguagesController : BaseApiController
@@ -22,25 +22,14 @@ public class LanguagesController : BaseApiController
 	private readonly ILanguageRepository _languageRepository;
 
 
+	/// <summary>
+	/// Constructor with injected parameters.
+	/// </summary>
+	/// <param name="languageRepository">Implementation of <seealso cref="ILanguageRepository"/>.</param>
 	public LanguagesController(ILanguageRepository languageRepository)
 	{
 		_languageRepository = languageRepository;
 	}
-
-// 	/// <summary>
-// 	/// Gets all Users.
-// 	/// </summary>
-// 	/// <returns></returns>
-// 	/// <response code="200">Request was successful.</response>
-// 	[HttpGet]
-// 	// TODO: Add parameters to allow filtering, paging, return 400 if bad request
-// 	public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
-// 	{
-// 		return Ok(await _userManager.Users.ToListAsync());
-// //		return users; // TODO use RESTful DTO
-// 	}
-//
-	
 
 	/// <summary>
 	/// Retrieve Language details.
