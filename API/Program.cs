@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Hangfire;
+using Hangfire.SqlServer;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +43,15 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
+builder.Services.AddHangfire(configuration=>
+    configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddHangfireServer();
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -63,6 +75,10 @@ app.UseAuthorization();
 app.UseMiddleware<HttpLoggingMiddleware>();
 app.MapControllers();
 
+app.UseHangfireDashboard();
+
+IBackgroundJobClient backgroundJobClient = app.Services.GetRequiredService<IBackgroundJobClient>();
+backgroundJobClient.Enqueue(() => Console.WriteLine("Test Hangfire"));
 
 using (IServiceScope scope = app.Services.CreateScope())
 {

@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
+/// <summary>
+/// Entity Framework Data Context.
+/// </summary>
 public class DataContext : IdentityDbContext<AppUser, 
 	AppRole, 
 	int, 
@@ -14,18 +17,40 @@ public class DataContext : IdentityDbContext<AppUser,
 	IdentityRoleClaim<int>,
 	IdentityUserToken<int>>
 {
+	/// <summary>
+	/// Languages.
+	/// </summary>
 	public DbSet<Language> Languages { get; set; }
+	
+	/// <summary>
+	/// Dictionaries
+	/// </summary>
 	public DbSet<Dictionary> Dictionaries { get; set; }
+	
+	/// <summary>
+	/// Words
+	/// </summary>
 	public DbSet<Word> Words { get; set; }
+	
+	/// <summary>
+	/// Word Translations
+	/// </summary>
 	public DbSet<WordTranslation> WordTranslations { get; set; }
 	public DbSet<ApiLog> ApiLogs { get; set; }
 	
 
-	
+	/// <summary>
+	/// Constructor with options parameter.
+	/// </summary>
+	/// <param name="options">Configure the connection to the database.</param>
 	public DataContext(DbContextOptions options) : base(options)
 	{
 	}
 
+	/// <summary>
+	/// Helper function for creation of migrations and called to allow configuration of database.
+	/// </summary>
+	/// <param name="builder">Entity Framework <seealso cref="ModelBuilder"/>.</param>
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
 		base.OnModelCreating(builder);
@@ -68,24 +93,19 @@ public class DataContext : IdentityDbContext<AppUser,
 					a.TheWord
 				}).IsUnique();
 
-		builder.Entity<Word>()
-			.HasMany(w => w.Translations)
-			.WithOne(wt => wt.FromWord)
-			.HasForeignKey(wt => wt.FromWordId)
-			.IsRequired();
-
+		// this results in migration failure
+		// builder.Entity<Word>()
+		// 	.HasMany(w => w.Translations)
+		// 	.WithOne(wt => wt.FromWord)
+		// 	.HasForeignKey(wt => wt.FromWordId)
+		// 	.OnDelete(DeleteBehavior.NoAction);
+		//
 		// builder.Entity<Word>()
 		// 	.HasMany(w => w.Translations)
 		// 	.WithOne(wt => wt.ToWord)
 		// 	.HasForeignKey(wt => wt.ToWordId)
-		// 	.IsRequired();
-		
-		// builder.Entity<WordTranslation>()
-		// 	.HasOne(wt=>wt.Dictionary)
-		// 	.WithOne(d=>d. // TODO: Understand Many to one relationship
-		// 	
+		// 	.OnDelete(DeleteBehavior.NoAction);
 			
-		
 
 	}
 }

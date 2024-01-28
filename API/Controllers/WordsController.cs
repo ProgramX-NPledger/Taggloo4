@@ -22,7 +22,11 @@ public class WordsController : BaseApiController
 	private readonly IWordRepository _wordRepository;
 	private readonly IDictionaryRepository _dictionaryRepository;
 
-
+	/// <summary>
+	/// Constructor with injected parameters.
+	/// </summary>
+	/// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
+	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
 	public WordsController(IWordRepository wordRepository, 
 		IDictionaryRepository dictionaryRepository)
 	{
@@ -31,6 +35,15 @@ public class WordsController : BaseApiController
 		
 	}
 
+	/// <summary>
+	/// Retrieve matching Words from an optional Dictionary.
+	/// </summary>
+	/// <param name="word">The word to search for.</param>
+	/// <param name="dictionaryId">If specified, searches within the Dictionary represented by the ID.</param>
+	/// <param name="offsetIndex">If specified, returns results starting at the specified offset position (starting index 0) Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
+	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
+	/// <response code="200">Results prepared.</response>
+	/// <response code="403">Not permitted.</response>
 	[HttpGet("{word}")]
 	[Authorize(Roles="administrator, dataExporter")]
 	public async Task<ActionResult<GetWordsResult>> GetWords(string word, int? dictionaryId, int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
@@ -149,7 +162,7 @@ public class WordsController : BaseApiController
 	/// </summary>
 	/// <param name="updateWord">A <see cref="UpdateWord"/> representing the Word to update.</param>
 	/// <returns>The updated Word.</returns>
-	/// <response code="201">Word was updated.</response>
+	/// <response code="200">Word was updated.</response>
 	/// <response code="400">One or more validation errors prevented successful updating.</response>
 	/// <response code="403">Not permitted.</response>
 	[HttpPatch]
