@@ -33,4 +33,9 @@
     <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Data\hangfire-install.sql" />
+    <EmbeddedResource Include="Data\hangfire-install.sql" />
+  </ItemGroup>
+
 </Project>

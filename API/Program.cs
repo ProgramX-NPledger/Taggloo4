@@ -3,6 +3,7 @@ using System.Text;
 using API.Contract;
 using API.Data;
 using API.Extension;
+using API.Middleware;
 using API.Model;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,6 +25,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddApplicationService(builder.Configuration);
+// temporarily disabling logigng middleware
+//builder.Services.Add(new ServiceDescriptor(typeof(IApiLogRepository),typeof(ApiLogRepository),ServiceLifetime.Singleton)); 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -40,11 +43,17 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
+// this can't happen before migrations create the DB!
 builder.Services.AddHangfire(configuration=>
     configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
-    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+    // xonfigure to not build tables
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions()
+    {
+        PrepareSchemaIfNecessary = false,
+        TryAutoDetectSchemaDependentOptions = false
+    }));
 builder.Services.AddHangfireServer();
 
 var app = builder.Build();
@@ -68,12 +77,12 @@ app.UseAuthorization();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
+app.UseMiddleware<HttpLoggingMiddleware>();
 app.MapControllers();
 
 app.UseHangfireDashboard();
 
-IBackgroundJobClient backgroundJobClient = app.Services.GetRequiredService<IBackgroundJobClient>();
-backgroundJobClient.Enqueue(() => Console.WriteLine("Test Hangfire"));
 
 using (IServiceScope scope = app.Services.CreateScope())
 {
@@ -85,6 +94,8 @@ using (IServiceScope scope = app.Services.CreateScope())
         UserManager<AppUser> userManager = services.GetRequiredService<UserManager<AppUser>>();
         RoleManager<AppRole> roleManager = services.GetRequiredService<RoleManager<AppRole>>();
         await Seed.SeedUsers(userManager,roleManager);
+        
+        
     }
     catch (Exception ex)
     {
@@ -93,4 +104,9 @@ using (IServiceScope scope = app.Services.CreateScope())
         else throw;
     }
 }
+
+
+IBackgroundJobClient backgroundJobClient = app.Services.GetRequiredService<IBackgroundJobClient>();
+backgroundJobClient.Enqueue(() => Console.WriteLine("Hello from Hangfire"));
+
 app.Run();
