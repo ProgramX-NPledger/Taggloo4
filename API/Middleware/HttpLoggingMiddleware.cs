@@ -85,7 +85,7 @@ public class HttpLoggingMiddleware
         StringBuilder sb = new StringBuilder();
         if (requestQueryString.HasValue)
         {
-            sb.Append("?");
+            //sb.Append("?");
             string[] split = requestQueryString.Value.Split(new char[] { '&' });
             int i = 0;
             foreach (string key in split)

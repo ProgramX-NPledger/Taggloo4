@@ -48,7 +48,12 @@ builder.Services.AddHangfire(configuration=>
     configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
-    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+    // xonfigure to not build tables
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions()
+    {
+        PrepareSchemaIfNecessary = false,
+        TryAutoDetectSchemaDependentOptions = false
+    }));
 builder.Services.AddHangfireServer();
 
 var app = builder.Build();
@@ -78,8 +83,6 @@ app.MapControllers();
 
 app.UseHangfireDashboard();
 
-IBackgroundJobClient backgroundJobClient = app.Services.GetRequiredService<IBackgroundJobClient>();
-backgroundJobClient.Enqueue(() => Console.WriteLine("Hello from Hangfire"));
 
 using (IServiceScope scope = app.Services.CreateScope())
 {
@@ -101,4 +104,9 @@ using (IServiceScope scope = app.Services.CreateScope())
         else throw;
     }
 }
+
+
+IBackgroundJobClient backgroundJobClient = app.Services.GetRequiredService<IBackgroundJobClient>();
+backgroundJobClient.Enqueue(() => Console.WriteLine("Hello from Hangfire"));
+
 app.Run();

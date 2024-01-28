@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -242,6 +244,25 @@ namespace API.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ApiLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1,1"),
+                    IpAddress = table.Column<string>(type: "nvarchar(32)", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime", nullable: false),
+                    RequestVerb = table.Column<string>(type: "nvarchar(12)", nullable: false),
+                    SafeUrl = table.Column<string>(type: "nvarchar(2048)", nullable: false),
+                    ResponseCode = table.Column<int>(type: "int", nullable: false),
+                    ResponseText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TimeMs = table.Column<double>(type: "numeric(18,4)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApiLogs", x => x.Id);
+                });
+            
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",

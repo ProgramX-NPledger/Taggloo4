@@ -32,7 +32,7 @@ public class ApiLogRepository : IApiLogRepository
 	public int SaveAll(IEnumerable<ApiLog> apiLogs)
 	{
 		int recordsAffected = 0;
-		foreach (ApiLog apiLog in apiLogs)
+		foreach (ApiLog apiLog in apiLogs.ToArray())
 		{
 			recordsAffected+=WriteApiLogToDatabase(apiLog);
 		}
