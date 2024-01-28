@@ -18,7 +18,7 @@ namespace API.Data.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     IpAddress = table.Column<string>(type: "TEXT", nullable: false),
-                    TimeStamp = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    TimeStamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RequestVerb = table.Column<string>(type: "TEXT", nullable: false),
                     SafeUrl = table.Column<string>(type: "TEXT", nullable: false),
                     ResponseCode = table.Column<int>(type: "INTEGER", nullable: false),

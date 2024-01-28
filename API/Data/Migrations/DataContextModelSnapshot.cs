@@ -22,6 +22,45 @@ namespace API.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("API.Model.ApiLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestVerb")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
+
+                    b.Property<int>("ResponseCode")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResponseText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SafeUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<double>("TimeMs")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ApiLogs");
+                });
+
             modelBuilder.Entity("API.Model.AppRole", b =>
                 {
                     b.Property<int>("Id")
@@ -147,7 +186,6 @@ namespace API.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedByUserName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedOn")
@@ -205,7 +243,6 @@ namespace API.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedByUserName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedOn")
@@ -239,7 +276,6 @@ namespace API.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedByUserName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedOn")

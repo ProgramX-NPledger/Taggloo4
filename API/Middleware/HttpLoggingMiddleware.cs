@@ -12,15 +12,19 @@ namespace API.Middleware;
 public class HttpLoggingMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly IApiLogRepository _apiRepository;
+    private readonly IApiLoggerService _apiLoggerService;
 
-    public HttpLoggingMiddleware(RequestDelegate next, IApiLogRepository apiRepository)
+    public HttpLoggingMiddleware(RequestDelegate next, IApiLoggerService apiLoggerService)
     {
         _next = next;
-        _apiRepository = apiRepository;
+        _apiLoggerService = apiLoggerService;
         
     }
 
+    /// <summary>
+    /// Invokes the middleware component.
+    /// </summary>
+    /// <param name="context">The <seealso cref="HttpContext"/> of the request/response.</param>
     public async Task Invoke(HttpContext context)
     {
         DateTime start = DateTime.Now;
@@ -44,7 +48,7 @@ public class HttpLoggingMiddleware
 
         TimeSpan time = DateTime.Now - start;
 
-        _apiRepository.Log(request.IpAddress, request.RequestVerb, request.SafeUrl, response.StatusCode,
+        _apiLoggerService.Log(request.IpAddress, request.RequestVerb, request.SafeUrl, response.StatusCode,
             response.ResponseText, time.TotalMilliseconds);
 
         //Copy the contents of the new memory stream, which contains the response to the original stream, which is then returned to the client.
@@ -63,7 +67,7 @@ public class HttpLoggingMiddleware
         var buffer = new byte[Convert.ToInt32(request.ContentLength)];
 
         //Copy into  buffer.
-        await request.Body.ReadAsync(buffer, 0, buffer.Length);
+        var _ = await request.Body.ReadAsync(buffer, 0, buffer.Length);
 
         //Assign the read body back to the request body
         request.Body = body;

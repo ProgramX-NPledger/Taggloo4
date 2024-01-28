@@ -43,6 +43,7 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
+// this can't happen before migrations create the DB!
 builder.Services.AddHangfire(configuration=>
     configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
@@ -78,7 +79,7 @@ app.MapControllers();
 app.UseHangfireDashboard();
 
 IBackgroundJobClient backgroundJobClient = app.Services.GetRequiredService<IBackgroundJobClient>();
-backgroundJobClient.Enqueue(() => Console.WriteLine("Test Hangfire"));
+backgroundJobClient.Enqueue(() => Console.WriteLine("Hello from Hangfire"));
 
 using (IServiceScope scope = app.Services.CreateScope())
 {
@@ -90,6 +91,8 @@ using (IServiceScope scope = app.Services.CreateScope())
         UserManager<AppUser> userManager = services.GetRequiredService<UserManager<AppUser>>();
         RoleManager<AppRole> roleManager = services.GetRequiredService<RoleManager<AppRole>>();
         await Seed.SeedUsers(userManager,roleManager);
+        
+        
     }
     catch (Exception ex)
     {
