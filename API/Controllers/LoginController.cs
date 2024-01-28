@@ -20,6 +20,11 @@ public class LoginController : BaseApiController
 	private readonly UserManager<AppUser> _userManager;
 	private readonly ITokenService _tokenService;
 
+	/// <summary>
+	///	Constructor with injected parameters.
+	/// </summary>
+	/// <param name="userManager">Impelementation of <seealso cref="UserManager{AppUser}"/>.</param>
+	/// <param name="tokenService">Implementation of <seealso cref="ITokenService"/>.</param>
 	public LoginController(UserManager<AppUser> userManager, ITokenService tokenService)
 	{
 		_userManager = userManager;

@@ -4,9 +4,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
+/// <summary>
+/// Services for seeding of database.
+/// </summary>
 public class Seed
 {
 
+	/// <summary>
+	/// Seeds Users into the database.
+	/// </summary>
+	/// <param name="userManager">Implementation of <seealso cref="UserManager&lt;AppUser&gt;"/></param>
+	/// <param name="roleManager">Implementation of <seealso cref="RoleManager&lt;AppRole&gt;"/></param>
 	public static async Task SeedUsers(UserManager<AppUser> userManager,
 		RoleManager<AppRole> roleManager)
 	{

@@ -5,8 +5,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Extension;
 
+/// <summary>
+/// Extension methods for Application-level services.
+/// </summary>
 public static class ApplicationServiceExtensions
 {
+	/// <summary>
+	/// Adds Application-level services to the <seealso cref="IServiceCollection"/> during initialisation.
+	/// </summary>
+	/// <param name="services"><seealso cref="IServiceCollection"/> that will contain all services for service resolution.</param>
+	/// <param name="configuration">The active <seealso cref="IConfiguration"/>.</param>
+	/// <returns>The configured <seealso cref="IServiceCollection"/>.</returns>
 	public static IServiceCollection AddApplicationService(this IServiceCollection services,
 		IConfiguration configuration)
 	{

@@ -2,6 +2,9 @@
 
 namespace API.Contract;
 
+/// <summary>
+/// Represents an abstraction for working with authentication tokens.
+/// </summary>
 public interface ITokenService
 {
 	/// <summary>

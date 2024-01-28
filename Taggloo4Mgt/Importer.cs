@@ -1,5 +1,6 @@
 ﻿using System.Data.SqlClient;
 using System.Globalization;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Dapper;
@@ -52,21 +53,29 @@ public class Importer
 				Log("\t\tGet all Languages");
 				IEnumerable<string> sourceLanguageCodes = await GetLanguageCodesFromSource(sqlConnection);
 				Log($"\t\t\t{sourceLanguageCodes.Count()} Languages");
-			
-				// ensure all languages are known at v4
-				IEnumerable<string> validLanguageCodes = sourceLanguageCodes as string[] ?? sourceLanguageCodes.ToArray();
-				await EnsureAllLanguagesAreKnown(httpClient, validLanguageCodes);
-				Log("\t\t\tAll Languages are valid");
+
+				// have to create both languages before we start
+				foreach (string languageCode in sourceLanguageCodes)
+				{
+					if (!await IsLanguageKnown(httpClient,languageCode))
+					{
+						CreateLanguageResult createLanguageResult=await CreateLanguage(httpClient,languageCode);
+						Log($"\t\t\tCreated Language for {languageCode}");
+					}
+				}
 				
 				IDictionary<string, int> dictionariesAtTargetDictionary = new Dictionary<string, int>(); // languageCode, idAtTarget
 				int wordsProcessed = 0;
 				int totalWords = 0;
 
-				UpdateProgressBar(0, 0, "", "");
-				foreach (string languageCode in validLanguageCodes)
+				foreach (string languageCode in sourceLanguageCodes)
 				{
-					Log($"\t\t\t{languageCode}");
+				
 					
+					UpdateProgressBar(0, 0, "", "");
+
+					Log($"\t\t\t{languageCode}");
+						
 					// get all words
 					IEnumerable<Word> wordsInLanguage = await GetAllWordsForLanguage(sqlConnection,languageCode);
 					Log($"\t\t\t\t{wordsInLanguage.Count()} words in Language");
@@ -91,7 +100,7 @@ public class Importer
 							Log($"\t\t\t\t\t\tWord ID {createWordResult.Id} created");
 							
 							// get translations
-							IEnumerable<Translation> translations = await GetTranslationsForWord(sqlConnection, wordInLanguage, validLanguageCodes);
+							IEnumerable<Translation> translations = await GetTranslationsForWord(sqlConnection, wordInLanguage);
 							Log($"\t\t\t\t\t\t{translations.Count()} Translations");
 							
 							foreach (Translation translation in translations)
@@ -160,7 +169,10 @@ public class Importer
 						
 					}
 
+						
 				}
+				
+				
 				
 			}
 
@@ -171,6 +183,7 @@ public class Importer
 		return 0;
 
 	}
+
 
 
 	private void UpdateProgressBar(int wordsProcessed, int totalWords, string languageCode, string theWord)
@@ -261,6 +274,28 @@ public class Importer
 			await response.Content.ReadFromJsonAsync<CreateDictionaryResult>();
 		return createDictionaryResult!;
 	}
+	
+	
+	public async Task<CreateLanguageResult> CreateLanguage(HttpClient httpClient, string languageCode)
+	{
+		string url = "/api/v4/languages";
+		CreateLanguage createLanguage = new CreateLanguage()
+		{
+			Name = languageCode,
+			IetfLanguageTag = languageCode
+		};
+		
+		HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createLanguage);
+		if (!response.IsSuccessStatusCode)
+		{
+			throw new InvalidOperationException($"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
+		}
+
+		CreateLanguageResult? createLanguageResult =
+			await response.Content.ReadFromJsonAsync<CreateLanguageResult>();
+		return createLanguageResult!;
+	}
+	
 
 	private async Task<GetWordsResult> GetOtherWord(HttpClient httpClient, string word, int dictionaryId)
 	{
@@ -280,7 +315,7 @@ public class Importer
 
 	
 	private async Task<IEnumerable<Translation>> GetTranslationsForWord(SqlConnection sqlConnection,
-		Word wordInLanguage, IEnumerable<string> sourceLanguageCodes)
+		Word wordInLanguage)
 	{
 		string sqlCmd = @"select toT.Translation as TheTranslation, toT.LanguageCode,fromWt.CreatedByUserName,fromWt.CreatedTimeStamp 
 							from Taggloo_Word fromWord 
@@ -294,8 +329,8 @@ public class Importer
 		
 		// make sure all the returned languages are supported
 		IEnumerable<Translation> translationsForWord = translations as Translation[] ?? translations.ToArray();
-		if (translationsForWord.All(q => sourceLanguageCodes.Contains(q.LanguageCode))) return translationsForWord;
-		throw new InvalidOperationException($"Unsupported translatable Language detected");
+		return translationsForWord;
+		
 	}
 
 	private async Task UpdateWordAtTargetWithMetaData(HttpClient httpClient, int id, string createdByUserName, DateTime createdAtTimeStamp)
@@ -347,20 +382,27 @@ public class Importer
 			LanguageCode = languageCode
 		});
 	}
-
-	private async Task EnsureAllLanguagesAreKnown(HttpClient httpClient, IEnumerable<string> sourceLanguageCodes)
+	
+	private async Task<bool> IsLanguageKnown(HttpClient httpClient, string languageCode)
 	{
-		foreach (string languageCode in sourceLanguageCodes)
+		string url = "/api/v4/languages";
+		HttpResponseMessage response = await httpClient.GetAsync(url+$"/{languageCode}");
+		if (response.StatusCode == HttpStatusCode.NotFound)
 		{
-			string url = "/api/v4/languages";
-			HttpResponseMessage response = await httpClient.GetAsync(url+$"/{languageCode}");
-			if (!response.IsSuccessStatusCode)
-			{
-				throw new InvalidOperationException(
-					$"Invalid IETF Language Tag {languageCode}. Target does not support Language from Source");
-			}
+			return false;
 		}
+
+		if (!response.IsSuccessStatusCode)
+		{
+			throw new InvalidOperationException($"Error when creating Language {languageCode}");
+		}
+
+		return true;
 	}
+
+	
+
+	
 
 	private async Task<IEnumerable<string>> GetLanguageCodesFromSource(SqlConnection sqlConnection)
 	{
@@ -415,7 +457,7 @@ public class Importer
 		}
 		catch (SqlException sqlEx)
 		{
-			throw new InvalidOperationException($"Unable to connect to SQL Server");
+			throw new InvalidOperationException($"Unable to connect to SQL Server",sqlEx);
 		}
 		
 	}

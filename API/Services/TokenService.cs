@@ -8,6 +8,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services;
 
+/// <summary>
+/// Service for generation of JWT Tokens.
+/// </summary>
 public class TokenService : ITokenService
 {
 	private readonly IConfiguration _configuration;
@@ -19,6 +22,12 @@ public class TokenService : ITokenService
 	/// </summary>
 	public const string JWT_TOKEN_KEY_CONFIG_KEY = "Security:JwtPolicy:TokenKey";
 	
+	/// <summary>
+	/// Constructor for instantiating the object with required configuration.
+	/// </summary>
+	/// <param name="configuration">The current <seealso cref="IConfiguration"/>.</param>
+	/// <param name="userManager">The <seealso cref="UserManager{TUser}"/> implementation.</param>
+	/// <exception cref="ArgumentNullException">Thrown if the <seealso cref="JWT_TOKEN_KEY_CONFIG_KEY"/> configuration is not specified.</exception>
 	public TokenService(IConfiguration configuration, UserManager<AppUser> userManager)
 	{
 		_configuration = configuration;
@@ -30,8 +39,16 @@ public class TokenService : ITokenService
 			new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenKey));
 	}
 	
+	/// <summary>
+	/// Create JWT Token.
+	/// </summary>
+	/// <param name="user">The <seealso cref="AppUser"/> to generate the Token for.</param>
+	/// <returns>A <see cref="string"/> containing the generated Token.</returns>
+	/// <exception cref="ArgumentNullException">Thrown if UserName property is null.</exception>
 	public async Task<string> CreateToken(AppUser user)
 	{
+		if (user.UserName == null) throw new ArgumentNullException("user.UserName");
+		
 		List<Claim> claims = new List<Claim>
 		{
 			new Claim(JwtRegisteredClaimNames.NameId, user.UserName)

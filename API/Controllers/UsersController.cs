@@ -21,24 +21,14 @@ public class UsersController : BaseApiController
 {
 	private readonly UserManager<AppUser> _userManager;
 
+	/// <summary>
+	/// Constructor with injected parameters.
+	/// </summary>
+	/// <param name="userManager">Implementation of <seealso cref="UserManager{AppUser}"/>.</param>
 	public UsersController(UserManager<AppUser> userManager)
 	{
 		_userManager = userManager;
 	}
-
-	/// <summary>
-	/// Gets all Users.
-	/// </summary>
-	/// <returns></returns>
-	/// <response code="200">Request was successful.</response>
-	[HttpGet]
-	// TODO: Add parameters to allow filtering, paging, return 400 if bad request
-	public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
-	{
-		return Ok(await _userManager.Users.ToListAsync());
-//		return users; // TODO use RESTful DTO
-	}
-
 	
 
 	/// <summary>

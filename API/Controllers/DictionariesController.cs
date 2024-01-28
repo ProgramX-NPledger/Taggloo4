@@ -19,6 +19,11 @@ public class DictionariesController : BaseApiController
 	private readonly ILanguageRepository _languageRepository;
 
 
+	/// <summary>
+	/// Constructor with injected parameters.
+	/// </summary>
+	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
+	/// <param name="languageRepository">Implementation of <seealso cref="ILanguageRepository"/>.</param>
 	public DictionariesController(IDictionaryRepository dictionaryRepository,
 		ILanguageRepository languageRepository)
 	{
@@ -26,68 +31,7 @@ public class DictionariesController : BaseApiController
 		_languageRepository = languageRepository;
 	}
 
-// 	/// <summary>
-// 	/// Gets all Users.
-// 	/// </summary>
-// 	/// <returns></returns>
-// 	/// <response code="200">Request was successful.</response>
-// 	[HttpGet]
-// 	// TODO: Add parameters to allow filtering, paging, return 400 if bad request
-// 	public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
-// 	{
-// 		return Ok(await _userManager.Users.ToListAsync());
-// //		return users; // TODO use RESTful DTO
-// 	}
-//
-	
 
-	// /// <summary>
-	// /// Retrieve user details.
-	// /// </summary>
-	// /// <param name="userName">User Name of user.</param>
-	// /// <returns>A user.</returns>
-	// /// <response code="200">User is found.</response>
-	// /// <response code="403">Not permitted.</response>
-	// /// <response code="404">User is not found.</response>
-	// [Authorize(Roles="administrator")]
-	// [HttpGet("{userName}")]
-	// public async Task<ActionResult<GetUserResult>> GetUser(string userName)
-	// {
-	// 	string upperedUserName = userName.ToUpper();
-	// 	AppUser? user = await _userManager.Users.SingleOrDefaultAsync(q => q.NormalizedUserName == upperedUserName);
-	// 	if (user == null) return NotFound();
-	//
-	// 	List<Link> links = new List<Link>
-	// 	{
-	// 		new Link()
-	// 		{
-	// 			Action = "get",
-	// 			Rel = "self",
-	// 			Types = new string[] { JSON_MIME_TYPE },
-	// 			HRef = $"{GetBaseApiPath()}/users/{user.UserName}" 
-	// 		}
-	// 	};
-	//
-	// 	IList<string> roles = await _userManager.GetRolesAsync(user);
-	// 	roles.ToList().ForEach(x =>
-	// 	{
-	// 		links.Add(new Link()
-	// 		{
-	// 			Action = "get",
-	// 			Rel = "role",
-	// 			Types = new string[] { JSON_MIME_TYPE },
-	// 			HRef = $"{GetBaseApiPath()}/roles/{x}"
-	// 		});
-	// 	});
-	// 	
-	// 	return new GetUserResult()
-	// 	{
-	// 		UserName = user.UserName ?? string.Empty,
-	// 		HasRoles = await _userManager.GetRolesAsync(user),
-	// 		Links = links
-	// 	};
-	// }
-	//
 	
     /// <summary>
 	/// Creates a new Dictionary.

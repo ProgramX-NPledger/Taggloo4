@@ -19,6 +19,10 @@ public class RolesController : BaseApiController
 {
 	private readonly RoleManager<AppRole> _roleManager;
 
+	/// <summary>
+	/// Constructor with injected parameters.
+	/// </summary>
+	/// <param name="roleManager">Implementation of <seealso cref="RoleManager{AppRole}"/></param>
 	public RolesController(RoleManager<AppRole> roleManager)
 	{
 		_roleManager = roleManager;
@@ -33,7 +37,6 @@ public class RolesController : BaseApiController
 	/// <response code="200">Role is found.</response>
 	/// <response code="403">Not permitted.</response>
 	/// <response code="404">Role is not found.</response>
-	//[Authorize(Roles="administrator")]
 	[HttpGet("{roleName}")]
 	public async Task<ActionResult<GetRoleResult>> GetRole(string roleName)
 	{

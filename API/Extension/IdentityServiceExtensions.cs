@@ -8,8 +8,18 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Extension;
 
+/// <summary>
+/// Extension methods for Identity services.
+/// </summary>
 public static class IdentityServiceExtensions
 {
+	/// <summary>
+	/// Adds authentication services to the application service resolver.
+	/// </summary>
+	/// <param name="services"><seealso cref="IServiceCollection"/> representing the services used by the application.</param>
+	/// <param name="configuration">Active <seealso cref="IConfiguration"/>.</param>
+	/// <returns>The configured <seealso cref="IServiceCollection"/>.</returns>
+	/// <exception cref="ArgumentNullException">Thrown if the <seealso cref="TokenService.JWT_TOKEN_KEY_CONFIG_KEY"/> configuration is not defined.</exception>
 	public static IServiceCollection AddIdentityServices(this IServiceCollection services,
 		IConfiguration configuration)
 	{
