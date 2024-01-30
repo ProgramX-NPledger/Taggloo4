@@ -7,6 +7,7 @@
     <InvariantGlobalization>false</InvariantGlobalization>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <UserSecretsId>db35d752-f02c-41b1-93db-e73dbd5a0b04</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,6 +37,12 @@
   <ItemGroup>
     <None Remove="Data\hangfire-install.sql" />
     <EmbeddedResource Include="Data\hangfire-install.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\.dockerignore">
+      <Link>.dockerignore</Link>
+    </Content>
   </ItemGroup>
 
 </Project>

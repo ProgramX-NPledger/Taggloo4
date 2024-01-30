@@ -1,0 +1,16 @@
+﻿services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: (from Github secret)
+      MSSQL_PID: Express
+    ports:
+      - "1433:1433"
+  dotnet8:
+    depends_on:
+      - mssql
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+
