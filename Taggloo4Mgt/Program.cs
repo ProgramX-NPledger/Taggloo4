@@ -4,14 +4,30 @@ using System.Diagnostics;
 using CommandLine;
 using Taggloo4Mgt;
 
-Parser.Default.ParseArguments<ImportOptions>(args)
-	.MapResult(
-		(ImportOptions importOptions) =>
-		{
-			Importer importer = new Importer(importOptions);
+var verbs = GetVerbs();
+
+Type[] GetVerbs()
+{
+	return new Type[]
+	{
+		typeof(ImportOptions)
+	};
+}
+
+void ProcessError(object obj)
+{
+	int i = 5;
+}
+
+void ProcessCommandLine(object obj)
+{
+	switch (obj)
+	{
+		case ImportOptions:
+			Importer importer = new Importer((ImportOptions)obj);
 			try
 			{
-				return importer.Process().Result;
+				importer.Process();
 			}
 			catch (Exception? ex)
 			{
@@ -21,11 +37,18 @@ Parser.Default.ParseArguments<ImportOptions>(args)
 					Console.Error.WriteLine($"{exPtr.Message}");
 					exPtr = exPtr.InnerException;
 				} while (exPtr!=null);
-				return 2;
+
+				return;
 			}
-		},
-		errors=>1
-	);
+			break;
+	}
+}
+
+
+Parser.Default.ParseArguments(args, verbs)
+	.WithParsed(ProcessCommandLine)
+	.WithNotParsed(ProcessError);
+
 
 
 
