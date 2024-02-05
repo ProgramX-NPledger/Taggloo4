@@ -4,50 +4,27 @@ using System.Diagnostics;
 using CommandLine;
 using Taggloo4Mgt;
 
-var verbs = GetVerbs();
-
-Type[] GetVerbs()
+try
 {
-	return new Type[]
-	{
-		typeof(ImportOptions)
-	};
-}
-
-void ProcessError(object obj)
-{
-	int i = 5;
-}
-
-void ProcessCommandLine(object obj)
-{
-	switch (obj)
-	{
-		case ImportOptions:
-			Importer importer = new Importer((ImportOptions)obj);
-			try
+	CommandLine.Parser.Default.ParseArguments<ImportOptions>(args)
+		.MapResult(
+			(ImportOptions options) =>
 			{
-				importer.Process();
-			}
-			catch (Exception? ex)
-			{
-				Exception? exPtr = ex;
-				do
-				{
-					Console.Error.WriteLine($"{exPtr.Message}");
-					exPtr = exPtr.InnerException;
-				} while (exPtr!=null);
+				Importer importer = new Importer(options);
+				return importer.Process().Result;
+			},
+			errors => 1);
 
-				return;
-			}
-			break;
-	}
 }
-
-
-Parser.Default.ParseArguments(args, verbs)
-	.WithParsed(ProcessCommandLine)
-	.WithNotParsed(ProcessError);
+catch (Exception ex)
+{
+	Exception? exPtr = ex;
+	do
+	{
+		Console.Error.WriteLine($"{exPtr.Message}");
+		exPtr = exPtr.InnerException;
+	} while (exPtr!=null);
+}
 
 
 
