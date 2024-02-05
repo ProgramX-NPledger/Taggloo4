@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Taggloo4.Dto\Taggloo4.Dto.csproj" />
+    <ProjectReference Include="..\Taggloo4.Model\Taggloo4.Model.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,5 +45,6 @@
       <Link>.dockerignore</Link>
     </Content>
   </ItemGroup>
+
 
 </Project>
