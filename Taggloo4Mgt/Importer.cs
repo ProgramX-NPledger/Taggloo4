@@ -8,7 +8,7 @@ using Taggloo4.Dto;
 using Taggloo4Mgt.Model;
 
 namespace Taggloo4Mgt;
-public class Importer
+public class Importer : ApiClientBase
 {
 	private readonly ImportOptions _importOptions;
 	private readonly string? _logFileName;
@@ -37,7 +37,7 @@ public class Importer
 		{
 			Log("\tOk");
 			Log($"Connect to API at {_importOptions.Url}");
-			using (HttpClient httpClient = CreateHttpClient())
+			using (HttpClient httpClient = CreateHttpClient(_importOptions.Url))
 			{
 				Log("\tOk");
 				
@@ -410,24 +410,6 @@ public class Importer
 		return await sqlConnection.QueryAsync<string>(sqlCmd);
 	}
 
-	private HttpClient CreateHttpClient()
-	{
-		HttpClientHandler httpClientHandler = new HttpClientHandler();
-		#if DEBUG
-		httpClientHandler.ServerCertificateCustomValidationCallback =
-			HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-		#endif
-		
-		HttpClient httpClient = new HttpClient(httpClientHandler);
-		// Server rejects when added this header
-		// httpClient.DefaultRequestHeaders.Accept.Clear();
-		// httpClient.DefaultRequestHeaders.Accept.Add(
-		// 	new MediaTypeWithQualityHeaderValue("application/json"));
-		httpClient.DefaultRequestHeaders.Add("User-Agent", "Taggloo4Mgt utility");
-		httpClient.BaseAddress = new Uri(_importOptions.Url);
-		
-		return httpClient;
-	}
 
 	private async Task<LoginUserResult> ConnectToApi(HttpClient httpClient)
 	{
