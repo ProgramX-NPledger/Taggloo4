@@ -1,4 +1,4 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)[![.github/workflows/dotnet.yml](https://github.com/ProgramX-NPledger/Taggloo4/actions/workflows/dotnet.yml/badge.svg)](https://github.com/ProgramX-NPledger/Taggloo4/actions/workflows/dotnet.yml)
 
 # Taggloo4
 
