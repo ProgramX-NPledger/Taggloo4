@@ -44,5 +44,14 @@ jobs:
         path: TestResults-${{ matrix.dotnet-version }}
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+    - name: release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: true
+        release_name: 4.0
+        tag_name: ${{ github.ref }}
+        body_path: CHANGELOG.md
 
   
