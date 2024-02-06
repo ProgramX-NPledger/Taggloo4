@@ -3,14 +3,24 @@
 
 name: .NET
 
+concurrency: 
+  group: main
+  cancel-in-progress: true
+
 on:
-  workflow_dispatch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
   
 jobs:
-  build:
+  Build:
 
     runs-on: ubuntu-latest
-
+    environment: production
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -23,3 +33,6 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+
+
+  
