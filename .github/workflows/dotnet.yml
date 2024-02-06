@@ -1,4 +1,4 @@
-# This workflow will build a .NET project
+eas# This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
 name: .NET
@@ -51,7 +51,7 @@ jobs:
         draft: false
         prerelease: true
         release_name: Latest build
-        tag_name: tag${{ github.ref }}
+        tag_name: release${{ github.ref }}
         body_path: CHANGELOG.md
       env:
         GITHUB_TOKEN: ${{ github.token }}
