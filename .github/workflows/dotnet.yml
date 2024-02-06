@@ -18,7 +18,7 @@ on:
   
 jobs:
   Build:
-
+    permissions: write-all
     runs-on: ubuntu-latest
     environment: production
     strategy:
@@ -53,6 +53,6 @@ jobs:
         release_name: 4.0
         tag_name: ${{ github.ref }}
         body_path: CHANGELOG.md
-    env:
-      GITHUB_TOKEN: ${{ github.token }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
   
