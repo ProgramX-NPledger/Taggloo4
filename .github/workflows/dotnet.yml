@@ -55,7 +55,8 @@ jobs:
         prerelease: true
         title: "Latest Build"
         files: |
-          *.*
-          API/*
+          /home/runner/work/Taggloo4/dotnet-webapp/*
+          README.md
+          CHANGELOG.md
 
   
