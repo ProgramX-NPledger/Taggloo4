@@ -1,4 +1,4 @@
-eas# This workflow will build a .NET project
+# This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
 name: .NET
@@ -26,7 +26,8 @@ jobs:
         dotnet-version: ['8.0.x']
         
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
     - name: Setup .NET ${{ matrix.dotnet-version }}
       uses: actions/setup-dotnet@v3
       with:
@@ -45,23 +46,13 @@ jobs:
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
     - name: Create GitHub Release
-      uses: actions/create-release@v1
-      id: create_release
+      uses: "marvinpinto/action-automatic-releases@latest"
       with:
-        draft: false
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
         prerelease: true
-        release_name: Latest build
-        tag_name: release${{ github.ref }}
-        body_path: CHANGELOG.md
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-    - name: Upload artifacts to Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./
-        asset_name: output.zip
-        asset_content_type: application/zip
+        title: "Latest Build"
+        files: |
+          *.*
+
   
