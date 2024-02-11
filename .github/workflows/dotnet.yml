@@ -47,6 +47,10 @@ jobs:
       if: ${{ always() }}
     - name: Publish Release build
       run: dotnet publish -c Release -o ../dotnet-webapp -r linux-x64 --self-contained true /p:UseAppHost=true
+    - name: Compress
+      uses: TonyBogdanov/zip@1.0
+      with:
+        args: zip -qq -r ./archive.zip /home/runner/work/Taggloo4/dotnet-webapp/*
     - name: Create GitHub Release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
@@ -55,7 +59,7 @@ jobs:
         prerelease: true
         title: "Latest Build"
         files: |
-          /home/runner/work/Taggloo4/dotnet-webapp/*
+          ./archive.zip
           README.md
           CHANGELOG.md
 
