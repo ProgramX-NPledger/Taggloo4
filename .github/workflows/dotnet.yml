@@ -36,7 +36,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Test with dotnet
+    - name: Test 
       run: dotnet test --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
     - name: Upload dotnet test results
       uses: actions/upload-artifact@v4
@@ -45,6 +45,8 @@ jobs:
         path: TestResults-${{ matrix.dotnet-version }}
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+    - name: Publish Release build
+      run: dotnet publish -c Release -o ../dotnet-webapp -r linux-x64 --self-contained true /p:UseAppHost=true
     - name: Create GitHub Release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
