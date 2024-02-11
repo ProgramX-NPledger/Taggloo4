@@ -50,7 +50,16 @@ jobs:
     - name: ZIP
       working-directory: ./API/bin/Release/net8.0/linux-x64
       run: zip -r ./deploy.zip . -i *
+    - name: Prepare temporary folder for archive
+      run: mkdir ./deploy_net8_linux-x64
+    - name: Copy built artefacts
+      run: cp -r ./API/bin/Release/net8.0/linux-x64/* deploy_net8_linux-x64
     - name: Compress
+      uses: TonyBogdanov/zip@1.0
+      with:
+        args: zip -r ./deploy_net8_linux-x64.zip ./API/bin/Release/net8.0/linux-x64 -i *
+      
+    - name: Compress (old)
       uses: TonyBogdanov/zip@1.0
       with:
         args: zip -r ./archive.zip ./API/bin/Release/net8.0/linux-x64 -i *
@@ -62,7 +71,7 @@ jobs:
         prerelease: true
         title: "Latest Build"
         files: |
-          ./*
+          ./deploy_net8_linux-x64.zip
           ./deploy.zip
           ./archive.zip
           README.md
