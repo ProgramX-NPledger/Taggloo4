@@ -47,6 +47,9 @@ jobs:
       if: ${{ always() }}
     - name: Publish Release build
       run: dotnet publish -c Release -o ../dotnet-webapp -r linux-x64 --self-contained true /p:UseAppHost=true
+    - name: ZIP
+      working-directory: ./API/bin/Release/net8.0/linux-x64
+      run: zip -r deploy.zip *
     - name: Compress
       uses: TonyBogdanov/zip@1.0
       with:
@@ -59,6 +62,7 @@ jobs:
         prerelease: true
         title: "Latest Build"
         files: |
+          ./deploy.zip
           ./archive.zip
           README.md
           CHANGELOG.md
