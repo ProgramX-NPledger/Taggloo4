@@ -50,7 +50,7 @@ jobs:
     - name: Compress
       uses: TonyBogdanov/zip@1.0
       with:
-        args: zip -r ./archive.zip /home/runner/work/Taggloo4/Taggloo4/API/bin/Release/net8.0/linux-x64/*
+        args: zip -r ./archive.zip *
     - name: Create GitHub Release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
