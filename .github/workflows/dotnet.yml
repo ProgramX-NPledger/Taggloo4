@@ -57,7 +57,7 @@ jobs:
     - name: Compress
       uses: TonyBogdanov/zip@1.0
       with:
-        args: zip -r ./deploy_net8_linux-x64.zip ./API/bin/Release/net8.0/linux-x64 -i *
+        args: zip -r ./deploy_net8_linux-x64.zip ./deploy_net8_linux-x64 -i *
       
     - name: Compress (old)
       uses: TonyBogdanov/zip@1.0
