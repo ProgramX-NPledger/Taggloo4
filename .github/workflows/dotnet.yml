@@ -54,6 +54,6 @@ jobs:
         title: "Latest Build"
         files: |
           *.*
-          API/bin/*
+          API/*
 
   
