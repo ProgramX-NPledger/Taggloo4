@@ -47,9 +47,6 @@ jobs:
       if: ${{ always() }}
     - name: Publish Release build
       run: dotnet publish -c Release -o ../dotnet-webapp -r linux-x64 --self-contained true /p:UseAppHost=true
-    - name: ZIP
-      working-directory: ./API/bin/Release/net8.0/linux-x64
-      run: zip -r ./deploy.zip . -i *
     - name: Prepare temporary folder for archive
       run: mkdir ./deploy_net8_linux-x64
     - name: Copy built artefacts
@@ -58,11 +55,6 @@ jobs:
       uses: TonyBogdanov/zip@1.0
       with:
         args: zip -r ./deploy_net8_linux-x64.zip ./deploy_net8_linux-x64 -i *
-      
-    - name: Compress (old)
-      uses: TonyBogdanov/zip@1.0
-      with:
-        args: zip -r ./archive.zip ./API/bin/Release/net8.0/linux-x64 -i *
     - name: Create GitHub Release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
@@ -72,8 +64,6 @@ jobs:
         title: "Latest Build"
         files: |
           ./deploy_net8_linux-x64.zip
-          ./deploy.zip
-          ./archive.zip
           README.md
           CHANGELOG.md
 
