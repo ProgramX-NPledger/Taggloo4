@@ -20,7 +20,7 @@ jobs:
   Build:
     permissions: write-all
     runs-on: ubuntu-latest
-    environment: production
+    environment: beta
     strategy:
       matrix:
         dotnet-version: ['8.0.x']
@@ -45,25 +45,25 @@ jobs:
         path: TestResults-${{ matrix.dotnet-version }}
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
-    - name: Publish Release build
-      run: dotnet publish -c Release -o ../dotnet-webapp -r linux-x64 --self-contained true /p:UseAppHost=true
+    - name: Publish Debug build
+      run: dotnet publish -c Debug -o ../dotnet-webapp -r linux-x64 --self-contained true /p:UseAppHost=true
     - name: Prepare temporary folder for archive
-      run: mkdir ./deploy_net8_linux-x64
+      run: mkdir ./deploy_debug_net8_linux-x64
     - name: Copy built artefacts
-      run: cp -r ./API/bin/Release/net8.0/linux-x64/* deploy_net8_linux-x64
+      run: cp -r ./API/bin/Debug/net8.0/linux-x64/* deploy_debug_net8_linux-x64
     - name: Compress
       uses: TonyBogdanov/zip@1.0
       with:
-        args: zip -r ./deploy_net8_linux-x64.zip ./deploy_net8_linux-x64 -i *
+        args: zip -r ./deploy_debug_net8_linux-x64.zip ./deploy_debug_net8_linux-x64 -i *
     - name: Create GitHub Release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
-        prerelease: false
+        prerelease: true
         title: "Latest Build"
         files: |
-          ./deploy_net8_linux-x64.zip
+          ./deploy_debug_net8_linux-x64.zip
           README.md
           CHANGELOG.md
 
