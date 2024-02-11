@@ -62,6 +62,7 @@ jobs:
         prerelease: true
         title: "Latest Build"
         files: |
+          ./*
           ./deploy.zip
           ./archive.zip
           README.md
