@@ -50,7 +50,7 @@ jobs:
     - name: Compress
       uses: TonyBogdanov/zip@1.0
       with:
-        args: zip -r ./archive.zip . -i *
+        args: zip -r ./archive.zip ./API/bin/Release/net8.0/linux-x64 -i *
     - name: Create GitHub Release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
