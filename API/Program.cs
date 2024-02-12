@@ -90,10 +90,21 @@ using (IServiceScope scope = app.Services.CreateScope())
     try
     {
         var dataContext = services.GetRequiredService<DataContext>();
+        // TODO: what if cannot connect to SQL Server?
         await dataContext.Database.MigrateAsync();
         UserManager<AppUser> userManager = services.GetRequiredService<UserManager<AppUser>>();
         RoleManager<AppRole> roleManager = services.GetRequiredService<RoleManager<AppRole>>();
-        await Seed.SeedUsers(userManager,roleManager);
+        ILogger logger = services.GetRequiredService<ILogger>();
+        Initialiser initialiser = new Initialiser(userManager, roleManager, logger, app.Environment.ContentRootPath, dataContext);
+        SiteReadiness siteReadiness = await initialiser.GetSiteStatus();
+        if (siteReadiness != SiteReadiness.Ready)
+        {
+            await initialiser.Initialise();    
+        }
+        
+        
+        
+        //await Seed.SeedUsers(userManager,roleManager,app.Environment.ContentRootPath);
         
         
     }
