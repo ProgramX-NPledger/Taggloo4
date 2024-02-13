@@ -11,13 +11,13 @@ public class Initialiser
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly RoleManager<AppRole> _roleManager;
-    private readonly ILogger _logger;
+    private readonly ILogger<Initialiser> _logger;
     private readonly string _contentRootPath;
     private readonly DataContext _dataContext;
 
     public Initialiser(UserManager<AppUser> userManager, 
         RoleManager<AppRole> roleManager,
-        ILogger logger,
+        ILogger<Initialiser> logger,
         string contentRootPath,
         DataContext dataContext
         )
@@ -39,8 +39,19 @@ public class Initialiser
             if (siteReadiness!=SiteReadiness.Ready)
             {
                 string siteInitialisationConfigurationText = File.ReadAllText(siteInitialisationFileName);
-                SiteInitialisationConfiguration? siteInitialisationConfiguration = JsonSerializer.Deserialize<SiteInitialisationConfiguration>(
-                    siteInitialisationConfigurationText);
+                SiteInitialisationConfiguration? siteInitialisationConfiguration;
+                try
+                {
+                    siteInitialisationConfiguration = JsonSerializer.Deserialize<SiteInitialisationConfiguration>(
+                        siteInitialisationConfigurationText);
+                    AssertValidSiteInitialisationConfiguration(siteInitialisationConfiguration);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e,$"Failed to read configuration from {siteInitialisationFileName}");
+                    throw;
+                }
+                
                 _logger.LogInformation($"Site Initialisation file '{siteInitialisationFileName} found and site is capable for initialisation.");
 
                 await EnsureRolesAreSeeded();
@@ -60,6 +71,29 @@ public class Initialiser
                 $"Taggloo site is not yet ready for start-up. Configure a site initialisation file ({siteInitialisationFileName}) to prepare the site");
     }
 
+    private void AssertValidSiteInitialisationConfiguration(SiteInitialisationConfiguration? siteInitialisationConfiguration)
+    {
+        List<string> errors = new List<string>();
+        foreach (User user in siteInitialisationConfiguration.Users)
+        {
+            if (string.IsNullOrWhiteSpace(user.UserName)) errors.Add($"User has empty UserName");
+            if (string.IsNullOrWhiteSpace(user.Password)) errors.Add($"User {user.UserName} has empty Password");
+            if (string.IsNullOrWhiteSpace(user.AssignToRoles)) errors.Add($"User {user.UserName} has empty AssignToRoles");
+        }
+
+        foreach (Language language in siteInitialisationConfiguration.Languages)
+        {
+            if (string.IsNullOrWhiteSpace(language.IetfLanguageTag)) errors.Add($"Language has empty IetfLanguageCode");
+            if (string.IsNullOrWhiteSpace(language.Name)) errors.Add($"Language {language.IetfLanguageTag} has empty Name");
+        }
+        
+        if (errors.Any())
+        {
+            throw new InvalidOperationException($"Site Initialisation is invalid: " +
+                                                string.Join(Environment.NewLine, errors.ToArray()));
+        }
+    }
+
     private async Task EnsureLanguagesAreConfigured(Language[] languages)
     {
         if (!_dataContext.Languages.Any())
@@ -67,6 +101,7 @@ public class Initialiser
             // create languages
             foreach (Language language in languages)
             {
+                _logger?.LogInformation($"Seeding missing Language '{language.IetfLanguageTag}'");
                 _dataContext.Languages.Add(new API.Model.Language()
                 {
                     Name = language.Name,
@@ -92,7 +127,8 @@ public class Initialiser
                     UserName = user.UserName
                 };
                 await _userManager.CreateAsync(appUser,user.Password);
-                string[] assignToRoles = user.RequiredRoles.Split([',']);
+                _logger?.LogInformation($"Seeding missing user '{user.UserName}' and adding to roles '{user.AssignToRoles}'");
+                string[] assignToRoles = user.AssignToRoles.Split([',']);
                 foreach (string role in assignToRoles)
                 {
                     await _userManager.AddToRoleAsync(appUser, role);

@@ -2,6 +2,8 @@
 using API.Data;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace API.Extension;
 
@@ -32,6 +34,16 @@ public static class ApplicationServiceExtensions
 		services.AddScoped<ITranslationRepository, TranslationRepository>();
 		services.AddSingleton<IApiLoggerService, BufferedApiLoggerService>();
 		services.AddSingleton<IApiLogRepository, ApiLogRepository>();
+
+		services.AddLogging(loggingBuilder =>
+			loggingBuilder.AddSerilog(dispose: true));
+		
+		// ILoggerFactory factory = new LoggerFactory().AddSerilog(Log.Logger);
+		// ILogger<Program> logger = factory.CreateLogger<Program>();
+		// services.AddScoped<ILogger<Program>>((x) =>
+		// {
+		// 	return factory.CreateLogger<Program>();
+		// });
 		return services;
 	}
 }
