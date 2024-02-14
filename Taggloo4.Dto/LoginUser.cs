@@ -8,10 +8,10 @@ public class LoginUser
 	/// <summary>
 	/// UserName of user. This is case-insensitive.
 	/// </summary>
-	public string UserName { get; set; }
+	public required string UserName { get; set; }
 	
 	/// <summary>
 	/// Password of user.
 	/// </summary>
-	public string Password { get; set; }
+	public required string Password { get; set; }
 }

@@ -2,9 +2,9 @@
 
 public class HttpRequestForLog
 {
-	public string IpAddress { get; set; }
+	public required string IpAddress { get; set; }
 	public DateTime TimeStamp { get; set; }
-	public string RequestVerb { get; set; }
-	public string SafeUrl { get; set; }
+	public required string RequestVerb { get; set; }
+	public required string SafeUrl { get; set; }
 	
 }

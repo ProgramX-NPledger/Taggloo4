@@ -25,6 +25,6 @@ public class UpdateWordTranslationResult
 	/// List of related Entities
 	/// </summary>
 	[JsonPropertyName("links")]
-	public IEnumerable<Link> Links { get; set; }
+	public IEnumerable<Link>? Links { get; set; }
 	
 }

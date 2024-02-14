@@ -20,7 +20,8 @@ public class ApiLogRepository : IApiLogRepository
 	/// <param name="configuration">Application configuration.</param>
 	public ApiLogRepository(IConfiguration configuration)
 	{
-		_connectionString = configuration.GetConnectionString("DefaultConnection");
+		if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+		_connectionString = configuration.GetConnectionString("DefaultConnection")!;
 		if (_connectionString == null) throw new NullReferenceException("DefaultConnection string not configured");
 		
 	}
