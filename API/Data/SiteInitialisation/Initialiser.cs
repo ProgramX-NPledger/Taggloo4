@@ -3,33 +3,46 @@ using API.Data.Model;
 using API.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Language = API.Data.Model.Language;
 
-namespace API.Data;
+namespace API.Data.SiteInitialisation;
 
+/// <summary>
+/// Initialises a Taggloo site with basic configuration given the presence of a siteInitialisation.json file.
+/// </summary>
 public class Initialiser
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly RoleManager<AppRole> _roleManager;
-    private readonly ILogger<Initialiser> _logger;
+  //  private readonly ILogger<Initialiser> _logger;
     private readonly string _contentRootPath;
     private readonly DataContext _dataContext;
 
+    /// <summary>
+    /// Instantiates a new instance of the <seealso cref="Initialiser"/> class.
+    /// </summary>
+    /// <param name="userManager">A <seealso cref="UserManager{TUser}"/> for managing Users.</param>
+    /// <param name="roleManager">A <seealso cref="RoleManager{TRole}"/> for managing Roles.</param>
+    /// <param name="contentRootPath">The physical file system path of the web-site, used to resolve the siteInitialisation.json file.</param>
+    /// <param name="dataContext">The Entity Framework Data Context.</param>
     public Initialiser(UserManager<AppUser> userManager, 
         RoleManager<AppRole> roleManager,
-        ILogger<Initialiser> logger,
         string contentRootPath,
         DataContext dataContext
         )
     {
         _userManager = userManager;
         _roleManager = roleManager;
-        _logger = logger;
         _contentRootPath = contentRootPath;
         _dataContext = dataContext;
     }
     
 
+    /// <summary>
+    /// Initialise the site, if required. If no initialisation is required, no changes are made.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown if the initialisation couldn't be performed due to an error reading or parsing the siteInitialisation.json file.</exception>
     public async Task Initialise()
     {
        string siteInitialisationFileName = Path.Combine(_contentRootPath, "siteInitialisation.json");
@@ -39,7 +52,7 @@ public class Initialiser
             if (siteReadiness!=SiteReadiness.Ready)
             {
                 string siteInitialisationConfigurationText = File.ReadAllText(siteInitialisationFileName);
-                SiteInitialisationConfiguration? siteInitialisationConfiguration;
+                SiteInitialisationConfiguration? siteInitialisationConfiguration = null;
                 try
                 {
                     siteInitialisationConfiguration = JsonSerializer.Deserialize<SiteInitialisationConfiguration>(
@@ -48,19 +61,19 @@ public class Initialiser
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e,$"Failed to read configuration from {siteInitialisationFileName}");
+                    Log.Error(e,$"Failed to read configuration from {siteInitialisationFileName}");
                     throw;
                 }
                 
-                _logger.LogInformation($"Site Initialisation file '{siteInitialisationFileName} found and site is capable for initialisation.");
+                Log.Information($"Site Initialisation file '{siteInitialisationFileName} found and site is capable for initialisation.");
 
                 await EnsureRolesAreSeeded();
-                await EnsureUsersAreSeeded(siteInitialisationConfiguration.Users);
+                await EnsureUsersAreSeeded(siteInitialisationConfiguration!.Users);
                 await EnsureLanguagesAreConfigured(siteInitialisationConfiguration.Languages);
             }
             else
             {
-                _logger.LogWarning($"Site Initialisation file '{siteInitialisationFileName} still exists but was ignored. You should delete this file. Site Readiness is {siteReadiness}");
+                Log.Warning($"Site Initialisation file '{siteInitialisationFileName} still exists but was ignored. You should delete this file. Site Readiness is {siteReadiness}");
             }
             
         }
@@ -73,6 +86,7 @@ public class Initialiser
 
     private void AssertValidSiteInitialisationConfiguration(SiteInitialisationConfiguration? siteInitialisationConfiguration)
     {
+        if (siteInitialisationConfiguration == null) throw new ArgumentNullException("siteInitialisationConfiguration");
         List<string> errors = new List<string>();
         foreach (User user in siteInitialisationConfiguration.Users)
         {
@@ -101,7 +115,7 @@ public class Initialiser
             // create languages
             foreach (Language language in languages)
             {
-                _logger?.LogInformation($"Seeding missing Language '{language.IetfLanguageTag}'");
+                Log.Information($"Seeding missing Language '{language.IetfLanguageTag}'");
                 _dataContext.Languages.Add(new API.Model.Language()
                 {
                     Name = language.Name,
@@ -127,7 +141,7 @@ public class Initialiser
                     UserName = user.UserName
                 };
                 await _userManager.CreateAsync(appUser,user.Password);
-                _logger?.LogInformation($"Seeding missing user '{user.UserName}' and adding to roles '{user.AssignToRoles}'");
+                Log.Information($"Seeding missing user '{user.UserName}' and adding to roles '{user.AssignToRoles}'");
                 string[] assignToRoles = user.AssignToRoles.Split([',']);
                 foreach (string role in assignToRoles)
                 {
@@ -146,7 +160,7 @@ public class Initialiser
         {
             if (!await _roleManager.RoleExistsAsync(role))
             {
-                _logger?.LogInformation($"Seeding missing role '{role}'");
+                Log.Information($"Seeding missing role '{role}'");
                 await _roleManager.CreateAsync(new AppRole()
                 {
                     Name = role

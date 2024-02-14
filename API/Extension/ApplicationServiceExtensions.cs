@@ -35,15 +35,12 @@ public static class ApplicationServiceExtensions
 		services.AddSingleton<IApiLoggerService, BufferedApiLoggerService>();
 		services.AddSingleton<IApiLogRepository, ApiLogRepository>();
 
+	
+		
 		services.AddLogging(loggingBuilder =>
 			loggingBuilder.AddSerilog(dispose: true));
 		
-		// ILoggerFactory factory = new LoggerFactory().AddSerilog(Log.Logger);
-		// ILogger<Program> logger = factory.CreateLogger<Program>();
-		// services.AddScoped<ILogger<Program>>((x) =>
-		// {
-		// 	return factory.CreateLogger<Program>();
-		// });
+		
 		return services;
 	}
 }

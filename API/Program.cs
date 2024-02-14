@@ -1,5 +1,6 @@
 using System.Reflection;
 using API.Data;
+using API.Data.SiteInitialisation;
 using API.Extension;
 using API.Middleware;
 using API.Model;
@@ -8,14 +9,17 @@ using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using Hangfire.SqlServer;
 using Serilog;
+using Serilog.Events;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 
 var builder = WebApplication.CreateBuilder(args);
-var logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .WriteTo.Console()
-    .Enrich.FromLogContext()
-    .CreateLogger();
+ var logger = new LoggerConfiguration()
+     .ReadFrom.Configuration(builder.Configuration)
+    // .MinimumLevel.Override("Microsoft.AspNetCore",LogEventLevel.Warning)
+     .WriteTo.Console()
+     .Enrich.FromLogContext()
+     .CreateLogger();
 builder.Host.UseSerilog(logger);
 
 builder.Services.AddControllers();
@@ -55,7 +59,7 @@ builder.Services.AddHangfireServer();
 
 var app = builder.Build();
 
-//app.UseSerilogRequestLogging();
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -75,7 +79,7 @@ app.UseAuthorization();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseMiddleware<HttpLoggingMiddleware>();
+//app.UseMiddleware<HttpLoggingMiddleware>();
 app.MapControllers();
 
 app.UseHangfireDashboard();
@@ -89,12 +93,12 @@ using (IServiceScope scope = app.Services.CreateScope())
         await dataContext.Database.MigrateAsync();
         UserManager<AppUser> userManager = services.GetRequiredService<UserManager<AppUser>>();
         RoleManager<AppRole> roleManager = services.GetRequiredService<RoleManager<AppRole>>();
-        ILogger<Initialiser> initialiserLogger = services.GetRequiredService<ILogger<Initialiser>>();
-        Initialiser initialiser = new Initialiser(userManager, roleManager, initialiserLogger, app.Environment.ContentRootPath, dataContext);
+        
+        Initialiser initialiser = new Initialiser(userManager, roleManager, app.Environment.ContentRootPath, dataContext);
         SiteReadiness siteReadiness = await initialiser.GetSiteStatus();
         if (siteReadiness != SiteReadiness.Ready)
         {
-            initialiserLogger.LogWarning("SiteReadiness requires initialisation",new
+            Log.Warning($"SiteReadiness requires initialisation: {siteReadiness}",new
             {
                 siteReadiness
             });
