@@ -1,25 +1,26 @@
 using System.Reflection;
-using System.Text;
-using API.Contract;
 using API.Data;
+using API.Data.SiteInitialisation;
 using API.Extension;
 using API.Middleware;
 using API.Model;
-using API.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Hangfire;
 using Hangfire.SqlServer;
-
+using Serilog;
+using Serilog.Events;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-// Add services to the container.
+ var logger = new LoggerConfiguration()
+     .ReadFrom.Configuration(builder.Configuration)
+    // .MinimumLevel.Override("Microsoft.AspNetCore",LogEventLevel.Warning)
+     .WriteTo.Console()
+     .Enrich.FromLogContext()
+     .CreateLogger();
+builder.Host.UseSerilog(logger);
 
 builder.Services.AddControllers();
 
@@ -48,7 +49,7 @@ builder.Services.AddHangfire(configuration=>
     configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
-    // xonfigure to not build tables
+    // do not create tables for Hangfire, these are created as part of EF migrations
     .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions()
     {
         PrepareSchemaIfNecessary = false,
@@ -58,6 +59,7 @@ builder.Services.AddHangfireServer();
 
 var app = builder.Build();
 
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -77,12 +79,10 @@ app.UseAuthorization();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
-app.UseMiddleware<HttpLoggingMiddleware>();
+//app.UseMiddleware<HttpLoggingMiddleware>();
 app.MapControllers();
 
 app.UseHangfireDashboard();
-
 
 using (IServiceScope scope = app.Services.CreateScope())
 {
@@ -93,14 +93,22 @@ using (IServiceScope scope = app.Services.CreateScope())
         await dataContext.Database.MigrateAsync();
         UserManager<AppUser> userManager = services.GetRequiredService<UserManager<AppUser>>();
         RoleManager<AppRole> roleManager = services.GetRequiredService<RoleManager<AppRole>>();
-        await Seed.SeedUsers(userManager,roleManager);
         
-        
+        Initialiser initialiser = new Initialiser(userManager, roleManager, app.Environment.ContentRootPath, dataContext);
+        SiteReadiness siteReadiness = await initialiser.GetSiteStatus();
+        if (siteReadiness != SiteReadiness.Ready)
+        {
+            Log.Warning($"SiteReadiness requires initialisation: {siteReadiness}",new
+            {
+                siteReadiness
+            });
+            await initialiser.Initialise();    
+        }
     }
     catch (Exception ex)
     {
-        ILogger<Program>? logger = services.GetService<ILogger<Program>>();
-        if (logger != null) logger.LogError(ex, "An error occurred during migration");
+        ILogger<Program>? programLogger = services.GetService<ILogger<Program>>();
+        if (programLogger != null) programLogger.LogError(ex, "An error occurred during migration");
         else throw;
     }
 }
