@@ -29,7 +29,7 @@ public class WordTranslation
 	/// <summary>
 	/// The Host from which the Word Translation was created.
 	/// </summary>
-	public string CreatedOn { get; set; }
+	public string? CreatedOn { get; set; }
 	
 	/// <summary>
 	/// The UserName of the creator of the Translation.
@@ -50,7 +50,7 @@ public class WordTranslation
 	/// <summary>
 	/// Owning <seealso cref="Dictionary"/> of the Translation.
 	/// </summary>
-	public Dictionary Dictionary { get; set; }
+	public Dictionary? Dictionary { get; set; }
 	
 	
 	

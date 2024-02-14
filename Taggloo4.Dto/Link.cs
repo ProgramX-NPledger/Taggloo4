@@ -11,25 +11,25 @@ public class Link
 	/// Entity relationship.
 	/// </summary>
 	[JsonPropertyName("rel")]
-	public string Rel { get; set; }
+	public required string Rel { get; set; }
 
 	/// <summary>
 	/// HRef that may be used to extract the entity.
 	/// </summary>
 	[JsonPropertyName("href")]
-	public string HRef { get; set; }
+	public required string HRef { get; set; }
 
 	/// <summary>
 	/// The Action (HTTP Verb) that is used when accessing the HRef.
 	/// </summary>
 	[JsonPropertyName("action")]
-	public string Action { get; set; }
+	public required string Action { get; set; }
 	
 	/// <summary>
 	/// A collection of MIME types that may be returned.
 	/// </summary>
 	[JsonPropertyName("types")]
-	public IEnumerable<string> Types { get; set; }
+	public IEnumerable<string>? Types { get; set; }
 		
 	
 }

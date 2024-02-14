@@ -3,6 +3,6 @@
 public class HttpResponseForLog
 {
 	public int StatusCode { get; set; }
-	public string ResponseText { get; set; }
-	
+	public string ResponseText { get; set; } = string.Empty;
+
 }

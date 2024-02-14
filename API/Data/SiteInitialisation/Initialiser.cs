@@ -1,10 +1,10 @@
 ﻿using System.Text.Json;
-using API.Data.Model;
+using API.Data.SiteInitialisation.Model;
 using API.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Language = API.Data.Model.Language;
+using Language = API.Data.SiteInitialisation.Model.Language;
 
 namespace API.Data.SiteInitialisation;
 
@@ -133,7 +133,7 @@ public class Initialiser
         
         foreach (User user in users)
         {
-            if (await _userManager.Users.SingleOrDefaultAsync(q => q.UserName.Equals(user.UserName)) == null)
+            if (await _userManager.Users.SingleOrDefaultAsync(q => q.UserName!=null && q.UserName.Equals(user.UserName)) == null)
             {
                 // user doesn't exist, so create it
                 AppUser appUser = new AppUser()
@@ -190,6 +190,10 @@ public class Initialiser
     }
 
 
+    /// <summary>
+    /// Gets the status of the site, which will determine if Site Initialisation is required, by calling <seealso cref="Initialise"/>.
+    /// </summary>
+    /// <returns>A <seealso cref="SiteReadiness"/> status.</returns>
     public async Task<SiteReadiness> GetSiteStatus()
     {
         SiteReadiness siteReadiness = 0;
