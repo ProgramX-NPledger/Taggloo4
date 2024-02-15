@@ -37,11 +37,6 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// </summary>
 	public DbSet<WordTranslation> WordTranslations { get; set; }
 	
-	/// <summary>
-	/// API Logs
-	/// </summary>
-	public DbSet<ApiLog> ApiLogs { get; set; }
-	
 
 	/// <summary>
 	/// Constructor with options parameter.
