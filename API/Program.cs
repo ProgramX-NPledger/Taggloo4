@@ -1,7 +1,9 @@
 using System.Reflection;
+using API.Contract;
 using API.Data;
 using API.Data.SiteInitialisation;
 using API.Extension;
+using API.Interceptors;
 using API.Middleware;
 using API.Model;
 using Microsoft.AspNetCore.Identity;
@@ -9,18 +11,28 @@ using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using Hangfire.SqlServer;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 
+
 var builder = WebApplication.CreateBuilder(args);
- var logger = new LoggerConfiguration()
-     .ReadFrom.Configuration(builder.Configuration)
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
     // .MinimumLevel.Override("Microsoft.AspNetCore",LogEventLevel.Warning)
-     .WriteTo.Console()
-     .Enrich.FromLogContext()
-     .CreateLogger();
-builder.Host.UseSerilog(logger);
+    .WriteTo.Console()
+    .WriteTo.MSSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),new MSSqlServerSinkOptions()
+    {
+        TableName = "Serilog",
+        AutoCreateSqlTable = true
+    })
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 
@@ -57,6 +69,9 @@ builder.Services.AddHangfire(configuration=>
     }));
 builder.Services.AddHangfireServer();
 
+// builder.Services.AddHttpLogging(o => { });
+// builder.Services.AddHttpLoggingInterceptor<HttpLoggingInterceptor>();
+
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
@@ -80,6 +95,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 //app.UseMiddleware<HttpLoggingMiddleware>();
+
 app.MapControllers();
 
 app.UseHangfireDashboard();
@@ -107,12 +123,10 @@ using (IServiceScope scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        ILogger<Program>? programLogger = services.GetService<ILogger<Program>>();
-        if (programLogger != null) programLogger.LogError(ex, "An error occurred during migration");
-        else throw;
+        Log.Fatal(ex,"An error occurred during migration");
+        throw;
     }
 }
-
 
 IBackgroundJobClient backgroundJobClient = app.Services.GetRequiredService<IBackgroundJobClient>();
 backgroundJobClient.Enqueue(() => Console.WriteLine("Hello from Hangfire"));
