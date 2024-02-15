@@ -3,8 +3,6 @@ using API.Contract;
 using API.Data;
 using API.Data.SiteInitialisation;
 using API.Extension;
-using API.Interceptors;
-using API.Middleware;
 using API.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -26,8 +24,7 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.MSSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),new MSSqlServerSinkOptions()
     {
-        TableName = "Serilog",
-        AutoCreateSqlTable = true
+        TableName = "Serilog"
     })
     .Enrich.FromLogContext()
     .CreateLogger();
@@ -38,8 +35,6 @@ builder.Services.AddControllers();
 
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddApplicationService(builder.Configuration);
-// temporarily disabling logigng middleware
-//builder.Services.Add(new ServiceDescriptor(typeof(IApiLogRepository),typeof(ApiLogRepository),ServiceLifetime.Singleton)); 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -93,8 +88,6 @@ app.UseAuthorization();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-//app.UseMiddleware<HttpLoggingMiddleware>();
 
 app.MapControllers();
 
