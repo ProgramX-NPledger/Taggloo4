@@ -9,10 +9,10 @@ public class LoginUserResult
 	/// <summary>
 	/// UserName of the User.
 	/// </summary>
-	public string UserName { get; set; }
+	public required string UserName { get; set; }
 	
 	/// <summary>
 	/// JWT Token representing the secure log-in.
 	/// </summary>
-	public string Token { get; set; }
+	public required string Token { get; set; }
 }

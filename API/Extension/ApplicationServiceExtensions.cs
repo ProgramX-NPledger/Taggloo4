@@ -2,6 +2,8 @@
 using API.Data;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace API.Extension;
 
@@ -30,8 +32,13 @@ public static class ApplicationServiceExtensions
 		services.AddScoped<IDictionaryRepository, DictionaryRepository>();
 		services.AddScoped<IWordRepository, WordRepository>();
 		services.AddScoped<ITranslationRepository, TranslationRepository>();
-		services.AddSingleton<IApiLoggerService, BufferedApiLoggerService>();
-		services.AddSingleton<IApiLogRepository, ApiLogRepository>();
+
+	
+		
+		services.AddLogging(loggingBuilder =>
+			loggingBuilder.AddSerilog(dispose: true));
+		
+		
 		return services;
 	}
 }

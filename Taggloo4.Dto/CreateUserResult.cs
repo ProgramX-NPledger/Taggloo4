@@ -11,13 +11,13 @@ public class CreateUserResult
 	/// The username chosen for the user.
 	/// </summary>
 	[JsonPropertyName("userName")]
-	public string UserName { get; set; }
+	public required string UserName { get; set; }
 
 	/// <summary>
 	/// List of related Entities
 	/// </summary>
 	[JsonPropertyName("links")]
-	public IEnumerable<Link> Links { get; set; }
+	public IEnumerable<Link>? Links { get; set; }
 	
 	/// <summary>
 	/// A list of Roles that the user is allocated.

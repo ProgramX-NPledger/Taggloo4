@@ -13,17 +13,17 @@ public class Language
 	[Required]
 	[Key]
 	[MaxLength(16)]
-	public string IetfLanguageTag { get; set; }
+	public required string IetfLanguageTag { get; set; }
 	
 	/// <summary>
 	/// Name of Language.
 	/// </summary>
 	[Required] 
-	public string Name { get; set; }
+	public required string Name { get; set; }
 
 	/// <summary>
 	/// <seealso cref="Dictionary"/> entities within the Language.
 	/// </summary>
-	public ICollection<Dictionary> Dictionaries { get; set; }
+	public ICollection<Dictionary>? Dictionaries { get; set; }
 	
 }

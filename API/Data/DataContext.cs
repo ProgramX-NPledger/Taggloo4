@@ -36,7 +36,6 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// Word Translations
 	/// </summary>
 	public DbSet<WordTranslation> WordTranslations { get; set; }
-	public DbSet<ApiLog> ApiLogs { get; set; }
 	
 
 	/// <summary>

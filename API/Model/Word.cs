@@ -18,7 +18,7 @@ public class Word
 	/// The Word.
 	/// </summary>
 	[Required] 
-	public string TheWord { get; set; }
+	public required string TheWord { get; set; }
 	
 	/// <summary>
 	/// UserName of creator of the Word.
@@ -38,7 +38,7 @@ public class Word
 	/// <summary>
 	/// The owning <seealso cref="Dictionary"/>.
 	/// </summary>
-	public Dictionary Dictionary { get; set; }
+	public Dictionary? Dictionary { get; set; }
 	
 	/// <summary>
 	/// Identifier of owning <seealso cref="Dictionary"/>.

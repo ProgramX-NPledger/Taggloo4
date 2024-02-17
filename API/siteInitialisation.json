@@ -1,0 +1,40 @@
+﻿{
+  "Users": 
+    [
+      {
+        "UserName": "administrator",
+        "AssignToRoles": "administrator",
+        "Password": "AReally$trongPassword123"
+      },
+      {
+        "UserName": "dataExporter",
+        "AssignToRoles": "dataExporter",
+        "Password": "AReally$trongPassword123"
+      },
+      {
+        "UserName": "dataImporter",
+        "AssignToRoles": "dataImporter",
+        "Password": "AReally$trongPassword123"
+      },
+      {
+        "UserName": "translator",
+        "AssignToRoles": "translator",
+        "Password": "AReally$trongPassword123"
+      },
+      {
+        "UserName": "guest",
+        "AssignToRoles": "translator",
+        "Password": "AReally$trongPassword123"
+      }
+    ],
+  "Languages": [
+    {
+      "IetfLanguageTag": "en-GB",
+      "Name": "British English"
+    },
+    {
+      "IetfLanguageTag": "gv-GV",
+      "Name": "Manx Gaelic"
+    }
+  ]
+}
