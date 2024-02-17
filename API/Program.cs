@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -68,6 +69,11 @@ builder.Services.AddHangfireServer();
 // builder.Services.AddHttpLoggingInterceptor<HttpLoggingInterceptor>();
 
 var app = builder.Build();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.UseSerilogRequestLogging();
 
