@@ -94,7 +94,7 @@ app.UseAuthorization();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseStaticFiles();
 app.MapControllers();
 
 app.UseHangfireDashboard();
