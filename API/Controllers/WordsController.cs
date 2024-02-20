@@ -169,7 +169,6 @@ public class WordsController : BaseApiController
 	[Authorize(Roles="administrator, dataImporter")]
 	public async Task<ActionResult<AppUser>> UpdateWord(UpdateWord updateWord)
 	{
-		// does the word for the language already exist? If so, reject - maybe a translation is required
 		Word? word = await _wordRepository.GetById(updateWord.WordId);
 		if (word == null) return NotFound();
 		
