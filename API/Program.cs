@@ -77,11 +77,17 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 
 app.UseSerilogRequestLogging();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger(config =>
+    {
+        config.RouteTemplate = "/api/{documentName}/swagger.json";
+    });
+    app.UseSwaggerUI(config =>
+    {
+        config.RoutePrefix = "api";
+        config.SwaggerEndpoint("/api/v1/swagger.json","Taggloo API v4");
+    });
 }
 
 #if !DEBUG
