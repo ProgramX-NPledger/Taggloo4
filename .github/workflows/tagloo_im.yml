@@ -87,7 +87,32 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         connect_timeout: 10s
         script: |
-          unzip taggloo.im/deploy_net8_linux-x64.zip
-          
-
+          cd taggloo.im
+          unzip deploy_net8_linux-x64.zip
+    - name: Copy deploy files
+      uses: cross-the-world/ssh-pipeline@master
+      env:
+        WELCOME: "ssh pipeline"
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        connect_timeout: 10s
+        script: |
+          cd taggloo.im
+          unzip deploy_net8_linux-x64.zip
+          cp -Rf * /var/www/taggloo-test
+    - name: Restart web server
+      uses: cross-the-world/ssh-pipeline@master
+      env:
+        WELCOME: "ssh pipeline"
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        connect_timeout: 10s
+        script: |
+    #sudo systemctl restart kestrel-taggloo.service
   
