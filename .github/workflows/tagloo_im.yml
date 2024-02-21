@@ -102,7 +102,7 @@ jobs:
         script: |
           cd taggloo.im
           unzip deploy_net8_linux-x64.zip
-          cp -Rf * /var/www/taggloo-test
+          cp -Rf deploy_net8_linux-x64/* /var/www/taggloo-test
     - name: Restart web server
       uses: cross-the-world/ssh-pipeline@master
       env:
