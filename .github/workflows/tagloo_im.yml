@@ -77,4 +77,6 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         connect_timeout: 10s
         script: |
+          export TAGGLOOIM_DB_USERNAME="${{ secrets.TAGGLOOIM_DB_USERNAME }}"
+          export TAGGLOOIM_DB_PASSWORD="${{ secrets.TAGGLOOIM_DB_PASSWORD }}"
           ~/scripts/deploy-taggloo.sh
