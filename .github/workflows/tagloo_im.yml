@@ -55,18 +55,6 @@ jobs:
       uses: TonyBogdanov/zip@1.0
       with:
         args: zip -r ./deploy_net8_linux-x64.zip ./deploy_net8_linux-x64 -i *
-    - name: Remove previous deployment files
-      uses: cross-the-world/ssh-pipeline@master
-      env:
-        WELCOME: "ssh pipeline"
-      with:
-        host: ${{ secrets.TAGGLOOIM_HOST }}
-        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
-        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
-        port: ${{ secrets.TAGGLOOIM_PORT }}
-        connect_timeout: 10s
-        script: |
-          rm -rf /home/deployagent/taggloo.im              
     - name: SCP using password
       uses: appleboy/scp-action@v0.1.7
       with:
