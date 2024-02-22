@@ -76,10 +76,12 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         source: "deploy_net8_linux-x64.zip"
         target: taggloo.im
-    - name: Expand deployment ZIP file
+    - name: Finalise deployment (move deployment, configure, launch)
       uses: cross-the-world/ssh-pipeline@master
       env:
-        WELCOME: "ssh pipeline"
+        TAGGLOOIM_DB_USERNAME: ${{ secrets.TAGGLOOIM_DB_USERNAME }}
+        TAGGLOOIM_DB_PASSWORD: ${{ secrets.TAGGLOOIM_DB_PASSWORD }}
+        WELCOME: "ssh p"
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
         user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
@@ -87,44 +89,4 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         connect_timeout: 10s
         script: |
-          cd taggloo.im
-          unzip deploy_net8_linux-x64.zip
-    - name: Delete appSettings
-      uses: cross-the-world/ssh-pipeline@master
-      env:
-        WELCOME: "ssh pipeline"
-      with:
-        host: ${{ secrets.TAGGLOOIM_HOST }}
-        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
-        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
-        port: ${{ secrets.TAGGLOOIM_PORT }}
-        connect_timeout: 10s
-        script: |
-          rm deploy_net8_linux-x64/appsettings.*
-    - name: Copy deploy files
-      uses: cross-the-world/ssh-pipeline@master
-      env:
-        WELCOME: "ssh pipeline"
-      with:
-        host: ${{ secrets.TAGGLOOIM_HOST }}
-        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
-        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
-        port: ${{ secrets.TAGGLOOIM_PORT }}
-        connect_timeout: 10s
-        script: |
-          cp -Rfv deploy_net8_linux-x64/* /var/www/taggloo.im
-    - name: Restart web server
-      uses: cross-the-world/ssh-pipeline@master
-      env:
-        WELCOME: "ssh pipeline"
-      with:
-        host: ${{ secrets.TAGGLOOIM_HOST }}
-        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
-        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
-        port: ${{ secrets.TAGGLOOIM_PORT }}
-        connect_timeout: 10s
-        script: |
-          echo ${{ secrets.DEPLOYAGENT_PASSWORD }} > ~/password.txt
-          sudo -S systemctl restart kestrel-taggloo.service < ~/password.txt
-          echo rm ~/password.txt
-  
+          ~/scripts/deploy.sh
