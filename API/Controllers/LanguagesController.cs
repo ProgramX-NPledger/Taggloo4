@@ -32,38 +32,67 @@ public class LanguagesController : BaseApiController
 	}
 
 	/// <summary>
-	/// Retrieve Language details.
+	/// Retrieve matching Languages.
 	/// </summary>
-	/// <param name="ietfLanguageTag">The IETF Tag used for the Language.</param>
-	/// <returns>A user.</returns>
-	/// <response code="200">Language is found.</response>
+	/// <param name="ietfLanguageTag">If specified, the IETF Tag used for the Language.</param>
+	/// <param name="offsetIndex">If specified, returns results starting at the specified offset position (starting index 0) Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
+	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
+	/// <returns>A <seealso cref="GetLanguagesResult"/> containing the results.</returns>
+	/// <response code="200">Results prepared..</response>
 	/// <response code="403">Not permitted.</response>
-	/// <response code="404">Language is not found.</response>
-	[HttpGet("{ietfLanguageTag}")]
-	public async Task<ActionResult<GetLanguageResult>> GetLanguage(string ietfLanguageTag)
+	[HttpGet("{ietfLanguageTag?}")] //
+	[Authorize(Roles="administrator,dataExporter,translator")]
+	public async Task<ActionResult<GetLanguagesResult>> GetLanguage(string? ietfLanguageTag, int offsetIndex=Defaults.OffsetIndex, int pageSize=Defaults.MaxItems)
 	{
-		Language? language = await _languageRepository.GetLanguageByIetfLanguageTag(ietfLanguageTag);
-		if (language == null) return NotFound();
-		
-		return new GetLanguageResult()
+		AssertApiConstraints(pageSize);
+
+		IEnumerable<Language> languages = (await _languageRepository.GetLanguagesAsync(ietfLanguageTag)).ToArray();
+
+		string queryString = BuildQueryString(ietfLanguageTag);
+		GetLanguagesResult getLanguagesResult = new GetLanguagesResult()
 		{
-			IetfLanguageCode = language.IetfLanguageTag,
+			Results = languages.Skip(offsetIndex).Take(pageSize).Select(l => new GetLanguageResultItem()
+			{
+				Name = l.Name,
+				IetfLanguageCode = l.IetfLanguageTag,
+				Links = new[]
+				{
+					new Link()
+					{
+						Action = "get",
+						Rel = "self",
+						Types = new[] { JSON_MIME_TYPE },
+						HRef = $"{GetBaseApiPath()}/languages/{l.IetfLanguageTag}"
+					}
+				}
+			}),
 			Links = new[]
 			{
 				new Link()
 				{
 					Action = "get",
 					Rel = "self",
-					Types = new[] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/languages/{language.IetfLanguageTag}"
+					Types = new [] { JSON_MIME_TYPE },
+					HRef = $"{GetBaseApiPath()}/languages?{queryString}offsetIndex={offsetIndex}&pageSize={pageSize}"
 				}
 			},
-			Name = language.Name
+			FromIndex = offsetIndex,
+			PageSize = pageSize,
+			TotalItemsCount = languages.Count()
 		};
+		return getLanguagesResult;
 	}
-	
-	
-    /// <summary>
+
+	private string BuildQueryString(string? ietfLanguageTag)
+	{
+		StringBuilder sb = new StringBuilder();
+		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={ietfLanguageTag}");
+		if (sb.Length > 0) sb.Append("&");
+		return sb.ToString();
+	}
+
+
+	/// <summary>
 	/// Creates a new Language.
 	/// </summary>
 	/// <param name="createLanguage">A <see cref="CreateLanguage"/> representing the Language to create.</param>

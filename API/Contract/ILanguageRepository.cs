@@ -37,7 +37,13 @@ public interface ILanguageRepository
 	/// </summary>
 	/// <param name="ietfLanguageTag">The IETF Language Tag of the Dictionary.</param>
 	/// <returns>The requested Language, or <c>null</c> if no Language could be found./</returns>
-	Task<Language?> GetLanguageByIetfLanguageTag(string ietfLanguageTag);
-	
+	Task<Language?> GetLanguageByIetfLanguageTagAsync(string ietfLanguageTag);
+
+	/// <summary>
+	/// Retrieves a all matching <seealso cref="Language"/>s.
+	/// </summary>
+	/// <param name="ietfLanguageTag">If specified, the IETF Language Tag of the <seealso cref="Language"/>.</param>
+	/// <returns>A collection of matching <seealso cref="Language"/>s.</returns>
+	Task<IEnumerable<Language>> GetLanguagesAsync(string? ietfLanguageTag);
 
 }

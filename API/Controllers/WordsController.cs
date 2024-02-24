@@ -83,7 +83,7 @@ public class WordsController : BaseApiController
 					Action = "get",
 					Rel = "self",
 					Types = new[] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/api/v4/words/{word}?offsetIndex={offsetIndex}&pageSize={pageSize}"
+					HRef = $"{GetBaseApiPath()}/words/{word}?offsetIndex={offsetIndex}&pageSize={pageSize}"
 				}
 			},
 			FromIndex = offsetIndex,
