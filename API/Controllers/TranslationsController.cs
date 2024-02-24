@@ -51,7 +51,7 @@ public class TranslationsController : BaseApiController
 	public async Task<ActionResult<AppUser>> CreateTranslation(CreateWordTranslation createWordTranslation)
 	{
 		// try to resolve the dictionary
-		Dictionary? dictionary = await _dictionaryRepository.GetById(createWordTranslation.DictionaryId);
+		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createWordTranslation.DictionaryId);
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 		
 		// do the words exist?
@@ -145,11 +145,11 @@ public class TranslationsController : BaseApiController
 		if (updateWordTranslation.DictionaryId.HasValue)
 		{
 			// does the new dictionary exist?
-			Dictionary? newDictionary = await _dictionaryRepository.GetById(updateWordTranslation.DictionaryId.Value);
+			Dictionary? newDictionary = await _dictionaryRepository.GetByIdAsync(updateWordTranslation.DictionaryId.Value);
 			if (newDictionary == null) return BadRequest("Invalid attempt to move Word into non-existent Dictionary");
 			
 			// is the new dictionary the same language as the previous?
-			Dictionary? oldDictionary = await _dictionaryRepository.GetById(wordTranslation.DictionaryId);
+			Dictionary? oldDictionary = await _dictionaryRepository.GetByIdAsync(wordTranslation.DictionaryId);
 
 			if (!newDictionary.IetfLanguageTag.Equals(oldDictionary!.IetfLanguageTag))
 			{

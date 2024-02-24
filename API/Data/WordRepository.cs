@@ -48,12 +48,12 @@ public class WordRepository : IWordRepository
 	}
 
 	/// <summary>
-	/// Retrieves a all matching <seealso cref="Word"/>s within a <seealso cref="Dictionary"/>.
+	/// Retrieves all matching <seealso cref="Word"/>s within a <seealso cref="Dictionary"/>.
 	/// </summary>
 	/// <param name="word">Word to match within the <seealso cref="Dictionary"/>.</param>
 	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
 	/// <returns>A collection of matching <seealso cref="Word"/>s within the <seealso cref="Dictionary"/>.</returns>
-	public async Task<IEnumerable<Word>> GetWords(string word, int? dictionaryId)
+	public async Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId)
 	{
 		IQueryable<Word> query = _dataContext.Words.AsQueryable();
 		if (!string.IsNullOrWhiteSpace(word))

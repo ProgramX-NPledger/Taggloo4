@@ -1,5 +1,8 @@
 ﻿namespace Taggloo4.Dto;
 
+/// <summary>
+/// Represents a result within <seealso cref="GetLanguagesResult"/>.
+/// </summary>
 public class GetLanguageResultItem
 {
 	/// <summary>
