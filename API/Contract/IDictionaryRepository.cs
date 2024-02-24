@@ -30,7 +30,15 @@ public interface IDictionaryRepository
 	/// </summary>
 	/// <param name="id">The ID of the <seealso cref="Dictionary"/>.</param>
 	/// <returns>The requested <seealso cref="Dictionary"/>, or <c>null</c> if no Dictionary could be found./</returns>
-	Task<Dictionary?> GetById(int id);
-	
+	Task<Dictionary?> GetByIdAsync(int id);
+
+	/// <summary>
+	/// Retrieves all matching <seealso cref="Dictionary"/> items.
+	/// </summary>
+	/// <param name="id">If specified, matches by the ID of the Dictionary.</param>
+	/// <param name="ietfLanguageTag">If specified, limits by IETF Language Tag</param>
+	/// <returns>A collection of matching <seealso cref="Dixtionary"/> items.</returns>
+	Task<IEnumerable<Dictionary>> GetDictionariesAsync(int? id, string? ietfLanguageTag);
+
 
 }
