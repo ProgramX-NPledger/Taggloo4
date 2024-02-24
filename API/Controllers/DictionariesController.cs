@@ -45,7 +45,7 @@ public class DictionariesController : BaseApiController
 	[Authorize(Roles="administrator,dataImporter")]
 	public async Task<ActionResult<CreateDictionaryResult>> CreateDictionary(CreateDictionary createDictionary)
 	{
-		Language? language = await _languageRepository.GetLanguageByIetfLanguageTag(createDictionary.IetfLanguageTag);
+		Language? language = await _languageRepository.GetLanguageByIetfLanguageTagAsync(createDictionary.IetfLanguageTag);
 		if (language == null) return BadRequest("Invalid Language");
 		
 		Dictionary newDictionary = new Dictionary()

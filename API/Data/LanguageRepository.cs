@@ -61,9 +61,24 @@ public class LanguageRepository : ILanguageRepository
 	/// </summary>
 	/// <param name="ietfLanguageTag">The IETF Language Tag of the Dictionary.</param>
 	/// <returns>The requested Language, or <c>null</c> if no Language could be found./</returns>
-	public async Task<Language?> GetLanguageByIetfLanguageTag(string ietfLanguageTag)
+	public async Task<Language?> GetLanguageByIetfLanguageTagAsync(string ietfLanguageTag)
 	{
 		return  await _dataContext.Languages.SingleOrDefaultAsync(q => q.IetfLanguageTag == ietfLanguageTag);
 	}
 
+	/// <summary>
+	/// Retrieves a all matching <seealso cref="Language"/>s.
+	/// </summary>
+	/// <param name="ietfLanguageTag">If specified, the IETF Language Tag of the <seealso cref="Language"/>.</param>
+	/// <returns>A collection of matching <seealso cref="Language"/>s.</returns>
+	public async Task<IEnumerable<Language>> GetLanguagesAsync(string? ietfLanguageTag)
+	{
+		IQueryable<Language> query = _dataContext.Languages.AsQueryable();
+		if (!string.IsNullOrWhiteSpace(ietfLanguageTag))
+		{
+			query = query.Where(q => q.IetfLanguageTag == ietfLanguageTag);
+		}
+
+		return await query.ToArrayAsync();
+	}
 }

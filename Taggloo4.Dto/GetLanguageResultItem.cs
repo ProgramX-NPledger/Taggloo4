@@ -1,11 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿namespace Taggloo4.Dto;
 
-namespace Taggloo4.Dto;
-
-/// <summary>
-/// Represents a Language
-/// </summary>
-public class GetLanguageResult
+public class GetLanguageResultItem
 {
 	/// <summary>
 	/// IETF Tag used to represent the Language.
