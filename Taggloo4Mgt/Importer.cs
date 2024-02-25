@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Net.NetworkInformation;
 using Dapper;
 using Taggloo4.Dto;
 using Taggloo4Mgt.Model;
@@ -94,60 +95,73 @@ public class Importer : ApiClientBase
 						Log($"\t\t\t\t\t{wordInLanguage.TheWord}");
 						try
 						{
-							// post word
-							CreateWordResult createWordResult=await PostWordToTarget(httpClient, wordInLanguage.TheWord, dictionariesAtTargetDictionary[languageCode]);
-							await UpdateWordAtTargetWithMetaData(httpClient, createWordResult.Id, wordInLanguage.CreatedByUserName, wordInLanguage.CreatedTimeStamp);
-							Log($"\t\t\t\t\t\tWord ID {createWordResult.Id} created");
-							
-							// get translations
-							IEnumerable<Translation> translations = await GetTranslationsForWord(sqlConnection, wordInLanguage);
-							Log($"\t\t\t\t\t\t{translations.Count()} Translations");
-							
-							foreach (Translation translation in translations)
+							// does the word already exist?
+							GetWordsResult existingWord = await GetWord(httpClient, wordInLanguage.TheWord,
+								dictionariesAtTargetDictionary[languageCode]);
+							if (existingWord.Results.Any())
 							{
-								Log($"\t\t\t\t\t\t\t{translation.TheTranslation} ({translation.LanguageCode})");
-								if (!dictionariesAtTargetDictionary.ContainsKey(translation.LanguageCode))
-								{
-									CreateDictionaryResult createOtherDictionaryResult =
-										await CreateDictionaryForLanguage(httpClient, translation.LanguageCode);
-									Log($"\t\t\t\t\t\t\tDictionary ID {createOtherDictionaryResult.Id} created for {translation.LanguageCode}");
-									dictionariesAtTargetDictionary.Add(translation.LanguageCode,createOtherDictionaryResult.Id);
-								}
-							
-								// post word
-								// we need to see if the word already exists. If it does, do not create another word, instead link the existing
-								GetWordsResult getOtherWordResult = await GetOtherWord(httpClient,
-									translation.TheTranslation, dictionariesAtTargetDictionary[translation.LanguageCode]);
-								int otherWordId;
-								if (getOtherWordResult.TotalItemsCount == 0)
-								{
-									// the word doesn't already exist
-									CreateWordResult otherCreateWordResult = await PostWordToTarget(httpClient,
-										translation.TheTranslation,
-										dictionariesAtTargetDictionary[translation.LanguageCode]);
-									otherWordId = otherCreateWordResult.Id;
-
-									// this will set the creation meta data for the target word to that of the Translation
-									await UpdateWordAtTargetWithMetaData(httpClient, otherWordId, translation.CreatedByUserName,translation.CreatedAt);
-									Log($"\t\t\t\t\t\t\tWord ID {otherWordId} created");
-
-								}
-								else
-								{
-									otherWordId = getOtherWordResult.Results.First().Id;
-									Log($"\t\t\t\t\t\t\tWord ID {otherWordId} already exists, adding translation");
-								}
-								
-								// post translation
-								CreateWordTranslationResult? createWordTranslationResult = await PostTranslationBetweenWords(httpClient,createWordResult.Id,otherWordId,dictionariesAtTargetDictionary[languageCode]);
-
-								await UpdateWordTranslationAtTargetWithMetaData(httpClient,
-									createWordTranslationResult!.Id, translation.CreatedByUserName,
-									translation.CreatedAt);
-								Log($"\t\t\t\t\t\t\tTranslation ID {createWordTranslationResult.Id} created");
+								// word already exists, so have to assume translations do too
+								Log($"\t\t\t\t\t\tWord ID already exists");
 							}
+							else
+							{
+								// post word
+								CreateWordResult createWordResult=await PostWordToTarget(httpClient, wordInLanguage.TheWord, dictionariesAtTargetDictionary[languageCode]);
+								await UpdateWordAtTargetWithMetaData(httpClient, createWordResult.Id, wordInLanguage.CreatedByUserName, wordInLanguage.CreatedTimeStamp);
+								Log($"\t\t\t\t\t\tWord ID {createWordResult.Id} created");
+								
+								// get translations
+								IEnumerable<Translation> translations = await GetTranslationsForWord(sqlConnection, wordInLanguage);
+								Log($"\t\t\t\t\t\t{translations.Count()} Translations");
+								
+								foreach (Translation translation in translations)
+								{
+									Log($"\t\t\t\t\t\t\t{translation.TheTranslation} ({translation.LanguageCode})");
+									if (!dictionariesAtTargetDictionary.ContainsKey(translation.LanguageCode))
+									{
+										CreateDictionaryResult createOtherDictionaryResult =
+											await CreateDictionaryForLanguage(httpClient, translation.LanguageCode);
+										Log($"\t\t\t\t\t\t\tDictionary ID {createOtherDictionaryResult.Id} created for {translation.LanguageCode}");
+										dictionariesAtTargetDictionary.Add(translation.LanguageCode,createOtherDictionaryResult.Id);
+									}
+								
+									// post word
+									// we need to see if the word already exists. If it does, do not create another word, instead link the existing
+									GetWordsResult getOtherWordResult = await GetWord(httpClient,
+										translation.TheTranslation, dictionariesAtTargetDictionary[translation.LanguageCode]);
+									int otherWordId;
+									if (getOtherWordResult.TotalItemsCount == 0)
+									{
+										// the word doesn't already exist
+										CreateWordResult otherCreateWordResult = await PostWordToTarget(httpClient,
+											translation.TheTranslation,
+											dictionariesAtTargetDictionary[translation.LanguageCode]);
+										otherWordId = otherCreateWordResult.Id;
 
-							UpdateProgressBar(wordsProcessed, totalWords, languageCode, wordInLanguage.TheWord);
+										// this will set the creation meta data for the target word to that of the Translation
+										await UpdateWordAtTargetWithMetaData(httpClient, otherWordId, translation.CreatedByUserName,translation.CreatedAt);
+										Log($"\t\t\t\t\t\t\tWord ID {otherWordId} created");
+
+									}
+									else
+									{
+										otherWordId = getOtherWordResult.Results.First().Id;
+										Log($"\t\t\t\t\t\t\tWord ID {otherWordId} already exists, adding translation");
+									}
+									
+									// post translation
+									CreateWordTranslationResult? createWordTranslationResult = await PostTranslationBetweenWords(httpClient,createWordResult.Id,otherWordId,dictionariesAtTargetDictionary[languageCode]);
+
+									await UpdateWordTranslationAtTargetWithMetaData(httpClient,
+										createWordTranslationResult!.Id, translation.CreatedByUserName,
+										translation.CreatedAt);
+									Log($"\t\t\t\t\t\t\tTranslation ID {createWordTranslationResult.Id} created");
+								}
+
+								UpdateProgressBar(wordsProcessed, totalWords, languageCode, wordInLanguage.TheWord);
+								
+							}
+						
 						}
 						catch (Exception ex)
 						{
@@ -297,9 +311,9 @@ public class Importer : ApiClientBase
 	}
 	
 
-	private async Task<GetWordsResult> GetOtherWord(HttpClient httpClient, string word, int dictionaryId)
+	private async Task<GetWordsResult> GetWord(HttpClient httpClient, string word, int dictionaryId)
 	{
-		string url = $"/api/v4/words/{word}?dictionaryId={dictionaryId}";
+		string url = $"/api/v4/words?word={word}&dictionaryId={dictionaryId}";
 
 		HttpResponseMessage response = await httpClient.GetAsync(url);
 		if (!response.IsSuccessStatusCode)
@@ -312,6 +326,9 @@ public class Importer : ApiClientBase
 		return getWordsResult!;
 
 	}
+	
+
+	
 
 	
 	private async Task<IEnumerable<Translation>> GetTranslationsForWord(SqlConnection sqlConnection,
