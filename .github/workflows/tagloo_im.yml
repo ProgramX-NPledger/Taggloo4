@@ -86,6 +86,9 @@ jobs:
           ~/taggloo.im/scripts/02-unzip.sh
     - name: Apply secrets
       uses: cross-the-world/ssh-pipeline@master
+      env:
+        TAGGLOOIM_DB_USERNAME: ${{ secrets.TAGGLOOIM_DB_USERNAME }}
+        TAGGLOOIM_DB_PASSWORD: ${{ secrets.TAGGLOOIM_DB_PASSWORD }}
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
         user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
