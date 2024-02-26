@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{2F70C2A9-31F7-411F-A13B-401BE6C2A147}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4Mgt", "Taggloo4Mgt\Taggloo4Mgt.csproj", "{B28A6BD6-9954-4314-8140-B8A5CF1A8D72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4.Dto", "Taggloo4.Dto\Taggloo4.Dto.csproj", "{85198731-09BB-40F1-99CD-DC315DDFCBCA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4.Contract", "Taggloo4.Contract\Taggloo4.Contract.csproj", "{43D0E1AC-06FC-4A8E-9872-6F15E18F09A5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{366816BD-AB0A-43E0-BD0A-5CB1382A9AE5}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4.Model", "Taggloo4.Model\Taggloo4.Model.csproj", "{A2F8AC54-ED1B-4DF6-8A60-3EB5278CCDD6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F70C2A9-31F7-411F-A13B-401BE6C2A147}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F70C2A9-31F7-411F-A13B-401BE6C2A147}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F70C2A9-31F7-411F-A13B-401BE6C2A147}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F70C2A9-31F7-411F-A13B-401BE6C2A147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B28A6BD6-9954-4314-8140-B8A5CF1A8D72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B28A6BD6-9954-4314-8140-B8A5CF1A8D72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B28A6BD6-9954-4314-8140-B8A5CF1A8D72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B28A6BD6-9954-4314-8140-B8A5CF1A8D72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85198731-09BB-40F1-99CD-DC315DDFCBCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85198731-09BB-40F1-99CD-DC315DDFCBCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85198731-09BB-40F1-99CD-DC315DDFCBCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85198731-09BB-40F1-99CD-DC315DDFCBCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43D0E1AC-06FC-4A8E-9872-6F15E18F09A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43D0E1AC-06FC-4A8E-9872-6F15E18F09A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43D0E1AC-06FC-4A8E-9872-6F15E18F09A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43D0E1AC-06FC-4A8E-9872-6F15E18F09A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2F8AC54-ED1B-4DF6-8A60-3EB5278CCDD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2F8AC54-ED1B-4DF6-8A60-3EB5278CCDD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2F8AC54-ED1B-4DF6-8A60-3EB5278CCDD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2F8AC54-ED1B-4DF6-8A60-3EB5278CCDD6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

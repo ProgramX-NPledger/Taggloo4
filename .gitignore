@@ -1,2 +1,2 @@
-﻿/ConsoleApp1TestingDocker/bin/
-/ConsoleApp1TestingDocker/obj/
+﻿**/bin/**
+**/obj/**
