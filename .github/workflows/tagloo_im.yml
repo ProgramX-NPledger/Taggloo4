@@ -73,7 +73,7 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         connect_timeout: 10s
         script: |
-          ~/taggloo.im/scripts/01-prepare-workarea.sh
+          ~/taggloo.im/scripts/01-prepare-workareaxxxxx.sh
     - name: Expand deployment archive
       uses: cross-the-world/ssh-pipeline@master
       with:
