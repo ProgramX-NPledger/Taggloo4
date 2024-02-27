@@ -86,9 +86,6 @@ jobs:
           ~/taggloo.im/scripts/02-unzip.sh
     - name: Apply secrets
       uses: cross-the-world/ssh-pipeline@master
-      env:
-        TAGGLOOIM_DB_USERNAME: ${{ secrets.TAGGLOOIM_DB_USERNAME }}
-        TAGGLOOIM_DB_PASSWORD: ${{ secrets.TAGGLOOIM_DB_PASSWORD }}
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
         user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
@@ -99,4 +96,15 @@ jobs:
           echo ${{ secrets.TAGGLOOIM_DB_USERNAME }} > ~/taggloo.im/work/var-db-username.txt
           echo ${{ secrets.TAGGLOOIM_DB_PASSWORD }} > ~/taggloo.im/work/var-db-password.txt
           ~/taggloo.im/scripts/03-apply-secrets.sh
+    - name: Remove debugging configuration
+      uses: cross-the-world/ssh-pipeline@master
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        connect_timeout: 10s
+        script: |
+          ~/taggloo.im/scripts/04-remove-dev-config
           
+                    
