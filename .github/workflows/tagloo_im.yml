@@ -105,4 +105,4 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         connect_timeout: 10s
         script: |
-          ~/taggloo.im/scripts/04-remove-dev-config
+          ~/taggloo.im/scripts/04-remove-dev-config.sh
