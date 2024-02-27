@@ -106,5 +106,3 @@ jobs:
         connect_timeout: 10s
         script: |
           ~/taggloo.im/scripts/04-remove-dev-config
-          
-                    
