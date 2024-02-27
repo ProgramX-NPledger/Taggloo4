@@ -116,3 +116,13 @@ jobs:
         connect_timeout: 10s
         script: |
           ~/taggloo.im/scripts/05-copy-to-www.sh
+    - name: Configure and restart Nginx
+      uses: cross-the-world/ssh-pipeline@master
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        connect_timeout: 10s
+        script: |
+          ~/taggloo.im/scripts/06-configure-nginx.sh
