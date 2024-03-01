@@ -61,7 +61,7 @@ jobs:
     - name: Prepare temporary folder for archive
       run: mkdir ./deploy_net8_linux-x64
     - name: Copy built artefacts
-      run: cp -r ./API/bin/Release/net8.0/linux-x64/* deploy_net8_linux-x64
+      run: cp -rv ./API/bin/Release/net8.0/linux-x64/* deploy_net8_linux-x64
     - name: Compress
       uses: TonyBogdanov/zip@1.0
       with:
@@ -81,7 +81,7 @@ jobs:
       run: echo ${{ github.run_number }}
     - name: Output Run Attempt
       run: echo ${{ github.run_attempt }}
-    - name: Host step 1 Prepare work area
+    - name: Host step ONE Prepare work area
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
@@ -91,7 +91,7 @@ jobs:
         connect_timeout: 10s
         script: |
           ~/taggloo.im/scripts/01-prepare-workarea.sh
-    - name: Host step 2 Expand deployment archive
+    - name: Host step TWO Expand deployment archive
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
@@ -101,7 +101,7 @@ jobs:
         connect_timeout: 10s
         script: |
           ~/taggloo.im/scripts/02-unzip.sh
-    - name: Host step 3 Apply secrets
+    - name: Host step THREE Apply secrets
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
@@ -114,7 +114,7 @@ jobs:
           echo ${{ secrets.TAGGLOOIM_DB_PASSWORD }} > ~/taggloo.im/work/var-db-password.txt
           echo "${{ secrets.JWT_KEY }}" > ~/taggloo.im/work/var-jwt-key.txt
           ~/taggloo.im/scripts/03-apply-secrets.sh
-    - name: Host step 4 Remove debugging configuration
+    - name: Host step FOUR Remove debugging configuration
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
@@ -124,7 +124,7 @@ jobs:
         connect_timeout: 10s
         script: |
           ~/taggloo.im/scripts/04-remove-dev-config.sh
-    - name: Host step 5 Copy deployment to web server file area
+    - name: Host step FIVE Copy deployment to web server file area
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
@@ -134,7 +134,7 @@ jobs:
         connect_timeout: 10s
         script: |
           ~/taggloo.im/scripts/05-copy-to-www.sh
-    - name: Host step 6 Configure and restart Nginx
+    - name: Host step SIX Configure and restart Nginx
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
@@ -145,7 +145,7 @@ jobs:
         script: |
           echo ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }} > ~/taggloo.im/work/var-password.txt
           ~/taggloo.im/scripts/06-configure-nginx.sh
-    - name: Host step 7 Clean-up
+    - name: Host step SEVEN Clean-up
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
