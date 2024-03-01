@@ -44,13 +44,13 @@ public class WordsController : BaseApiController
 	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
 	/// <response code="200">Results prepared.</response>
 	/// <response code="403">Not permitted.</response>
-	[HttpGet("{word}")]
+	[HttpGet()]
 	[Authorize(Roles="administrator, dataExporter")]
-	public async Task<ActionResult<GetWordsResult>> GetWords(string word, int? dictionaryId, int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
+	public async Task<ActionResult<GetWordsResult>> GetWords(string? word, int? dictionaryId, int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
 	{
 		AssertApiConstraints(pageSize);
 		
-		IEnumerable<Word> words = (await _wordRepository.GetWords(word, dictionaryId)).ToArray();
+		IEnumerable<Word> words = (await _wordRepository.GetWordsAsync(word, dictionaryId)).ToArray();
 
 		GetWordsResult getWordsResult = new GetWordsResult()
 		{
@@ -72,7 +72,7 @@ public class WordsController : BaseApiController
 						Action = "get",
 						Rel = "dictionary",
 						Types = new[] { JSON_MIME_TYPE },
-						HRef = $"{GetBaseApiPath()}/dictionary/{w.DictionaryId}"
+						HRef = $"{GetBaseApiPath()}/dictionaries/{w.DictionaryId}"
 					}
 				}
 			}),
@@ -83,7 +83,7 @@ public class WordsController : BaseApiController
 					Action = "get",
 					Rel = "self",
 					Types = new[] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/api/v4/words/{word}?offsetIndex={offsetIndex}&pageSize={pageSize}"
+					HRef = $"{GetBaseApiPath()}/words/{word}?offsetIndex={offsetIndex}&pageSize={pageSize}"
 				}
 			},
 			FromIndex = offsetIndex,
@@ -107,11 +107,11 @@ public class WordsController : BaseApiController
 	public async Task<ActionResult<AppUser>> CreateWord(CreateWord createWord)
 	{
 		// try to resolve the dictionary
-		Dictionary? dictionary = await _dictionaryRepository.GetById(createWord.DictionaryId);
+		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createWord.DictionaryId);
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 		
 		// does the word for the language already exist? If so, reject - maybe a translation is required
-		IEnumerable<Word> existingWord = await _wordRepository.GetWords(createWord.Word, dictionary.Id);
+		IEnumerable<Word> existingWord = await _wordRepository.GetWordsAsync(createWord.Word, dictionary.Id);
 		if (existingWord.Any())
 			return BadRequest("Word already exists, perhaps a Translation from the existing Word is appropriate?");
 		
@@ -182,7 +182,7 @@ public class WordsController : BaseApiController
 		    !word.TheWord.Equals(updateWord.Word))
 		{
 			// changing the word is dangerous. Ensure the new word doesn't already exist
-			IEnumerable<Word>? newWord = await _wordRepository.GetWords(updateWord.Word,updateWord.DictionaryId);
+			IEnumerable<Word>? newWord = await _wordRepository.GetWordsAsync(updateWord.Word,updateWord.DictionaryId);
 			if (newWord.Any()) return BadRequest("The word is being renamed to another Word that already exists within the Dictionary");
 
 			word.TheWord = updateWord.Word;
@@ -192,11 +192,11 @@ public class WordsController : BaseApiController
 		    word.DictionaryId != updateWord.MoveWordToDictionaryId.Value)
 		{
 			// does the new dictionary exist?
-			Dictionary? newDictionary = await _dictionaryRepository.GetById(updateWord.MoveWordToDictionaryId.Value);
+			Dictionary? newDictionary = await _dictionaryRepository.GetByIdAsync(updateWord.MoveWordToDictionaryId.Value);
 			if (newDictionary == null) return BadRequest("Invalid attempt to move Word into non-existent Dictionary");
 			
 			// is the new dictionary the same language as the previous?
-			Dictionary? oldDictionary = await _dictionaryRepository.GetById(word.DictionaryId);
+			Dictionary? oldDictionary = await _dictionaryRepository.GetByIdAsync(word.DictionaryId);
 
 			if (!newDictionary.IetfLanguageTag.Equals(oldDictionary!.IetfLanguageTag))
 			{

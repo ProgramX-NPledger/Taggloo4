@@ -31,7 +31,7 @@ public interface IWordRepository
 	/// <param name="word">Word to match within the <seealso cref="Dictionary"/>.</param>
 	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
 	/// <returns>A collection of matching <seealso cref="Word"/>s within the <seealso cref="Dictionary"/>.</returns>
-	Task<IEnumerable<Word>> GetWords(string word, int? dictionaryId);
+	Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId);
 	
 	/// <summary>
 	/// Retrieves a <seealso cref="Word"/> by its ID.

@@ -1,22 +1,22 @@
 ﻿namespace Taggloo4.Dto;
 
 /// <summary>
-/// Result of a request for many Words.
+/// Result of a request for many Languages.
 /// </summary>
-public class GetWordsResult
+public class GetLanguagesResult
 {
 	/// <summary>
 	/// Results of the query.
 	/// </summary>
-	public IEnumerable<GetWordResultItem> Results { get; set; } = Enumerable.Empty<GetWordResultItem>();
+	public IEnumerable<GetLanguageResultItem> Results { get; set; } = Enumerable.Empty<GetLanguageResultItem>();
 	
 	/// <summary>
 	/// The index from which results have been returned. This is 0-based.
 	/// </summary>
 	public int FromIndex { get; set; }
-	
+		
 	/// <summary>
-	/// Total items that match the criteria, which may be greater than the number of returned results.
+	/// Total number of items that match the criteria, which may be greater than the number of returned results.
 	/// </summary>
 	public int TotalItemsCount { get; set; }
 	

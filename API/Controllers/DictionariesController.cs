@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text;
 using Taggloo4.Dto;
 
 namespace API.Controllers;
@@ -32,8 +33,91 @@ public class DictionariesController : BaseApiController
 	}
 
 
-	
-    /// <summary>
+	/// <summary>
+	/// Retrieve matching Dictionaries.
+	/// </summary>
+	/// <param name="id">If specified, limits results to the matching Dictionary ID.</param>
+	/// <param name="ietfLanguageTag">If specified, limits results to the matching Language.</param>
+	/// <param name="offsetIndex">If specified, returns results starting at the specified offset position (starting index 0) Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
+	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
+	/// <response code="200">Results prepared.</response>
+	/// <response code="403">Not permitted.</response>
+	[HttpGet()]
+	[Authorize(Roles="administrator, dataExporter")]
+	public async Task<ActionResult<GetDictionariesResult>> GetDictionaries(int? id, string? ietfLanguageTag, int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
+	{
+		AssertApiConstraints(pageSize);
+		
+		IEnumerable<Dictionary> words = (await _dictionaryRepository.GetDictionariesAsync(id,ietfLanguageTag)).ToArray();
+
+		string queryString = BuildQueryString(id,ietfLanguageTag);
+		GetDictionariesResult getDictionariesResult = new GetDictionariesResult()
+		{
+			Results = words.Skip(offsetIndex).Take(pageSize).Select(d => new GetDictionaryResultItem()
+			{
+				Id = d.Id,
+				Description = d.Description,
+				Name = d.Name,
+				CreatedAt = d.CreatedAt,
+				CreatedOn = d.CreatedOn,
+				SourceUrl = d.SourceUrl,
+				IetfLanguageTag = d.IetfLanguageTag,
+				CreatedByUserName = d.CreatedByUserName,
+				Links = new[]
+				{
+					new Link()
+					{
+						Action = "get",
+						Rel = "self",
+						Types = new[] { JSON_MIME_TYPE },
+						HRef = $"{GetBaseApiPath()}/dictionaries/{d.Id}"
+					},
+					new Link()
+					{
+						Action = "get",
+						Rel = "language",
+						Types = new[] { JSON_MIME_TYPE },
+						HRef = $"{GetBaseApiPath()}/languages/{d.IetfLanguageTag}"
+					},
+					new Link()
+					{
+						Action = "get",
+						Rel = "firstwords",
+						Types = new[] { JSON_MIME_TYPE },
+						HRef = $"{GetBaseApiPath()}/words?dictionaryId={d.Id}"
+					}
+				}
+			}),
+			Links = new[]
+			{
+				new Link()
+				{
+					Action = "get",
+					Rel = "self",
+					Types = new[] { JSON_MIME_TYPE },
+					HRef = $"{GetBaseApiPath()}/dictionaries?{queryString}offsetIndex={offsetIndex}&pageSize={pageSize}"
+				}
+			},
+			FromIndex = offsetIndex,
+			PageSize = pageSize,
+			TotalItemsCount = words.Count()
+		};
+		return getDictionariesResult;
+	}
+
+	private string BuildQueryString(int? id, string? ietfLanguageTag)
+	{
+		StringBuilder sb = new StringBuilder();
+		if (id.HasValue) sb.Append($"id={id.Value}");
+		if (sb.Length > 0) sb.Append("&");
+		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={ietfLanguageTag}");
+		if (sb.Length > 0) sb.Append("&");
+		return sb.ToString();
+		
+	}
+
+
+	/// <summary>
 	/// Creates a new Dictionary.
 	/// </summary>
 	/// <param name="createDictionary">A <see cref="CreateDictionary"/> representing the Dictionary to create.</param>
@@ -45,7 +129,7 @@ public class DictionariesController : BaseApiController
 	[Authorize(Roles="administrator,dataImporter")]
 	public async Task<ActionResult<CreateDictionaryResult>> CreateDictionary(CreateDictionary createDictionary)
 	{
-		Language? language = await _languageRepository.GetLanguageByIetfLanguageTag(createDictionary.IetfLanguageTag);
+		Language? language = await _languageRepository.GetLanguageByIetfLanguageTagAsync(createDictionary.IetfLanguageTag);
 		if (language == null) return BadRequest("Invalid Language");
 		
 		Dictionary newDictionary = new Dictionary()

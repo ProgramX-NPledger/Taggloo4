@@ -41,6 +41,7 @@
   <ItemGroup>
     <None Remove="Data\hangfire-install.sql" />
     <EmbeddedResource Include="Data\hangfire-install.sql" />
+    <None Include="wwwroot\test.htm" />
   </ItemGroup>
 
   <ItemGroup>

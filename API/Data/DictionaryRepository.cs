@@ -52,9 +52,30 @@ public class DictionaryRepository : IDictionaryRepository
 	/// </summary>
 	/// <param name="id">The ID of the <seealso cref="Dictionary"/>.</param>
 	/// <returns>The requested <seealso cref="Dictionary"/>, or <c>null</c> if no Dictionary could be found./</returns>
-	public async Task<Dictionary?> GetById(int id)
+	public async Task<Dictionary?> GetByIdAsync(int id)
 	{
 		return await _dataContext.Dictionaries.SingleOrDefaultAsync(q => q.Id == id);
 	}
-	
+
+	/// <summary>
+	/// Retrieves all matching <seealso cref="Dictionary"/> items.
+	/// </summary>
+	/// <param name="id">If specified, limits by the ID of the Dictionary.</param>
+	/// <param name="ietfLanguageTag">If specified, limits by the IETF Language Tag for the Dictionary.</param>
+	/// <returns>A collection of matching <seealso cref="Dictionary"/> items.</returns>
+	public async Task<IEnumerable<Dictionary>> GetDictionariesAsync(int? id, string? ietfLanguageTag)
+	{
+		IQueryable<Dictionary> query = _dataContext.Dictionaries.AsQueryable();
+		if (id.HasValue)
+		{
+			query = query.Where(q => q.Id == id.Value);
+		}
+
+		if (!string.IsNullOrWhiteSpace(ietfLanguageTag))
+		{
+			query = query.Where(q => q.IetfLanguageTag == ietfLanguageTag);
+		}
+
+		return await query.ToArrayAsync();
+	}
 }
