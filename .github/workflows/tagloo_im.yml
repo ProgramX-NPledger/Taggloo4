@@ -103,7 +103,7 @@ jobs:
         script: |
           echo ${{ secrets.TAGGLOOIM_DB_USERNAME }} > ~/taggloo.im/work/var-db-username.txt
           echo ${{ secrets.TAGGLOOIM_DB_PASSWORD }} > ~/taggloo.im/work/var-db-password.txt
-          echo ${{ secrets.JWT_KEY }} > ~/taggloo.im/work/var-jwt-key.txt
+          echo "${{ secrets.JWT_KEY }}" > ~/taggloo.im/work/var-jwt-key.txt
           ~/taggloo.im/scripts/03-apply-secrets.sh
     - name: Host step 4 Remove debugging configuration
       uses: cross-the-world/ssh-pipeline@master
