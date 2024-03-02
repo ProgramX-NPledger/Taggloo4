@@ -98,7 +98,7 @@ app.UseAuthorization();
 
 //app.UseCors(builder => builder.AllowANyHeader().AllowAnyMethod()).WithOrigins("http://localhost:123"));
 
-app.UseStaticFiles();
+//app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
