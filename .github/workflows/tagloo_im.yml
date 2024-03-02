@@ -8,9 +8,6 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - release/taggloo_im
@@ -27,7 +24,18 @@ jobs:
         
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }}
+#    - name: Display checkout information
+#      run: |
+#        echo "Repository: ${{ steps.checkout.outputs.repository }}"
+#        echo "Ref: ${{ steps.checkout.outputs.ref }}"
+#        echo "SHA: ${{ steps.checkout.outputs.sha }}"
+#    - name: Display checked out files
+#      run: |
+#        echo "Checked out files:"
+#        find . -type f
     - name: Setup .NET ${{ matrix.dotnet-version }}
       uses: actions/setup-dotnet@v3
       with:
@@ -47,26 +55,16 @@ jobs:
       if: ${{ always() }}
     - name: Publish Release build
       run: dotnet publish -c Release -o ../dotnet-webapp -r linux-x64 --self-contained true /p:UseAppHost=true
+    - name: List Release
+      run: ls ../dotnet-webapp
     - name: Prepare temporary folder for archive
       run: mkdir ./deploy_net8_linux-x64
     - name: Copy built artefacts
-      run: cp -r ./API/bin/Release/net8.0/linux-x64/* deploy_net8_linux-x64
+      run: cp -rv ../dotnet-webapp/* deploy_net8_linux-x64
     - name: Compress
       uses: TonyBogdanov/zip@1.0
       with:
         args: zip -r ./deploy_net8_linux-x64.zip ./deploy_net8_linux-x64 -i *
-    - name: Remove previous deployment files
-      uses: cross-the-world/ssh-pipeline@master
-      env:
-        WELCOME: "ssh pipeline"
-      with:
-        host: ${{ secrets.TAGGLOOIM_HOST }}
-        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
-        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
-        port: ${{ secrets.TAGGLOOIM_PORT }}
-        connect_timeout: 10s
-        script: |
-          rm -rf /home/deployagent/taggloo.im              
     - name: SCP using password
       uses: appleboy/scp-action@v0.1.7
       with:
@@ -76,12 +74,14 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         source: "deploy_net8_linux-x64.zip"
         target: taggloo.im
-    - name: Finalise deployment (move deployment, configure, launch)
+    - name: Output Run ID
+      run: echo ${{ github.run_id }}
+    - name: Output Run Number
+      run: echo ${{ github.run_number }}
+    - name: Output Run Attempt
+      run: echo ${{ github.run_attempt }}
+    - name: Host step ONE Prepare work area
       uses: cross-the-world/ssh-pipeline@master
-      env:
-        TAGGLOOIM_DB_USERNAME: ${{ secrets.TAGGLOOIM_DB_USERNAME }}
-        TAGGLOOIM_DB_PASSWORD: ${{ secrets.TAGGLOOIM_DB_PASSWORD }}
-        WELCOME: "ssh p"
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
         user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
@@ -89,4 +89,68 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         connect_timeout: 10s
         script: |
-          ~/scripts/deploy.sh
+          ~/taggloo.im/scripts/01-prepare-workarea.sh
+    - name: Host step TWO Expand deployment archive
+      uses: cross-the-world/ssh-pipeline@master
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        connect_timeout: 10s
+        script: |
+          ~/taggloo.im/scripts/02-unzip.sh
+    - name: Host step THREE Apply secrets
+      uses: cross-the-world/ssh-pipeline@master
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        connect_timeout: 10s
+        script: |
+          echo ${{ secrets.TAGGLOOIM_DB_USERNAME }} > ~/taggloo.im/work/var-db-username.txt
+          echo ${{ secrets.TAGGLOOIM_DB_PASSWORD }} > ~/taggloo.im/work/var-db-password.txt
+          echo "${{ secrets.JWT_KEY }}" > ~/taggloo.im/work/var-jwt-key.txt
+          ~/taggloo.im/scripts/03-apply-secrets.sh
+    - name: Host step FOUR Remove debugging configuration
+      uses: cross-the-world/ssh-pipeline@master
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        connect_timeout: 10s
+        script: |
+          ~/taggloo.im/scripts/04-remove-dev-config.sh
+    - name: Host step FIVE Copy deployment to web server file area
+      uses: cross-the-world/ssh-pipeline@master
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        connect_timeout: 10s
+        script: |
+          ~/taggloo.im/scripts/05-copy-to-www.sh
+    - name: Host step SIX Configure and restart Nginx
+      uses: cross-the-world/ssh-pipeline@master
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        connect_timeout: 10s
+        script: |
+          echo ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }} > ~/taggloo.im/work/var-password.txt
+          ~/taggloo.im/scripts/06-configure-nginx.sh
+    - name: Host step SEVEN Clean-up
+      uses: cross-the-world/ssh-pipeline@master
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        connect_timeout: 10s
+        script: |
+          ~/taggloo.im/scripts/07-clean-up.sh
