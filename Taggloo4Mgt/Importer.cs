@@ -82,10 +82,18 @@ public class Importer : ApiClientBase
 					Log($"\t\t\t\t{wordsInLanguage.Count()} words in Language");
 					totalWords += wordsInLanguage.Count();
 
-					Log("\t\t\t\tCreate Dictionary");
-					CreateDictionaryResult createDictionaryResult = await CreateDictionaryForLanguage(httpClient,languageCode);
-					Log($"\t\t\t\tDictionary ID {createDictionaryResult.Id} created");
-					dictionariesAtTargetDictionary.Add(languageCode,createDictionaryResult.Id);
+					// make sure dictionary hasn't already been created
+					if (!dictionariesAtTargetDictionary.ContainsKey(languageCode))
+					{
+						Log("\t\t\t\tCreate Dictionary");
+						CreateDictionaryResult createDictionaryResult = await CreateDictionaryForLanguage(httpClient,languageCode);
+						Log($"\t\t\t\tDictionary ID {createDictionaryResult.Id} created");
+						dictionariesAtTargetDictionary.Add(languageCode,createDictionaryResult.Id);
+					}
+					else
+					{
+						Log($"\t\t\t\tDictionary for Language {languageCode} already created, has ID {dictionariesAtTargetDictionary[languageCode]}");
+					}
 					
 					// for each Word in source
 					foreach (Word wordInLanguage in wordsInLanguage)
@@ -93,93 +101,41 @@ public class Importer : ApiClientBase
 						DateTime startTimeStamp = DateTime.Now;
 						
 						Log($"\t\t\t\t\t{wordInLanguage.TheWord}");
-						try
+
+						if (_importOptions.MaxWordsPerLanguage.HasValue &&
+						    _importOptions.MaxWordsPerLanguage.Value < wordsProcessed)
 						{
-							// does the word already exist?
-							GetWordsResult existingWord = await GetWord(httpClient, wordInLanguage.TheWord,
-								dictionariesAtTargetDictionary[languageCode]);
-							if (existingWord.Results.Any())
-							{
-								// word already exists, so have to assume translations do too
-								Log($"\t\t\t\t\t\tWord ID already exists");
-							}
-							else
-							{
-								// post word
-								CreateWordResult createWordResult=await PostWordToTarget(httpClient, wordInLanguage.TheWord, dictionariesAtTargetDictionary[languageCode]);
-								await UpdateWordAtTargetWithMetaData(httpClient, createWordResult.Id, wordInLanguage.CreatedByUserName, wordInLanguage.CreatedTimeStamp);
-								Log($"\t\t\t\t\t\tWord ID {createWordResult.Id} created");
-								
-								// get translations
-								IEnumerable<Translation> translations = await GetTranslationsForWord(sqlConnection, wordInLanguage);
-								Log($"\t\t\t\t\t\t{translations.Count()} Translations");
-								
-								foreach (Translation translation in translations)
-								{
-									Log($"\t\t\t\t\t\t\t{translation.TheTranslation} ({translation.LanguageCode})");
-									if (!dictionariesAtTargetDictionary.ContainsKey(translation.LanguageCode))
-									{
-										CreateDictionaryResult createOtherDictionaryResult =
-											await CreateDictionaryForLanguage(httpClient, translation.LanguageCode);
-										Log($"\t\t\t\t\t\t\tDictionary ID {createOtherDictionaryResult.Id} created for {translation.LanguageCode}");
-										dictionariesAtTargetDictionary.Add(translation.LanguageCode,createOtherDictionaryResult.Id);
-									}
-								
-									// post word
-									// we need to see if the word already exists. If it does, do not create another word, instead link the existing
-									GetWordsResult getOtherWordResult = await GetWord(httpClient,
-										translation.TheTranslation, dictionariesAtTargetDictionary[translation.LanguageCode]);
-									int otherWordId;
-									if (getOtherWordResult.TotalItemsCount == 0)
-									{
-										// the word doesn't already exist
-										CreateWordResult otherCreateWordResult = await PostWordToTarget(httpClient,
-											translation.TheTranslation,
-											dictionariesAtTargetDictionary[translation.LanguageCode]);
-										otherWordId = otherCreateWordResult.Id;
-
-										// this will set the creation meta data for the target word to that of the Translation
-										await UpdateWordAtTargetWithMetaData(httpClient, otherWordId, translation.CreatedByUserName,translation.CreatedAt);
-										Log($"\t\t\t\t\t\t\tWord ID {otherWordId} created");
-
-									}
-									else
-									{
-										otherWordId = getOtherWordResult.Results.First().Id;
-										Log($"\t\t\t\t\t\t\tWord ID {otherWordId} already exists, adding translation");
-									}
-									
-									// post translation
-									CreateWordTranslationResult? createWordTranslationResult = await PostTranslationBetweenWords(httpClient,createWordResult.Id,otherWordId,dictionariesAtTargetDictionary[languageCode]);
-
-									await UpdateWordTranslationAtTargetWithMetaData(httpClient,
-										createWordTranslationResult!.Id, translation.CreatedByUserName,
-										translation.CreatedAt);
-									Log($"\t\t\t\t\t\t\tTranslation ID {createWordTranslationResult.Id} created");
-								}
-
-								UpdateProgressBar(wordsProcessed, totalWords, languageCode, wordInLanguage.TheWord);
-								
-							}
-						
+							// already processed enough words, so ignore
 						}
-						catch (Exception ex)
+						else
 						{
-							await Console.Error.WriteLineAsync();
-							await Console.Error.WriteLineAsync($"Failed to import Word '{wordInLanguage.TheWord}'");
-							Exception? exPtr = ex;
-							do
+							try
 							{
-								await Console.Error.WriteLineAsync(exPtr.Message);
-								Log($"ERROR: {exPtr.GetType().Name}: {exPtr.Message}");
-								exPtr = exPtr.InnerException;
-							} while (exPtr!=null);
+								ProcessWord(httpClient, sqlConnection, wordInLanguage, dictionariesAtTargetDictionary,
+									languageCode);
+							
+							}
+							catch (Exception ex)
+							{
+								await Console.Error.WriteLineAsync();
+								await Console.Error.WriteLineAsync($"Failed to import Word '{wordInLanguage.TheWord}'");
+								Exception? exPtr = ex;
+								do
+								{
+									await Console.Error.WriteLineAsync(exPtr.Message);
+									Log($"ERROR: {exPtr.GetType().Name}: {exPtr.Message}");
+									exPtr = exPtr.InnerException;
+								} while (exPtr!=null);
+							}
+							
 						}
 
 						TimeSpan delta = DateTime.Now - startTimeStamp;
 						_millisecondsBetweenWords.Add((int)delta.TotalMilliseconds);
 						
-						wordsProcessed++;
+						
+						UpdateProgressBar(wordsProcessed++, totalWords, languageCode, wordInLanguage.TheWord);
+						
 						
 					}
 
@@ -198,6 +154,77 @@ public class Importer : ApiClientBase
 
 	}
 
+	private async Task ProcessWord(HttpClient httpClient, SqlConnection sqlConnection, Word wordInLanguage, IDictionary<string,int> dictionariesAtTargetDictionary, string languageCode)
+	{
+		
+		// does the word already exist?
+		GetWordsResult existingWord = await GetWord(httpClient, wordInLanguage.TheWord,
+			dictionariesAtTargetDictionary[languageCode]);
+		if (existingWord.Results.Any())
+		{
+			// word already exists, so have to assume translations do too
+			Log($"\t\t\t\t\t\tWord ID already exists");
+		}
+		else
+		{
+			// post word
+			CreateWordResult createWordResult=await PostWordToTarget(httpClient, wordInLanguage.TheWord, dictionariesAtTargetDictionary[languageCode]);
+			await UpdateWordAtTargetWithMetaData(httpClient, createWordResult.Id, wordInLanguage.CreatedByUserName, wordInLanguage.CreatedTimeStamp);
+			Log($"\t\t\t\t\t\tWord ID {createWordResult.Id} created");
+			
+			// get translations
+			IEnumerable<Translation> translations = await GetTranslationsForWord(sqlConnection, wordInLanguage);
+			Log($"\t\t\t\t\t\t{translations.Count()} Translations");
+			
+			foreach (Translation translation in translations)
+			{
+				Log($"\t\t\t\t\t\t\t{translation.TheTranslation} ({translation.LanguageCode})");
+				if (!dictionariesAtTargetDictionary.ContainsKey(translation.LanguageCode))
+				{
+					CreateDictionaryResult createOtherDictionaryResult =
+						await CreateDictionaryForLanguage(httpClient, translation.LanguageCode);
+					Log($"\t\t\t\t\t\t\tDictionary ID {createOtherDictionaryResult.Id} created for {translation.LanguageCode}");
+					dictionariesAtTargetDictionary.Add(translation.LanguageCode,createOtherDictionaryResult.Id);
+				}
+			
+				// post word
+				// we need to see if the word already exists. If it does, do not create another word, instead link the existing
+				GetWordsResult getOtherWordResult = await GetWord(httpClient,
+					translation.TheTranslation, dictionariesAtTargetDictionary[translation.LanguageCode]);
+				int otherWordId;
+				if (getOtherWordResult.TotalItemsCount == 0)
+				{
+					// the word doesn't already exist
+					CreateWordResult otherCreateWordResult = await PostWordToTarget(httpClient,
+						translation.TheTranslation,
+						dictionariesAtTargetDictionary[translation.LanguageCode]);
+					otherWordId = otherCreateWordResult.Id;
+
+					// this will set the creation meta data for the target word to that of the Translation
+					await UpdateWordAtTargetWithMetaData(httpClient, otherWordId, translation.CreatedByUserName,translation.CreatedAt);
+					Log($"\t\t\t\t\t\t\tWord ID {otherWordId} created");
+
+				}
+				else
+				{
+					otherWordId = getOtherWordResult.Results.First().Id;
+					Log($"\t\t\t\t\t\t\tWord ID {otherWordId} already exists, adding translation");
+				}
+				
+				// post translation
+				CreateWordTranslationResult? createWordTranslationResult = await PostTranslationBetweenWords(httpClient,createWordResult.Id,otherWordId,dictionariesAtTargetDictionary[languageCode]);
+
+				await UpdateWordTranslationAtTargetWithMetaData(httpClient,
+					createWordTranslationResult!.Id, translation.CreatedByUserName,
+					translation.CreatedAt);
+				Log($"\t\t\t\t\t\t\tTranslation ID {createWordTranslationResult.Id} created");
+			}
+
+		
+		}
+		
+
+	}
 
 
 	private void UpdateProgressBar(int wordsProcessed, int totalWords, string languageCode, string theWord)
@@ -226,10 +253,34 @@ public class Importer : ApiClientBase
 	{
 		if (_importOptions.Log)
 		{
-			File.AppendAllLines(_logFileName!,new string[]
+			int attempts = 0;
+
+			while (true)
 			{
-				s
-			});
+				try
+				{
+					attempts++;
+					File.AppendAllLines(_logFileName!,new string[]
+					{
+						s
+					});
+					return;
+				}
+				catch (Exception e)
+				{
+					if (e.Message.Contains("The process cannot access the file") && attempts<6)
+					{
+						// suspect a locking issue, hold off a second before retrying
+						Thread.Sleep(1000*attempts);
+					}
+					else
+					{
+						Console.WriteLine(e);
+						throw;
+					}
+				}
+			}
+			
 		}
 	}
 
