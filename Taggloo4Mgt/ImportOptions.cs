@@ -20,6 +20,11 @@ public class ImportOptions
 	[Option(HelpText = "Log processing")]
 	public bool Log { get; set; } = false;
 
+	[Option('m',HelpText = "Maximum Words to import per language")]
+	public int? MaxWordsPerLanguage { get; set; }
 
+	[Option(HelpText = "Delete all Dictionaries for detected Languages before importing")]
+	public bool ResetAllDictionaries { get; set; } = false;
+	
 
 }

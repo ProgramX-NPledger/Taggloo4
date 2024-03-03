@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text;
+using API.Jobs;
+using Hangfire;
 using Taggloo4.Dto;
 
 namespace API.Controllers;
@@ -18,6 +20,7 @@ public class DictionariesController : BaseApiController
 {
 	private readonly IDictionaryRepository _dictionaryRepository;
 	private readonly ILanguageRepository _languageRepository;
+	private readonly IBackgroundJobClient _backgroundJobClient;
 
 
 	/// <summary>
@@ -25,11 +28,14 @@ public class DictionariesController : BaseApiController
 	/// </summary>
 	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
 	/// <param name="languageRepository">Implementation of <seealso cref="ILanguageRepository"/>.</param>
+	/// <param name="backgroundJobClient"></param>
 	public DictionariesController(IDictionaryRepository dictionaryRepository,
-		ILanguageRepository languageRepository)
+		ILanguageRepository languageRepository,
+		IBackgroundJobClient backgroundJobClient)
 	{
 		_dictionaryRepository = dictionaryRepository;
 		_languageRepository = languageRepository;
+		_backgroundJobClient = backgroundJobClient;
 	}
 
 
@@ -120,7 +126,7 @@ public class DictionariesController : BaseApiController
 	/// <summary>
 	/// Creates a new Dictionary.
 	/// </summary>
-	/// <param name="createDictionary">A <see cref="CreateDictionary"/> representing the Dictionary to create.</param>
+	/// <param name="createDictionary">A <see cref="Taggloo4.Dto.CreateDictionary"/> representing the Dictionary to create.</param>
 	/// <returns>The created Language.</returns>
 	/// <response code="201">Dictionary was created.</response>
 	/// <response code="400">One or more validation errors prevented successful creation.</response>
@@ -172,4 +178,49 @@ public class DictionariesController : BaseApiController
 		return Created(url,createDictionaryResult);
 	}
 
+	
+
+	/// <summary>
+	/// Deletes a Dictionary and all associated content
+	/// </summary>
+	/// <param name="deleteDictionary">A <see cref="DeleteDictionary"/> representing the Dictionary to delete.</param>
+	/// <returns>A <seealso cref="DeleteDictionaryResult"/> with status and detail on interrogating progress.</returns>
+	/// <response code="202">Dictionary deletion has been requested.</response>
+	/// <response code="400">One or more validation errors prevented successful deletion.</response>
+	/// <response code="403">Not permitted.</response>
+	/// <response code="404">Requested Dictionary is not found.</response>
+	[HttpDelete("{id}")]
+	[Authorize(Roles="administrator")]
+	public async Task<ActionResult> DeleteDictionary(int id)
+	{
+		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(id);
+		if (dictionary == null) return NotFound();
+		
+		_backgroundJobClient.Enqueue<DeleteDictionaryJob>(job =>
+			job.DeleteDictionary(id)
+		);
+
+		DeleteDictionaryResult result = new DeleteDictionaryResult()
+		{
+			DictionaryId = id,
+			Links = new[]
+			{
+				new Link()
+				{
+					Action = "get",
+					Rel = "self",
+					HRef = $"{GetBaseApiPath()}/dictionaries/{dictionary.Id}",
+					Types = new[]
+					{
+						JSON_MIME_TYPE
+					}
+				}
+			}
+		};
+
+		return Accepted(result);
+		
+	}
+
+	
 }

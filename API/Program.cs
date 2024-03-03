@@ -103,7 +103,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.UseHangfireDashboard();
+app.UseHangfireDashboard("/admin/hangfire");
 
 using (IServiceScope scope = app.Services.CreateScope())
 {

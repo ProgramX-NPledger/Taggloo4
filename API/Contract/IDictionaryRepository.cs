@@ -40,5 +40,13 @@ public interface IDictionaryRepository
 	/// <returns>A collection of matching <seealso cref="Dixtionary"/> items.</returns>
 	Task<IEnumerable<Dictionary>> GetDictionariesAsync(int? id, string? ietfLanguageTag);
 
+	/// <summary>
+	/// Deletes the specified Dictionary, and all related content.
+	/// </summary>
+	/// <param name="dictionaryId">ID of Dictionary to delete.</param>
+	/// <returns></returns>
+	/// <exception cref="InvalidOperationException">Thrown if deletion fails.</exception>
+	Task Delete(int dictionaryId);
+	
 
 }
