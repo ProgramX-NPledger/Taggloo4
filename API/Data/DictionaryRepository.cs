@@ -78,4 +78,17 @@ public class DictionaryRepository : IDictionaryRepository
 
 		return await query.ToArrayAsync();
 	}
+
+	/// <summary>
+	/// Deletes the specified Dictionary, and all related content.
+	/// </summary>
+	/// <param name="dictionaryId">ID of Dictionary to delete.</param>
+	/// <returns></returns>
+	/// <exception cref="InvalidOperationException">Thrown if deletion fails.</exception>
+	public async Task Delete(int dictionaryId)
+	{
+		Dictionary dictionary = _dataContext.Dictionaries.Single(q => q.Id == dictionaryId);
+		_dataContext.Dictionaries.Remove(dictionary);
+		await _dataContext.SaveChangesAsync();
+	}
 }
