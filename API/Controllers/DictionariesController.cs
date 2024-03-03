@@ -183,7 +183,7 @@ public class DictionariesController : BaseApiController
 	/// <summary>
 	/// Deletes a Dictionary and all associated content
 	/// </summary>
-	/// <param name="deleteDictionary">A <see cref="DeleteDictionary"/> representing the Dictionary to delete.</param>
+	/// <param name="id">ID of the Dictionary to delete.</param>
 	/// <returns>A <seealso cref="DeleteDictionaryResult"/> with status and detail on interrogating progress.</returns>
 	/// <response code="202">Dictionary deletion has been requested.</response>
 	/// <response code="400">One or more validation errors prevented successful deletion.</response>
