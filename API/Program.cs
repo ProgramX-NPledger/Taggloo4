@@ -3,6 +3,7 @@ using API.Contract;
 using API.Data;
 using API.Data.SiteInitialisation;
 using API.Extension;
+using API.Jobs;
 using API.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -135,5 +136,10 @@ using (IServiceScope scope = app.Services.CreateScope())
 
 IBackgroundJobClient backgroundJobClient = app.Services.GetRequiredService<IBackgroundJobClient>();
 backgroundJobClient.Enqueue(() => Console.WriteLine("Hello from Hangfire"));
+
+string? enforceDatabaseSizeCron = app.Configuration["Database:SizeManagement:CheckEvery"];
+if (string.IsNullOrWhiteSpace(enforceDatabaseSizeCron))
+    throw new NullReferenceException("Configuration Database:SizeManagement:CheckEvery must be specified");
+RecurringJob.AddOrUpdate<EnforceDatabaseSizeJob>("databaseSize",job => job.EnforceDatabaseSize(), enforceDatabaseSizeCron);
 
 app.Run();

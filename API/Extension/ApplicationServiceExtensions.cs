@@ -32,8 +32,8 @@ public static class ApplicationServiceExtensions
 		services.AddScoped<IDictionaryRepository, DictionaryRepository>();
 		services.AddScoped<IWordRepository, WordRepository>();
 		services.AddScoped<ITranslationRepository, TranslationRepository>();
-
-	
+		services.AddScoped<IDatabaseManagement, DatabaseManagement>();
+		
 		
 		services.AddLogging(loggingBuilder =>
 			loggingBuilder.AddSerilog(dispose: true));
