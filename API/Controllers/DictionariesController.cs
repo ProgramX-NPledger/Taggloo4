@@ -189,20 +189,20 @@ public class DictionariesController : BaseApiController
 	/// <response code="400">One or more validation errors prevented successful deletion.</response>
 	/// <response code="403">Not permitted.</response>
 	/// <response code="404">Requested Dictionary is not found.</response>
-	[HttpDelete]
+	[HttpDelete("{id}")]
 	[Authorize(Roles="administrator")]
-	public async Task<ActionResult> CreateDictionary(DeleteDictionary deleteDictionary)
+	public async Task<ActionResult> DeleteDictionary(int id)
 	{
-		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(deleteDictionary.DictionaryId);
+		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(id);
 		if (dictionary == null) return NotFound();
 		
 		_backgroundJobClient.Enqueue<DeleteDictionaryJob>(job =>
-			job.DeleteDictionary(deleteDictionary.DictionaryId)
+			job.DeleteDictionary(id)
 		);
 
 		DeleteDictionaryResult result = new DeleteDictionaryResult()
 		{
-			DictionaryId = deleteDictionary.DictionaryId,
+			DictionaryId = id,
 			Links = new[]
 			{
 				new Link()
