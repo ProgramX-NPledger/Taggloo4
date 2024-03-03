@@ -117,7 +117,7 @@ public class Importer : ApiClientBase
 						{
 							try
 							{
-								ProcessWord(httpClient, sqlConnection, wordInLanguage, dictionariesAtTargetDictionary,
+								await ProcessWord(httpClient, sqlConnection, wordInLanguage, dictionariesAtTargetDictionary,
 									languageCode);
 							
 							}
