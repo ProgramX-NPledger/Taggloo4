@@ -20,7 +20,7 @@ public class DeleteDictionaryJob
 
         try
         {
-            _dictionaryRepository.Delete(dictionaryId);
+            _dictionaryRepository.Delete(dictionaryId).Wait();
         }
         catch (Exception e)
         {

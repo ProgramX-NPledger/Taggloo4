@@ -64,6 +64,12 @@ public class Importer : ApiClientBase
 						Log($"\t\t\tCreated Language for {languageCode}");
 					}
 				}
+
+				if (_importOptions.ResetAllDictionaries)
+				{
+					// reset all existing dictionaries for languages prior to import
+					await DeleteAllDictionariesForLanguage(httpClient, sourceLanguageCodes);
+				}
 				
 				IDictionary<string, int> dictionariesAtTargetDictionary = new Dictionary<string, int>(); // languageCode, idAtTarget
 				int wordsProcessed = 0;
@@ -151,6 +157,40 @@ public class Importer : ApiClientBase
 		Console.WriteLine();
 		
 		return 0;
+
+	}
+
+	private async Task DeleteAllDictionariesForLanguage(HttpClient httpClient, IEnumerable<string> sourceLanguageCodes)
+	{
+		Log($"\t\t\tConfiguration to delete all Dictionaries at target for source languages {string.Join(", ",sourceLanguageCodes.ToArray())}");
+		foreach (string languageCode in sourceLanguageCodes)
+		{
+			// get all dictionaries for Languages
+
+			string url = $"/api/v4/dictionaries?ietfLanguageTag={languageCode}";
+			HttpResponseMessage response = await httpClient.GetAsync(url);
+			if (response.IsSuccessStatusCode)
+			{
+				GetDictionariesResult? getDictionariesResult = await response.Content.ReadFromJsonAsync<GetDictionariesResult>();
+				if (getDictionariesResult == null)
+					throw new InvalidOperationException($"Call to {url} resulted in a null response");
+
+				foreach (GetDictionaryResultItem dictionary in getDictionariesResult.Results)
+				{
+					Log($"\t\t\t\tDeleting Dictionary ID {dictionary.Id} for Language {languageCode}");
+					string deleteUrl = $"/api/v4/dictionaries/{dictionary.Id}";
+					HttpResponseMessage deleteResponse = await httpClient.DeleteAsync(deleteUrl);
+					if (!deleteResponse.IsSuccessStatusCode)
+					{
+						throw new InvalidOperationException($"Failed to delete Dictionary ID {dictionary.Id}");
+					}
+				}
+				
+			}
+
+			
+		}
+		
 
 	}
 
