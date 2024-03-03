@@ -1,4 +1,5 @@
 ﻿using API.Contract;
+using API.Model;
 
 namespace API.Jobs;
 
@@ -10,8 +11,21 @@ public class DeleteDictionaryJob
     {
         _dictionaryRepository = dictionaryRepository;
     }
+    
     public void DeleteDictionary(int dictionaryId)
     {
-        int i = 5;
+        // check if Dictionary exists
+        Dictionary? dictionary = _dictionaryRepository.GetByIdAsync(dictionaryId).Result;
+        if (dictionary == null) throw new InvalidOperationException($"Attempt to delete non-existent Dictionary");
+
+        try
+        {
+            _dictionaryRepository.Delete(dictionaryId);
+        }
+        catch (Exception e)
+        {
+            throw new InvalidOperationException($"Failure to delete Dictionary", e);
+        }
+        
     }
 }
