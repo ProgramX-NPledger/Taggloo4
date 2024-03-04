@@ -42,7 +42,11 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// </summary>
 	public DbSet<WordTranslation> WordTranslations { get; set; }
 	
-
+	/// <summary>
+	/// Phrase Translations
+	/// </summary>
+	public DbSet<PhraseTranslation> PhraseTranslations { get; set; }
+	
 	/// <summary>
 	/// Constructor with options parameter.
 	/// </summary>

@@ -174,7 +174,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("IetfLanguageTag");
 
-                    b.ToTable("Dictionaries", (string)null);
+                    b.ToTable("Dictionaries");
                 });
 
             modelBuilder.Entity("API.Model.Language", b =>
@@ -189,7 +189,7 @@ namespace API.Data.Migrations
 
                     b.HasKey("IetfLanguageTag");
 
-                    b.ToTable("Languages", (string)null);
+                    b.ToTable("Languages");
                 });
 
             modelBuilder.Entity("API.Model.Phrase", b =>
@@ -222,7 +222,7 @@ namespace API.Data.Migrations
                     b.HasIndex("DictionaryId", "ThePhrase")
                         .IsUnique();
 
-                    b.ToTable("Phrases", (string)null);
+                    b.ToTable("Phrases");
                 });
 
             modelBuilder.Entity("API.Model.PhraseTranslation", b =>
@@ -255,7 +255,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("DictionaryId");
 
-                    b.ToTable("PhraseTranslation", (string)null);
+                    b.ToTable("PhraseTranslations");
                 });
 
             modelBuilder.Entity("API.Model.Word", b =>
@@ -288,7 +288,7 @@ namespace API.Data.Migrations
                     b.HasIndex("DictionaryId", "TheWord")
                         .IsUnique();
 
-                    b.ToTable("Words", (string)null);
+                    b.ToTable("Words");
                 });
 
             modelBuilder.Entity("API.Model.WordTranslation", b =>
@@ -321,7 +321,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("DictionaryId");
 
-                    b.ToTable("WordTranslations", (string)null);
+                    b.ToTable("WordTranslations");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -424,7 +424,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("WordsId");
 
-                    b.ToTable("WordsInPhrase", (string)null);
+                    b.ToTable("WordsInPhrase");
                 });
 
             modelBuilder.Entity("API.Model.AppUserRole", b =>

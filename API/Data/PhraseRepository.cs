@@ -52,8 +52,9 @@ public class PhraseRepository : IPhraseRepository
 	/// </summary>
 	/// <param name="phrase">Phrase to match within the <seealso cref="Dictionary"/>.</param>
 	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
+	/// <param name="containingText">Filters response for presence of text (collation as per database).</param>
 	/// <returns>A collection of matching <seealso cref="Phrase"/>s within the <seealso cref="Dictionary"/>.</returns>
-	public async Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId)
+	public async Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId, string? containingText)
 	{
 		IQueryable<Phrase> query = _dataContext.Phrases.AsQueryable();
 		if (!string.IsNullOrWhiteSpace(phrase))
@@ -66,7 +67,11 @@ public class PhraseRepository : IPhraseRepository
 			query = query.Where(q => q.DictionaryId == dictionaryId.Value);
 		}
 
-		return await query.ToArrayAsync();
+		if (!string.IsNullOrWhiteSpace(containingText))
+		{
+			query = query.Where(q => q.ThePhrase.Contains(containingText));
+		}
+		return await query.Include("Dictionary").ToArrayAsync();
 	}
 
 	/// <summary>

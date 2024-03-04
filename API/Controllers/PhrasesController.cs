@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Collections.ObjectModel;
+using System.Security.Cryptography;
 using System.Text;
 using API.Contract;
 using API.Data;
@@ -20,6 +21,7 @@ namespace API.Controllers;
 public class PhrasesController : BaseApiController
 {
 	private readonly IPhraseRepository _phraseRepository;
+	private readonly IWordRepository _wordRepository;
 	private readonly IDictionaryRepository _dictionaryRepository;
 
 	/// <summary>
@@ -27,10 +29,12 @@ public class PhrasesController : BaseApiController
 	/// </summary>
 	/// <param name="phraseRepository">Implementation of <seealso cref="IPhraseRepository"/>.</param>
 	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
-	public PhrasesController(IPhraseRepository phraseRepository, 
+	public PhrasesController(IPhraseRepository phraseRepository,
+		IWordRepository wordRepository,
 		IDictionaryRepository dictionaryRepository)
 	{
 		_phraseRepository = phraseRepository;
+		_wordRepository = wordRepository;
 		_dictionaryRepository = dictionaryRepository;
 		
 	}
@@ -50,7 +54,7 @@ public class PhrasesController : BaseApiController
 	{
 		AssertApiConstraints(pageSize);
 		
-		IEnumerable<Phrase> words = (await _phraseRepository.GetPhrasesAsync(phrase, dictionaryId)).ToArray();
+		IEnumerable<Phrase> words = (await _phraseRepository.GetPhrasesAsync(phrase, dictionaryId,null)).ToArray();
 
 		GetPhrasesResult getPhrasesResult = new GetPhrasesResult()
 		{
@@ -104,14 +108,14 @@ public class PhrasesController : BaseApiController
 	/// <response code="403">Not permitted.</response>
 	[HttpPost]
 	[Authorize(Roles="administrator, dataImporter")]
-	public async Task<ActionResult<AppUser>> CreatePhrase(CreatePhrase createPhrase)
+	public async Task<ActionResult<CreatePhraseResult>> CreatePhrase(CreatePhrase createPhrase)
 	{
 		// try to resolve the dictionary
 		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createPhrase.DictionaryId);
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 		
 		// does the Phrase for the language already exist? If so, reject - maybe a translation is required
-		IEnumerable<Phrase> existingPhrase = await _phraseRepository.GetPhrasesAsync(createPhrase.Phrase, dictionary.Id);
+		IEnumerable<Phrase> existingPhrase = await _phraseRepository.GetPhrasesAsync(createPhrase.Phrase, dictionary.Id,null);
 		if (existingPhrase.Any())
 			return BadRequest("Phrase already exists, perhaps a Translation from the existing Phrase is appropriate?");
 		
@@ -127,32 +131,93 @@ public class PhrasesController : BaseApiController
 		_phraseRepository.Create(newPhrase);
 		if (!await _phraseRepository.SaveAllAsync()) return BadRequest();
 		
+		// break apart Phrase and links with words in same Dictionary
 		string url = $"{GetBaseApiPath()}/phrases/{newPhrase.Id}";
+		List<Link> links = new List<Link>(new[]
+		{
+			new Link()
+			{
+				Action = "get",
+				Rel = "self",
+				Types = new string[] { JSON_MIME_TYPE },
+				HRef = url
+			},
+			new Link()
+			{
+				Action = "get",
+				Rel = "dictionary",
+				Types = new[] { JSON_MIME_TYPE },
+				HRef = $"{GetBaseApiPath()}/dictionaries/{newPhrase.DictionaryId}"
+			}
+		});
+		
+		string[] wordsInPhrase = createPhrase.Phrase.Split(new char[] { ' ' });
+		foreach (string wordInPhrase in wordsInPhrase)
+		{
+			IEnumerable<Word> existingWordsInPhrase = await _wordRepository.GetWordsAsync(wordInPhrase, null);
+			bool foundWord = false;
+			foreach (Word existingWordInPhrase in existingWordsInPhrase)
+			{
+				// dictionary must be in same language 
+				if (existingWordInPhrase.Dictionary.IetfLanguageTag == dictionary.IetfLanguageTag)
+				{
+					foundWord = true;
+					// link the word with the phrase
+					existingWordInPhrase.Phrases.Add(newPhrase);
+					_wordRepository.Update(existingWordInPhrase);
+					await _wordRepository.SaveAllAsync();
+					
+					Link link = new Link()
+					{
+						Action = "get",
+						Rel = "existingWordInPhrase",
+						HRef = $"{GetBaseApiPath()}/words/{existingWordInPhrase.Id}"
+					};
+					links.Add(link);
+				}
+			}
+
+			if (!foundWord)
+			{
+				// create word
+				Word newWord = new Word()
+				{
+					CreatedAt = DateTime.Now,
+					CreatedOn = this.GetRemoteHostAddress(),
+					CreatedByUserName = this.GetCurrentUserName(),
+					TheWord = wordInPhrase,
+					DictionaryId = dictionary.Id, // bug: will create word link in same dictionary as phrase, should get Dictionary in same language with Words - cannot select dictionary because do not know purpose of dictionary without putting a type on it
+					Phrases = new Collection<Phrase>(
+					[
+						newPhrase
+					])
+				};
+				_wordRepository.Create(newWord);
+				await _wordRepository.SaveAllAsync();
+
+				Link link = new Link()
+				{
+					Action = "get",
+					Rel = "createdWordInPhrase",
+					HRef = $"{GetBaseApiPath()}/words/{newWord.Id}",
+					Types = new []{ JSON_MIME_TYPE}
+				};
+				links.Add(link);
+
+			}
+			
+
+			
+		}
+
+		
+		
 		CreatePhraseResult createPhraseResult = new CreatePhraseResult()
 		{
 			Id = newPhrase.Id,
-			Links = new[]
-			{
-				new Link()
-				{
-					Action = "get",
-					Rel = "self",
-					Types = new string[] { JSON_MIME_TYPE },
-					HRef = url
-				},
-				new Link()
-				{
-					Action = "get",
-					Rel = "dictionary",
-					Types = new [] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/dictionaries/{newPhrase.DictionaryId}"
-				}
-			}
+			Links = links.ToArray()
 		};
-		
-		// TODO: Scan phrases/etc. for instances of Word within this language and link
-		// TODO: WordsinPhrase
-		
+
 		return Created(url,createPhraseResult);
 		
 		
@@ -184,8 +249,8 @@ public class PhrasesController : BaseApiController
 		    !phrase.ThePhrase.Equals(updatePhrase.Phrase))
 		{
 			// changing the word is dangerous. Ensure the new word doesn't already exist
-			IEnumerable<Phrase>? newPhrase = await _phraseRepository.GetPhrasesAsync(updatePhrase.Phrase,updatePhrase.DictionaryId);
-			if (newPhrase.Any()) return BadRequest("The Phrase is being renamed to another Word that already exists within the Dictionary");
+			IEnumerable<Phrase>? newPhrase = await _phraseRepository.GetPhrasesAsync(updatePhrase.Phrase,updatePhrase.DictionaryId,null);
+			if (newPhrase.Any()) return BadRequest("The Phrase is being renamed to another Phrase that already exists within the Dictionary");
 
 			phrase.ThePhrase = updatePhrase.Phrase;
 		}

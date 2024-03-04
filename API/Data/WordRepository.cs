@@ -66,7 +66,7 @@ public class WordRepository : IWordRepository
 			query = query.Where(q => q.DictionaryId == dictionaryId.Value);
 		}
 
-		return await query.ToArrayAsync();
+		return await query.Include("Dictionary").ToArrayAsync();
 	}
 
 	/// <summary>

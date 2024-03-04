@@ -1,6 +1,6 @@
 ﻿namespace Taggloo4Mgt.Model;
 
-public class Translation
+public class WordTranslation
 {
 	public required string TheTranslation { get; set; }
 	public required string LanguageCode { get; set; }

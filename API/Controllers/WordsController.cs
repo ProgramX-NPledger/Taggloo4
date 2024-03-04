@@ -20,17 +20,21 @@ namespace API.Controllers;
 public class WordsController : BaseApiController
 {
 	private readonly IWordRepository _wordRepository;
+	private readonly IPhraseRepository _phraseRepository;
 	private readonly IDictionaryRepository _dictionaryRepository;
 
 	/// <summary>
 	/// Constructor with injected parameters.
 	/// </summary>
 	/// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
+	/// <param name="phraseRepository">Implementation of <seealso cref="IPhraseRepository"/>.</param>
 	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
-	public WordsController(IWordRepository wordRepository, 
+	public WordsController(IWordRepository wordRepository,
+		IPhraseRepository phraseRepository,
 		IDictionaryRepository dictionaryRepository)
 	{
 		_wordRepository = wordRepository;
+		_phraseRepository = phraseRepository;
 		_dictionaryRepository = dictionaryRepository;
 		
 	}
@@ -128,26 +132,53 @@ public class WordsController : BaseApiController
 		if (!await _wordRepository.SaveAllAsync()) return BadRequest();
 		
 		string url = $"{GetBaseApiPath()}/words/{newWord.Id}";
+		List<Link> links = new List<Link>([
+			new Link()
+			{
+				Action = "get",
+				Rel = "self",
+				Types = new string[] { JSON_MIME_TYPE },
+				HRef = url
+			},
+			new Link()
+			{
+				Action = "get",
+				Rel = "dictionary",
+				Types = new[] { JSON_MIME_TYPE },
+				HRef = $"{GetBaseApiPath()}/dictionaries/{newWord.DictionaryId}"
+			}
+		]);
+
+		IEnumerable<Phrase> phrasesWithText= await _phraseRepository.GetPhrasesAsync(null, null, createWord.Word);
+		foreach (Phrase phrase in phrasesWithText)
+		{
+			// must be a complete word and not be a part of another word
+			bool wordIsADiscreteWord=IsWordADiscreteWordWithinPhrase(createWord.Word, phrase);
+			if (wordIsADiscreteWord)
+			{
+				// does phrase dictionary language match the word language?
+				if (phrase.Dictionary.IetfLanguageTag == dictionary.IetfLanguageTag)
+				{
+					links.Add(new Link()
+					{
+						Action = "get",
+						Rel = "wordInPhrase",
+						HRef = $"{GetBaseApiPath()}/phrases/{phrase.Id}",
+						Types = new []{ JSON_MIME_TYPE}
+					});
+					
+					newWord.Phrases.Add(phrase);
+					_wordRepository.Update(newWord);
+				}
+			}
+		}
+
+		await _wordRepository.SaveAllAsync();
+		
 		CreateWordResult createWordResult = new CreateWordResult()
 		{
 			Id = newWord.Id,
-			Links = new[]
-			{
-				new Link()
-				{
-					Action = "get",
-					Rel = "self",
-					Types = new string[] { JSON_MIME_TYPE },
-					HRef = url
-				},
-				new Link()
-				{
-					Action = "get",
-					Rel = "dictionary",
-					Types = new [] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/dictionaries/{newWord.DictionaryId}"
-				}
-			}
+			Links = links.ToArray()
 		};
 		
 		// TODO: Scan phrases/etc. for instances of Word within this language and link
@@ -156,7 +187,16 @@ public class WordsController : BaseApiController
 		
 		
 	}
-    
+
+	private bool IsWordADiscreteWordWithinPhrase(string word, Phrase phrase)
+	{
+		string lowerPhrase = phrase.ThePhrase.ToLower();
+		string lowerWord = word.ToLower();
+		return lowerPhrase == lowerWord ||
+		       lowerPhrase.Contains(lowerWord + " ") ||
+		       lowerPhrase.Contains(" " + lowerWord);
+	}
+
 	/// <summary>
 	/// Update an existing Word with meta-data.
 	/// </summary>
