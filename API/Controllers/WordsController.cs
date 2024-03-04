@@ -83,7 +83,7 @@ public class WordsController : BaseApiController
 					Action = "get",
 					Rel = "self",
 					Types = new[] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/words/{word}?offsetIndex={offsetIndex}&pageSize={pageSize}"
+					HRef = $"{GetBaseApiPath()}/words?word={word}&offsetIndex={offsetIndex}&pageSize={pageSize}"
 				}
 			},
 			FromIndex = offsetIndex,
@@ -165,6 +165,7 @@ public class WordsController : BaseApiController
 	/// <response code="200">Word was updated.</response>
 	/// <response code="400">One or more validation errors prevented successful updating.</response>
 	/// <response code="403">Not permitted.</response>
+	/// <response code="404">Word not found.</response>
 	[HttpPatch]
 	[Authorize(Roles="administrator, dataImporter")]
 	public async Task<ActionResult<AppUser>> UpdateWord(UpdateWord updateWord)

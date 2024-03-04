@@ -3,7 +3,7 @@
 namespace API.Contract;
 
 /// <summary>
-/// Represents an abstraction for working with Dictionaries.
+/// Represents an abstraction for working with Words.
 /// </summary>
 public interface IWordRepository
 {
