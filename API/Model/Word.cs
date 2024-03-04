@@ -48,7 +48,10 @@ public class Word
 	// this fails when building migrations
 //	public ICollection<WordTranslation> Translations { get; set; }
 
-	public ICollection<Phrase> Phrases { get; set; } 
+	/// <summary>
+	/// Phrases in which this Word appears.
+	/// </summary>
+	public ICollection<Phrase>? Phrases { get; set; } 
 	
 	
 }

@@ -44,8 +44,11 @@ public class Phrase
 	/// Identifier of owning <seealso cref="Dictionary"/>.
 	/// </summary>
 	public int DictionaryId { get; set; }
-
-	public ICollection<Word> Words { get; set; }
+	
+	/// <summary>
+	/// Words used in this Phrase.
+	/// </summary>
+	public ICollection<Word>? Words { get; set; }
 	
 	// this fails when building migrations
 //	public ICollection<WordTranslation> Translations { get; set; }

@@ -53,12 +53,12 @@ public class PhraseRepository : IPhraseRepository
 	/// <param name="phrase">Phrase to match within the <seealso cref="Dictionary"/>.</param>
 	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
 	/// <returns>A collection of matching <seealso cref="Phrase"/>s within the <seealso cref="Dictionary"/>.</returns>
-	public async Task<IEnumerable<Phrase>> GetPhrasesAsync(string? word, int? dictionaryId)
+	public async Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId)
 	{
 		IQueryable<Phrase> query = _dataContext.Phrases.AsQueryable();
-		if (!string.IsNullOrWhiteSpace(word))
+		if (!string.IsNullOrWhiteSpace(phrase))
 		{
-			query = query.Where(q => q.ThePhrase == word);
+			query = query.Where(q => q.ThePhrase == phrase);
 		}
 
 		if (dictionaryId.HasValue)
