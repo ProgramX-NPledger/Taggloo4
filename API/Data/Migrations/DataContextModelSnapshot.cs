@@ -174,7 +174,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("IetfLanguageTag");
 
-                    b.ToTable("Dictionaries");
+                    b.ToTable("Dictionaries", (string)null);
                 });
 
             modelBuilder.Entity("API.Model.Language", b =>
@@ -189,7 +189,73 @@ namespace API.Data.Migrations
 
                     b.HasKey("IetfLanguageTag");
 
-                    b.ToTable("Languages");
+                    b.ToTable("Languages", (string)null);
+                });
+
+            modelBuilder.Entity("API.Model.Phrase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedByUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedOn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DictionaryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThePhrase")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DictionaryId", "ThePhrase")
+                        .IsUnique();
+
+                    b.ToTable("Phrases", (string)null);
+                });
+
+            modelBuilder.Entity("API.Model.PhraseTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedByUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedOn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DictionaryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FromPhraseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ToPhraseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DictionaryId");
+
+                    b.ToTable("PhraseTranslation", (string)null);
                 });
 
             modelBuilder.Entity("API.Model.Word", b =>
@@ -222,7 +288,7 @@ namespace API.Data.Migrations
                     b.HasIndex("DictionaryId", "TheWord")
                         .IsUnique();
 
-                    b.ToTable("Words");
+                    b.ToTable("Words", (string)null);
                 });
 
             modelBuilder.Entity("API.Model.WordTranslation", b =>
@@ -255,7 +321,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("DictionaryId");
 
-                    b.ToTable("WordTranslations");
+                    b.ToTable("WordTranslations", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -346,6 +412,21 @@ namespace API.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("WordsInPhrase", b =>
+                {
+                    b.Property<int>("PhrasesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WordsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PhrasesId", "WordsId");
+
+                    b.HasIndex("WordsId");
+
+                    b.ToTable("WordsInPhrase", (string)null);
+                });
+
             modelBuilder.Entity("API.Model.AppUserRole", b =>
                 {
                     b.HasOne("API.Model.AppRole", "Role")
@@ -374,6 +455,28 @@ namespace API.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Language");
+                });
+
+            modelBuilder.Entity("API.Model.Phrase", b =>
+                {
+                    b.HasOne("API.Model.Dictionary", "Dictionary")
+                        .WithMany("Phrases")
+                        .HasForeignKey("DictionaryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dictionary");
+                });
+
+            modelBuilder.Entity("API.Model.PhraseTranslation", b =>
+                {
+                    b.HasOne("API.Model.Dictionary", "Dictionary")
+                        .WithMany("PhraseTranslations")
+                        .HasForeignKey("DictionaryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dictionary");
                 });
 
             modelBuilder.Entity("API.Model.Word", b =>
@@ -434,6 +537,21 @@ namespace API.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WordsInPhrase", b =>
+                {
+                    b.HasOne("API.Model.Phrase", null)
+                        .WithMany()
+                        .HasForeignKey("PhrasesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Model.Word", null)
+                        .WithMany()
+                        .HasForeignKey("WordsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("API.Model.AppRole", b =>
                 {
                     b.Navigation("UserRoles");
@@ -446,6 +564,10 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Model.Dictionary", b =>
                 {
+                    b.Navigation("PhraseTranslations");
+
+                    b.Navigation("Phrases");
+
                     b.Navigation("WordTranslations");
 
                     b.Navigation("Words");

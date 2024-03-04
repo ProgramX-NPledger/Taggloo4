@@ -5,33 +5,33 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Model;
 
 /// <summary>
-/// A Word within a <seealso cref="Dictionary"/>.
+/// A Phrase within a <seealso cref="Dictionary"/>.
 /// </summary>
-public class Word
+public class Phrase
 {
 	/// <summary>
-	/// The identifier of the Word.
+	/// The identifier of the Phrase.
 	/// </summary>
 	public int Id { get; set; }
 	
 	/// <summary>
-	/// The Word.
+	/// The Phrase.
 	/// </summary>
 	[Required] 
-	public required string TheWord { get; set; }
+	public required string ThePhrase { get; set; }
 	
 	/// <summary>
-	/// UserName of creator of the Word.
+	/// UserName of creator of the Phrase.
 	/// </summary>
 	public required string? CreatedByUserName { get; set; }
 
 	/// <summary>
-	/// Timestamp of creation of the Word.
+	/// Timestamp of creation of the Phrase.
 	/// </summary>
 	public required DateTime CreatedAt { get; set; }
 
 	/// <summary>
-	/// Host from which the Word was created.
+	/// Host from which the Phrase was created.
 	/// </summary>
 	public required string CreatedOn { get; set; }
 
@@ -45,10 +45,11 @@ public class Word
 	/// </summary>
 	public int DictionaryId { get; set; }
 
+	public ICollection<Word> Words { get; set; }
+	
 	// this fails when building migrations
 //	public ICollection<WordTranslation> Translations { get; set; }
 
-	public ICollection<Phrase> Phrases { get; set; } 
 	
 	
 }

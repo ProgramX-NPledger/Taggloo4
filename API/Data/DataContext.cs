@@ -31,6 +31,11 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// Words
 	/// </summary>
 	public DbSet<Word> Words { get; set; }
+
+	/// <summary>
+	/// Phrases
+	/// </summary>
+	public DbSet<Phrase> Phrases { get; set; }
 	
 	/// <summary>
 	/// Word Translations
@@ -72,6 +77,7 @@ public class DataContext : IdentityDbContext<AppUser,
 			.HasForeignKey(d => d.IetfLanguageTag)
 			.IsRequired();
 
+		// words
 		builder.Entity<Dictionary>()
 			.HasMany(d => d.Words)
 			.WithOne(w => w.Dictionary)
@@ -92,6 +98,35 @@ public class DataContext : IdentityDbContext<AppUser,
 					a.TheWord
 				}).IsUnique();
 
+		// phrases
+		builder.Entity<Dictionary>()
+			.HasMany(d => d.Phrases)
+			.WithOne(w => w.Dictionary)
+			.HasForeignKey(w => w.DictionaryId)
+			.IsRequired();
+
+		builder.Entity<Phrase>()
+			.HasIndex(a =>
+				new
+				{
+					a.DictionaryId,
+					a.ThePhrase
+				}).IsUnique();
+		
+		builder.Entity<Dictionary>()
+			.HasMany(d => d.PhraseTranslations)
+			.WithOne(pt => pt.Dictionary)
+			.HasForeignKey(wt => wt.DictionaryId)
+			.IsRequired();
+
+		builder.Entity<Phrase>()
+			.HasMany(p => p.Words)
+			.WithMany(w => w.Phrases)
+			.UsingEntity("WordsInPhrase");
+
+		
+
+
 		// this results in migration failure
 		// builder.Entity<Word>()
 		// 	.HasMany(w => w.Translations)
@@ -104,7 +139,7 @@ public class DataContext : IdentityDbContext<AppUser,
 		// 	.WithOne(wt => wt.ToWord)
 		// 	.HasForeignKey(wt => wt.ToWordId)
 		// 	.OnDelete(DeleteBehavior.NoAction);
-			
+
 
 	}
 }
