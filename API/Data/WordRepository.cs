@@ -74,8 +74,13 @@ public class WordRepository : IWordRepository
 	/// </summary>
 	/// <param name="id">The ID of the <seealso cref="Word"/>.</param>
 	/// <returns>The requested <seealso cref="Word"/>, or <c>null</c> if no Word could be found./</returns>
-	public async Task<Word?> GetById(int id)
+	public async Task<Word?> GetByIdAsync(int id)
 	{
 		return await _dataContext.Words.SingleOrDefaultAsync(q => q.Id == id);
+	}
+
+	public async Task<Word?> GetByImportIdAsync(Guid importId)
+	{
+		return await _dataContext.Words.SingleOrDefaultAsync(q => q.ImportId == importId);
 	}
 }

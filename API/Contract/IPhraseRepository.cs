@@ -41,6 +41,8 @@ public interface IPhraseRepository
 	/// <returns>The requested <seealso cref="Phrase"/>, or <c>null</c> if no Phrase could be found./</returns>
 	Task<Phrase?> GetByIdAsync(int id);
 	
+	Task<Phrase?> GetByImportIdAsync(Guid importId);
+	
 
 
 }

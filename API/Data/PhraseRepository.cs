@@ -83,4 +83,10 @@ public class PhraseRepository : IPhraseRepository
 	{
 		return await _dataContext.Phrases.SingleOrDefaultAsync(q => q.Id == id);
 	}
+	
+	public async Task<Phrase?> GetByImportIdAsync(Guid importId)
+	{
+		return await _dataContext.Phrases.SingleOrDefaultAsync(q => q.ImportId == importId);
+	}
+	
 }

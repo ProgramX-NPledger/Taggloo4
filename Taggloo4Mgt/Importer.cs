@@ -100,7 +100,9 @@ public class Importer : ApiClientBase
 					{
 						if (importType == "words")
 						{
-							await ImportWords(httpClient, sqlConnection, languageCode, processedCount, totalProcessedCount, dictionariesForLanguageDictionary);	
+							await ImportWords(httpClient, sqlConnection, languageCode, processedCount, totalProcessedCount, dictionariesForLanguageDictionary);
+							await ImportTranslations(httpClient, sqlConnection, languageCode, processedCount,
+								totalProcessedCount, dictionariesForLanguageDictionary);
 						}
 						
 						if (importType == "phrases")
@@ -293,9 +295,8 @@ public class Importer : ApiClientBase
 			{
 				try
 				{
-					await ProcessWord(httpClient, sqlConnection, wordInLanguage, dictionariesForLanguageDictionary,
-						languageCode);
-				
+					await PostWordToTarget(httpClient, wordInLanguage.TheWord, dictionariesForLanguageDictionary[languageCode]);
+
 				}
 				catch (Exception ex)
 				{
@@ -369,13 +370,18 @@ public class Importer : ApiClientBase
 		}
 		else
 		{
+
+
 			// post word
-			CreateWordResult createWordResult=await PostWordToTarget(httpClient, wordInLanguage.TheWord, dictionariesAtTargetDictionary[languageCode]);
+			await PostWordToTarget(httpClient, wordInLanguage.TheWord, dictionariesAtTargetDictionary[languageCode]);
+			
+			// translations are sent by POST translations, waiting for each word to have been created
+			IEnumerable<WordTranslation> translations = await GetTranslationsForWord(sqlConnection, wordInLanguage);
+			
 			await UpdateWordAtTargetWithMetaData(httpClient, createWordResult.Id, wordInLanguage.CreatedByUserName, wordInLanguage.CreatedTimeStamp);
 			Log($"\t\t\t\t\t\tWord ID {createWordResult.Id} created");
 			
 			// get translations
-			IEnumerable<WordTranslation> translations = await GetTranslationsForWord(sqlConnection, wordInLanguage);
 			Log($"\t\t\t\t\t\t{translations.Count()} Translations");
 			
 			foreach (WordTranslation translation in translations)
@@ -706,7 +712,7 @@ public class Importer : ApiClientBase
 		}
 	}
 	
-	private async Task<CreateWordResult> PostWordToTarget(HttpClient httpClient, string wordInLanguage,
+	private async Task PostWordToTarget(HttpClient httpClient, string wordInLanguage,
 		int dictionaryId)
 	{
 		string url = "/api/v4/words";
@@ -721,10 +727,6 @@ public class Importer : ApiClientBase
 		{
 			throw new InvalidOperationException($"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
 		}
-
-		CreateWordResult? createWordResult=
-			await response.Content.ReadFromJsonAsync<CreateWordResult>();
-		return createWordResult!;
 	}
 
 	private async Task<CreatePhraseResult> PostPhraseToTarget(HttpClient httpClient, string phraseInLanguage,

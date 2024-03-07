@@ -38,8 +38,9 @@ public interface IWordRepository
 	/// </summary>
 	/// <param name="id">The ID of the <seealso cref="Word"/>.</param>
 	/// <returns>The requested <seealso cref="Word"/>, or <c>null</c> if no Word could be found./</returns>
-	Task<Word?> GetById(int id);
-	
+	Task<Word?> GetByIdAsync(int id);
+
+	Task<Word?> GetByImportIdAsync(Guid importId);
 
 
 }

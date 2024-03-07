@@ -8,9 +8,9 @@ namespace Taggloo4.Dto;
 public class CreateWordResult
 {
 	/// <summary>
-	/// Internal identification of Word
+	/// A unique identifier that represents this creation operation.
 	/// </summary>
-	public int Id { get; set; }
+	public Guid ImportId { get; set; }
 	
 	/// <summary>
 	/// List of related Entities

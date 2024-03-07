@@ -8,9 +8,9 @@ namespace Taggloo4.Dto;
 public class CreatePhraseResult
 {
 	/// <summary>
-	/// Internal identification of Phrase
+	/// A unique identifier that represents this creation operation.
 	/// </summary>
-	public int Id { get; set; }
+	public Guid ImportId { get; set; }
 	
 	/// <summary>
 	/// List of related Entities

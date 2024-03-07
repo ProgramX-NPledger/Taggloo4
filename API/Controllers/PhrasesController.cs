@@ -4,7 +4,9 @@ using System.Text;
 using API.Contract;
 using API.Data;
 using API.Helper;
+using API.Jobs;
 using API.Model;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -23,21 +25,85 @@ public class PhrasesController : BaseApiController
 	private readonly IPhraseRepository _phraseRepository;
 	private readonly IWordRepository _wordRepository;
 	private readonly IDictionaryRepository _dictionaryRepository;
+	private readonly IBackgroundJobClient _backgroundJobClient;
 
 	/// <summary>
 	/// Constructor with injected parameters.
 	/// </summary>
-	/// <param name="phraseRepository">Implementation of <seealso cref="IPhraseRepository"/>.</param>
-	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
+	/// <param name="phraseRepository">Implementation of <see cref="IPhraseRepository"/>.</param>
+	/// <param name="wordRepository">Implementation of <see cref="IWordRepository"/>.</param>
+	/// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
+	/// <param name="backgroundJobClient">Implementation of <see cref="IBackgroundJobClient"/></param>
 	public PhrasesController(IPhraseRepository phraseRepository,
 		IWordRepository wordRepository,
-		IDictionaryRepository dictionaryRepository)
+		IDictionaryRepository dictionaryRepository,
+		IBackgroundJobClient backgroundJobClient)
 	{
 		_phraseRepository = phraseRepository;
 		_wordRepository = wordRepository;
 		_dictionaryRepository = dictionaryRepository;
-		
+		_backgroundJobClient = backgroundJobClient;
 	}
+	
+	
+	[HttpGet("{importGuid}/importguid")]
+	[Authorize(Roles = "administrator,dataExporter")]
+	public async Task<ActionResult<GetPhraseResultItem>> GetPhraseByImportGuid(Guid importGuid)
+	{
+		Phrase? phrase = await _phraseRepository.GetByImportIdAsync(importGuid);
+		if (phrase == null) return NotFound();
+
+		return Ok(new GetPhraseResultItem()
+		{
+			Phrase = phrase.ThePhrase,
+			Id = phrase.Id,
+			CreatedAt = phrase.CreatedAt,
+			CreatedOn = phrase.CreatedOn,
+			CreatedByUserName = phrase.CreatedByUserName,
+			DictionaryId = phrase.DictionaryId,
+			ImportId = phrase.ImportId,
+			Links = new[]
+			{
+				new Link()
+				{
+					Action = "get",
+					Rel = "self",
+					HRef = $"{GetBaseApiPath()}/phrases/{phrase.Id}",
+					Types = new[] { JSON_MIME_TYPE }
+				}
+			}
+		});
+	}
+
+	[HttpGet("{id}")]
+	[Authorize(Roles = "administrator,dataExporter")]
+	public async Task<ActionResult<GetWordResultItem>> GetPhraseById(int id)
+	{
+		Phrase? phrase = await _phraseRepository.GetByIdAsync(id);
+		if (phrase == null) return NotFound();
+
+		return Ok(new GetPhraseResultItem()
+		{
+			Phrase = phrase.ThePhrase,
+			Id = phrase.Id,
+			CreatedAt = phrase.CreatedAt,
+			CreatedOn = phrase.CreatedOn,
+			CreatedByUserName = phrase.CreatedByUserName,
+			DictionaryId = phrase.DictionaryId,
+			ImportId = phrase.ImportId,
+			Links = new[]
+			{
+				new Link()
+				{
+					Action = "get",
+					Rel = "self",
+					HRef = $"{GetBaseApiPath()}/phrases/{phrase.Id}",
+					Types = new[] { JSON_MIME_TYPE }
+				}
+			}
+		});
+	}
+	
 
 	/// <summary>
 	/// Retrieve matching Phrases from an optional Dictionary.
@@ -58,10 +124,15 @@ public class PhrasesController : BaseApiController
 
 		GetPhrasesResult getPhrasesResult = new GetPhrasesResult()
 		{
-			Results = words.Skip(offsetIndex).Take(pageSize).Select(p => new GetPhrasesResultItem()
+			Results = words.Skip(offsetIndex).Take(pageSize).Select(p => new GetPhraseResultItem()
 			{
 				Id = p.Id,
 				Phrase = p.ThePhrase,
+				CreatedAt = p.CreatedAt,
+				CreatedOn = p.CreatedOn,
+				CreatedByUserName = p.CreatedByUserName,
+				DictionaryId = p.DictionaryId,
+				ImportId = p.ImportId,
 				Links = new[]
 				{
 					new Link()
@@ -114,111 +185,28 @@ public class PhrasesController : BaseApiController
 		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createPhrase.DictionaryId);
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 		
-		// does the Phrase for the language already exist? If so, reject - maybe a translation is required
-		IEnumerable<Phrase> existingPhrase = await _phraseRepository.GetPhrasesAsync(createPhrase.Phrase, dictionary.Id,null);
-		if (existingPhrase.Any())
-			return BadRequest("Phrase already exists, perhaps a Translation from the existing Phrase is appropriate?");
-		
-		Phrase newPhrase = new Phrase()
-		{
-			CreatedAt = DateTime.Now,
-			CreatedOn = GetRemoteHostAddress(),
-			CreatedByUserName = GetCurrentUserName(),
-			ThePhrase = createPhrase.Phrase,
-			DictionaryId = dictionary.Id
-		};
+		Guid importGuid = Guid.NewGuid();
+		_backgroundJobClient.Enqueue<ImportPhraseJob>(job =>
+			job.ImportPhrase(GetRemoteHostAddress(), 
+				GetCurrentUserName(), 
+				createPhrase.Phrase, 
+				dictionary.Id,
+				importGuid));
 
-		_phraseRepository.Create(newPhrase);
-		if (!await _phraseRepository.SaveAllAsync()) return BadRequest();
-		
-		// break apart Phrase and links with words in same Dictionary
-		string url = $"{GetBaseApiPath()}/phrases/{newPhrase.Id}";
-		List<Link> links = new List<Link>(new[]
+		return Accepted(new CreatePhraseResult()
 		{
-			new Link()
+			ImportId = importGuid,
+			Links = new []
 			{
-				Action = "get",
-				Rel = "self",
-				Types = new string[] { JSON_MIME_TYPE },
-				HRef = url
-			},
-			new Link()
-			{
-				Action = "get",
-				Rel = "dictionary",
-				Types = new[] { JSON_MIME_TYPE },
-				HRef = $"{GetBaseApiPath()}/dictionaries/{newPhrase.DictionaryId}"
-			}
-		});
-		
-		string[] wordsInPhrase = createPhrase.Phrase.Split(new char[] { ' ' });
-		foreach (string wordInPhrase in wordsInPhrase)
-		{
-			IEnumerable<Word> existingWordsInPhrase = await _wordRepository.GetWordsAsync(wordInPhrase, null);
-			bool foundWord = false;
-			foreach (Word existingWordInPhrase in existingWordsInPhrase)
-			{
-				// dictionary must be in same language 
-				if (existingWordInPhrase.Dictionary.IetfLanguageTag == dictionary.IetfLanguageTag)
-				{
-					foundWord = true;
-					// link the word with the phrase
-					existingWordInPhrase.Phrases.Add(newPhrase);
-					_wordRepository.Update(existingWordInPhrase);
-					await _wordRepository.SaveAllAsync();
-					
-					Link link = new Link()
-					{
-						Action = "get",
-						Rel = "existingWordInPhrase",
-						HRef = $"{GetBaseApiPath()}/words/{existingWordInPhrase.Id}"
-					};
-					links.Add(link);
-				}
-			}
-
-			if (!foundWord)
-			{
-				// create word
-				Word newWord = new Word()
-				{
-					CreatedAt = DateTime.Now,
-					CreatedOn = this.GetRemoteHostAddress(),
-					CreatedByUserName = this.GetCurrentUserName(),
-					TheWord = wordInPhrase,
-					DictionaryId = dictionary.Id, // bug: will create word link in same dictionary as phrase, should get Dictionary in same language with Words - cannot select dictionary because do not know purpose of dictionary without putting a type on it
-					Phrases = new Collection<Phrase>(
-					[
-						newPhrase
-					])
-				};
-				_wordRepository.Create(newWord);
-				await _wordRepository.SaveAllAsync();
-
-				Link link = new Link()
+				new Link()
 				{
 					Action = "get",
-					Rel = "createdWordInPhrase",
-					HRef = $"{GetBaseApiPath()}/words/{newWord.Id}",
-					Types = new []{ JSON_MIME_TYPE}
-				};
-				links.Add(link);
-
+					Rel = "self",
+					HRef = $"{GetBaseApiPath()}/phrases/{importGuid}/importguid",
+					Types = new []{ JSON_MIME_TYPE }
+				}
 			}
-			
-
-			
-		}
-
-		
-		
-		CreatePhraseResult createPhraseResult = new CreatePhraseResult()
-		{
-			Id = newPhrase.Id,
-			Links = links.ToArray()
-		};
-
-		return Created(url,createPhraseResult);
+		});
 		
 		
 	}

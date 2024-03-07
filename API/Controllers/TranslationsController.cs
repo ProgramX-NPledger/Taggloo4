@@ -58,9 +58,9 @@ public class TranslationsController : BaseApiController
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 		
 		// do the words exist?
-		Word? fromWord = await _wordRepository.GetById(createWordTranslation.FromWordId);
+		Word? fromWord = await _wordRepository.GetByIdAsync(createWordTranslation.FromWordId);
 		if (fromWord == null) return BadRequest("From Word does not exist");
-		Word? toWord = await _wordRepository.GetById(createWordTranslation.ToWordId);
+		Word? toWord = await _wordRepository.GetByIdAsync(createWordTranslation.ToWordId);
 		if (toWord == null) return BadRequest("To Word does not exist");
 
 		WordTranslation wordTranslation=new WordTranslation()

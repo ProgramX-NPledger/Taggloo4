@@ -3,12 +3,15 @@ using System.Text;
 using API.Contract;
 using API.Data;
 using API.Helper;
+using API.Jobs;
 using API.Model;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Taggloo4.Dto;
 
 namespace API.Controllers;
@@ -22,30 +25,92 @@ public class WordsController : BaseApiController
 	private readonly IWordRepository _wordRepository;
 	private readonly IPhraseRepository _phraseRepository;
 	private readonly IDictionaryRepository _dictionaryRepository;
+	private readonly IBackgroundJobClient _backgroundJobClient;
 
 	/// <summary>
 	/// Constructor with injected parameters.
 	/// </summary>
-	/// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
-	/// <param name="phraseRepository">Implementation of <seealso cref="IPhraseRepository"/>.</param>
-	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
+	/// <param name="wordRepository">Implementation of <see cref="IWordRepository"/>.</param>
+	/// <param name="phraseRepository">Implementation of <see cref="IPhraseRepository"/>.</param>
+	/// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
+	/// <param name="backgroundJobClient">Implementation of <see cref="IBackgroundJobClient" />.</param>
 	public WordsController(IWordRepository wordRepository,
 		IPhraseRepository phraseRepository,
-		IDictionaryRepository dictionaryRepository)
+		IDictionaryRepository dictionaryRepository,
+		IBackgroundJobClient backgroundJobClient)
 	{
 		_wordRepository = wordRepository;
 		_phraseRepository = phraseRepository;
 		_dictionaryRepository = dictionaryRepository;
-		
+		_backgroundJobClient = backgroundJobClient;
 	}
 
+	[HttpGet("{importGuid}/importguid")]
+	[Authorize(Roles = "administrator,dataExporter")]
+	public async Task<ActionResult<GetWordResultItem>> GetWordByImportGuid(Guid importGuid)
+	{
+		Word? word = await _wordRepository.GetByImportIdAsync(importGuid);
+		if (word == null) return NotFound();
+
+		return Ok(new GetWordResultItem()
+		{
+			Word = word.TheWord,
+			Id = word.Id,
+			CreatedAt = word.CreatedAt,
+			CreatedOn = word.CreatedOn,
+			CreatedByUserName = word.CreatedByUserName,
+			DictionaryId = word.DictionaryId,
+			ImportId = word.ImportId,
+			Links = new[]
+			{
+				new Link()
+				{
+					Action = "get",
+					Rel = "self",
+					HRef = $"{GetBaseApiPath()}/words/{word.Id}",
+					Types = new[] { JSON_MIME_TYPE }
+				}
+			}
+		});
+	}
+
+	[HttpGet("{id}")]
+	[Authorize(Roles = "administrator,dataExporter")]
+	public async Task<ActionResult<GetWordResultItem>> GetWordById(int id)
+	{
+		Word? word = await _wordRepository.GetByIdAsync(id);
+		if (word == null) return NotFound();
+
+		return Ok(new GetWordResultItem()
+		{
+			Word = word.TheWord,
+			Id = word.Id,
+			CreatedAt = word.CreatedAt,
+			CreatedOn = word.CreatedOn,
+			CreatedByUserName = word.CreatedByUserName,
+			DictionaryId = word.DictionaryId,
+			ImportId = word.ImportId,
+			Links = new[]
+			{
+				new Link()
+				{
+					Action = "get",
+					Rel = "self",
+					HRef = $"{GetBaseApiPath()}/words/{word.Id}",
+					Types = new[] { JSON_MIME_TYPE }
+				}
+			}
+		});
+	}
+
+	
 	/// <summary>
 	/// Retrieve matching Words from an optional Dictionary.
 	/// </summary>
 	/// <param name="word">The word to search for.</param>
 	/// <param name="dictionaryId">If specified, searches within the Dictionary represented by the ID.</param>
-	/// <param name="offsetIndex">If specified, returns results starting at the specified offset position (starting index 0) Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
-	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
+	/// <param name="offsetIndex">If specified, returns results starting at the specified offset position (starting index 0) Default is defined by <see cref="Defaults.OffsetIndex"/>.</param>
+	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <see cref="Defaults.MaxItems" />.</param>
 	/// <response code="200">Results prepared.</response>
 	/// <response code="403">Not permitted.</response>
 	[HttpGet()]
@@ -62,6 +127,11 @@ public class WordsController : BaseApiController
 			{
 				Id = w.Id,
 				Word = w.TheWord,
+				CreatedAt = w.CreatedAt,
+				CreatedOn = w.CreatedOn,
+				CreatedByUserName = w.CreatedByUserName,
+				DictionaryId = w.DictionaryId,
+				ImportId = w.ImportId,
 				Links = new[]
 				{
 					new Link()
@@ -103,7 +173,7 @@ public class WordsController : BaseApiController
 	/// </summary>
 	/// <param name="createWord">A <see cref="CreateWord"/> representing the Word to create.</param>
 	/// <returns>The created Word.</returns>
-	/// <response code="201">Word was created.</response>
+	/// <response code="202">Word creation was accepted.</response>
 	/// <response code="400">One or more validation errors prevented successful creation.</response>
 	/// <response code="403">Not permitted.</response>
 	[HttpPost]
@@ -113,89 +183,29 @@ public class WordsController : BaseApiController
 		// try to resolve the dictionary
 		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createWord.DictionaryId);
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
-		
-		// does the word for the language already exist? If so, reject - maybe a translation is required
-		IEnumerable<Word> existingWord = await _wordRepository.GetWordsAsync(createWord.Word, dictionary.Id);
-		if (existingWord.Any())
-			return BadRequest("Word already exists, perhaps a Translation from the existing Word is appropriate?");
-		
-		Word newWord = new Word()
-		{
-			CreatedAt = DateTime.Now,
-			CreatedOn = GetRemoteHostAddress(),
-			CreatedByUserName = GetCurrentUserName(),
-			TheWord = createWord.Word,
-			DictionaryId = dictionary.Id
-		};
 
-		_wordRepository.Create(newWord);
-		if (!await _wordRepository.SaveAllAsync()) return BadRequest();
-		
-		string url = $"{GetBaseApiPath()}/words/{newWord.Id}";
-		List<Link> links = new List<Link>([
-			new Link()
-			{
-				Action = "get",
-				Rel = "self",
-				Types = new string[] { JSON_MIME_TYPE },
-				HRef = url
-			},
-			new Link()
-			{
-				Action = "get",
-				Rel = "dictionary",
-				Types = new[] { JSON_MIME_TYPE },
-				HRef = $"{GetBaseApiPath()}/dictionaries/{newWord.DictionaryId}"
-			}
-		]);
+		Guid importGuid = Guid.NewGuid();
+		_backgroundJobClient.Enqueue<ImportWordJob>(job =>
+			job.ImportWord(GetRemoteHostAddress(), GetCurrentUserName(), createWord.Word, dictionary.Id,importGuid));
 
-		IEnumerable<Phrase> phrasesWithText= await _phraseRepository.GetPhrasesAsync(null, null, createWord.Word);
-		foreach (Phrase phrase in phrasesWithText)
+		return Accepted(new CreateWordResult()
 		{
-			// must be a complete word and not be a part of another word
-			bool wordIsADiscreteWord=IsWordADiscreteWordWithinPhrase(createWord.Word, phrase);
-			if (wordIsADiscreteWord)
+			ImportId = importGuid,
+			Links = new []
 			{
-				// does phrase dictionary language match the word language?
-				if (phrase.Dictionary.IetfLanguageTag == dictionary.IetfLanguageTag)
+				new Link()
 				{
-					links.Add(new Link()
-					{
-						Action = "get",
-						Rel = "wordInPhrase",
-						HRef = $"{GetBaseApiPath()}/phrases/{phrase.Id}",
-						Types = new []{ JSON_MIME_TYPE}
-					});
-					
-					newWord.Phrases.Add(phrase);
-					_wordRepository.Update(newWord);
+					Action = "get",
+					Rel = "self",
+					HRef = $"{GetBaseApiPath()}/words/{importGuid}/importguid",
+					Types = new []{ JSON_MIME_TYPE }
 				}
 			}
-		}
-
-		await _wordRepository.SaveAllAsync();
-		
-		CreateWordResult createWordResult = new CreateWordResult()
-		{
-			Id = newWord.Id,
-			Links = links.ToArray()
-		};
-		
-		// TODO: Scan phrases/etc. for instances of Word within this language and link
-		
-		return Created(url,createWordResult);
-		
+		});
 		
 	}
 
-	private bool IsWordADiscreteWordWithinPhrase(string word, Phrase phrase)
-	{
-		string lowerPhrase = phrase.ThePhrase.ToLower();
-		string lowerWord = word.ToLower();
-		return lowerPhrase == lowerWord ||
-		       lowerPhrase.Contains(lowerWord + " ") ||
-		       lowerPhrase.Contains(" " + lowerWord);
-	}
+
 
 	/// <summary>
 	/// Update an existing Word with meta-data.
@@ -210,7 +220,7 @@ public class WordsController : BaseApiController
 	[Authorize(Roles="administrator, dataImporter")]
 	public async Task<ActionResult<AppUser>> UpdateWord(UpdateWord updateWord)
 	{
-		Word? word = await _wordRepository.GetById(updateWord.WordId);
+		Word? word = await _wordRepository.GetByIdAsync(updateWord.WordId);
 		if (word == null) return NotFound();
 		
 		// update word

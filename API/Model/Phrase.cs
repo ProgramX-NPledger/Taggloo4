@@ -5,8 +5,9 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Model;
 
 /// <summary>
-/// A Phrase within a <seealso cref="Dictionary"/>.
+/// A Phrase within a Dictionary.
 /// </summary>
+/// <seealso cref="Dictionary"/>
 public class Phrase
 {
 	/// <summary>
@@ -36,13 +37,15 @@ public class Phrase
 	public required string CreatedOn { get; set; }
 
 	/// <summary>
-	/// The owning <seealso cref="Dictionary"/>.
+	/// The owning Dictionary.
 	/// </summary>
+	/// <seealso cref="Dictionary"/>.
 	public Dictionary? Dictionary { get; set; }
 	
 	/// <summary>
-	/// Identifier of owning <seealso cref="Dictionary"/>.
+	/// Identifier of owning Dictionary.
 	/// </summary>
+	/// <seealso cref="Dictionary"/>
 	public int DictionaryId { get; set; }
 	
 	/// <summary>
@@ -53,6 +56,10 @@ public class Phrase
 	// this fails when building migrations
 //	public ICollection<WordTranslation> Translations { get; set; }
 
+	/// <summary>
+	/// The unique identifier given to this Word during importing.
+	/// </summary>
+	public Guid? ImportId { get; set; }
 	
 	
 }

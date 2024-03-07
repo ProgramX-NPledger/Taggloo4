@@ -8,7 +8,7 @@ public class GetPhrasesResult
 	/// <summary>
 	/// Results of the query.
 	/// </summary>
-	public IEnumerable<GetPhrasesResultItem> Results { get; set; } = Enumerable.Empty<GetPhrasesResultItem>();
+	public IEnumerable<GetPhraseResultItem> Results { get; set; } = Enumerable.Empty<GetPhraseResultItem>();
 	
 	/// <summary>
 	/// The index from which results have been returned. This is 0-based.

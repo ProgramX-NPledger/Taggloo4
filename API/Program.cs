@@ -64,7 +64,10 @@ builder.Services.AddHangfire(configuration=>
         PrepareSchemaIfNecessary = false,
         TryAutoDetectSchemaDependentOptions = false
     }));
-builder.Services.AddHangfireServer();
+builder.Services.AddHangfireServer(options =>
+{
+    options.Queues = new string[] { "import" };
+});
 
 // builder.Services.AddHttpLogging(o => { });
 // builder.Services.AddHttpLoggingInterceptor<HttpLoggingInterceptor>();

@@ -51,7 +51,11 @@ public class Word
 	/// <summary>
 	/// Phrases in which this Word appears.
 	/// </summary>
-	public ICollection<Phrase>? Phrases { get; set; } 
-	
+	public ICollection<Phrase>? Phrases { get; set; }
+
+	/// <summary>
+	/// The unique identifier given to this Word during importing.
+	/// </summary>
+	public Guid? ImportId { get; set; }
 	
 }

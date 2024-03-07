@@ -18,4 +18,8 @@ public class CreateWord
 	/// </summary>
 	[Required]
 	public required string Word { get; set; }
+
+	public IEnumerable<string> Translations { get; set; }
+
+	public int TranslationDictionaryId { get; set; }
 }
