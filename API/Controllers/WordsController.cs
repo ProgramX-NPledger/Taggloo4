@@ -186,7 +186,8 @@ public class WordsController : BaseApiController
 
 		Guid importGuid = Guid.NewGuid();
 		_backgroundJobClient.Enqueue<ImportWordJob>(job =>
-			job.ImportWord(GetRemoteHostAddress(), GetCurrentUserName(), createWord.Word, dictionary.Id,importGuid));
+			job.ImportWord(createWord.CreatedOn ?? GetRemoteHostAddress(), 
+				createWord.CreatedByUserName ?? GetCurrentUserName(), createWord.Word, dictionary.Id,importGuid,createWord.CreatedAt));
 
 		return Accepted(new CreateWordResult()
 		{
@@ -220,7 +221,7 @@ public class WordsController : BaseApiController
 	[Authorize(Roles="administrator, dataImporter")]
 	public async Task<ActionResult<AppUser>> UpdateWord(UpdateWord updateWord)
 	{
-		Word? word = await _wordRepository.GetByIdAsync(updateWord.WordId);
+		Word? word= await _wordRepository.GetByIdAsync(updateWord.WordId);
 		if (word == null) return NotFound();
 		
 		// update word
@@ -228,16 +229,6 @@ public class WordsController : BaseApiController
 		{
 
 		};
-
-		if (updateWord.Word!=null &&
-		    !word.TheWord.Equals(updateWord.Word))
-		{
-			// changing the word is dangerous. Ensure the new word doesn't already exist
-			IEnumerable<Word>? newWord = await _wordRepository.GetWordsAsync(updateWord.Word,updateWord.DictionaryId);
-			if (newWord.Any()) return BadRequest("The word is being renamed to another Word that already exists within the Dictionary");
-
-			word.TheWord = updateWord.Word;
-		}
 
 		if (updateWord.MoveWordToDictionaryId.HasValue &&
 		    word.DictionaryId != updateWord.MoveWordToDictionaryId.Value)
@@ -284,8 +275,6 @@ public class WordsController : BaseApiController
 				HRef = $"{GetBaseApiPath()}/dictionaries/{word.DictionaryId}"
 			}
 		};
-		
-		// TODO: Scan phrases/etc. for instances of Word within this language and link
 		
 		return Ok(updateWordResult);
 		

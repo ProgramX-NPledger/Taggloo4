@@ -1,4 +1,4 @@
-﻿namespace Taggloo4Mgt.Model;
+﻿namespace Taggloo4Mgt.Importing.Model;
 
 public class WordTranslation
 {

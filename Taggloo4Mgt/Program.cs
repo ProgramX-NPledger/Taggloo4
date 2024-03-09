@@ -3,6 +3,7 @@
 using System.Diagnostics;
 using CommandLine;
 using Taggloo4Mgt;
+using Taggloo4Mgt.Importing;
 
 try
 {
