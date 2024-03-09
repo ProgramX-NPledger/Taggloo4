@@ -10,7 +10,8 @@ public class ImporterFactory
         {
             new WordImporter(),
             new PhraseImporter(),
-            new WordTranslationImporter()
-        };
+            new WordTranslationImporter(),
+            new PhraseTranslationImporter()
+        }.OrderBy(q=>q.Ordinal);
     }
 }

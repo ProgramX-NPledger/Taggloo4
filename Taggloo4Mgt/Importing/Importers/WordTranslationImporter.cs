@@ -7,7 +7,9 @@ namespace Taggloo4Mgt.Importing.Importers;
 
 public class WordTranslationImporter : IImporter
 {
-    public string Key { get; } = "translations";
+    public string Key { get; } = "wordTranslations";
+
+    public int Ordinal { get; } = 50;
     
     public async Task<IImportSession> CreateSession(SqlConnection sqlConnection)
     {

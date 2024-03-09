@@ -222,7 +222,7 @@ public class TranslationsController : BaseApiController
 	/// <response code="403">Not permitted.</response>
 	[HttpPost("phrase")] // /api/v4/translations/phrase
 	[Authorize(Roles="administrator, dataImporter")]
-	public async Task<ActionResult<AppUser>> CreateTranslation(CreatePhraseTranslation createPhraseTranslation)
+	public async Task<ActionResult<CreatePhraseTranslationResult>> CreatePhraseTranslation(CreatePhraseTranslation createPhraseTranslation)
 	{
 		// try to resolve the dictionary
 		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createPhraseTranslation.DictionaryId);
@@ -236,9 +236,9 @@ public class TranslationsController : BaseApiController
 
 		PhraseTranslation phraseTranslation=new PhraseTranslation()
 		{
-			CreatedAt = DateTime.Now,
-			CreatedOn = GetRemoteHostAddress(),
-			CreatedByUserName = GetCurrentUserName(),
+			CreatedAt = createPhraseTranslation.CreatedAt ?? DateTime.Now,
+			CreatedOn = createPhraseTranslation.CreatedOn ?? GetRemoteHostAddress(),
+			CreatedByUserName = createPhraseTranslation.CreatedByUserName ?? GetCurrentUserName(),
 			DictionaryId = createPhraseTranslation.DictionaryId,
 			FromPhraseId = createPhraseTranslation.FromPhraseId,
 			ToPhraseId = createPhraseTranslation.ToPhraseId

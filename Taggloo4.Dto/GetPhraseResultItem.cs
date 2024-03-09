@@ -45,4 +45,10 @@ public class GetPhraseResultItem
 	/// </summary>
 	public Guid? ImportId { get; set; }
 	
+	/// <summary>
+	/// The IETF Language Tag for the Language this Word is in
+	/// </summary>
+	public string? IetfLanguageTag { get; set; }
+	
+	
 }

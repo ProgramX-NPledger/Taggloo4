@@ -62,6 +62,7 @@ public class PhrasesController : BaseApiController
 			CreatedByUserName = phrase.CreatedByUserName,
 			DictionaryId = phrase.DictionaryId,
 			ImportId = phrase.ImportId,
+			IetfLanguageTag = phrase.Dictionary?.IetfLanguageTag,
 			Links = new[]
 			{
 				new Link()
@@ -91,6 +92,7 @@ public class PhrasesController : BaseApiController
 			CreatedByUserName = phrase.CreatedByUserName,
 			DictionaryId = phrase.DictionaryId,
 			ImportId = phrase.ImportId,
+			IetfLanguageTag = phrase.Dictionary?.IetfLanguageTag,
 			Links = new[]
 			{
 				new Link()
@@ -133,6 +135,7 @@ public class PhrasesController : BaseApiController
 				CreatedByUserName = p.CreatedByUserName,
 				DictionaryId = p.DictionaryId,
 				ImportId = p.ImportId,
+				IetfLanguageTag = p.Dictionary?.IetfLanguageTag,
 				Links = new[]
 				{
 					new Link()

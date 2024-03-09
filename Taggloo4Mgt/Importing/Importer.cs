@@ -259,41 +259,28 @@ public class Importer : ApiClientBase
 		}
 	}
 
-	
-	private async Task UpdatePhraseTranslationAtTargetWithMetaData(HttpClient httpClient, int id, string translationCreatedByUserName, DateTime translationCreatedAt)
-	{
-		string url = $"/api/v4/translations/phrase/{id}";
-		UpdatePhraseTranslation updatePhraseTranslation = new UpdatePhraseTranslation()
-		{
-			CreatedByUserName = translationCreatedByUserName,
-			CreatedAt = translationCreatedAt
-		};
-		
-		HttpResponseMessage response = await httpClient.PatchAsJsonAsync(url, updatePhraseTranslation);
-		response.EnsureSuccessStatusCode();
-	}
-	
-
-	private async Task<CreatePhraseTranslationResult?> PostTranslationBetweenPhrases(HttpClient httpClient, int fromPhraseId, int toPhraseId, int dictionaryId)
-	{
-		string url = "/api/v4/translations/phrase";
-		CreatePhraseTranslation createPhraseTranslation = new CreatePhraseTranslation()
-		{
-			DictionaryId = dictionaryId,
-			FromPhraseId = fromPhraseId,
-			ToPhraseId = toPhraseId
-		};
-
-		HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createPhraseTranslation);
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException($"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
-		}
-
-		CreatePhraseTranslationResult? createPhraseTranslationResult =
-			await response.Content.ReadFromJsonAsync<CreatePhraseTranslationResult>();
-		return createPhraseTranslationResult;
-	}
+	//
+	//
+	// private async Task<CreatePhraseTranslationResult?> PostTranslationBetweenPhrases(HttpClient httpClient, int fromPhraseId, int toPhraseId, int dictionaryId)
+	// {
+	// 	string url = "/api/v4/translations/phrase";
+	// 	CreatePhraseTranslation createPhraseTranslation = new CreatePhraseTranslation()
+	// 	{
+	// 		DictionaryId = dictionaryId,
+	// 		FromPhraseId = fromPhraseId,
+	// 		ToPhraseId = toPhraseId
+	// 	};
+	//
+	// 	HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createPhraseTranslation);
+	// 	if (!response.IsSuccessStatusCode)
+	// 	{
+	// 		throw new InvalidOperationException($"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
+	// 	}
+	//
+	// 	CreatePhraseTranslationResult? createPhraseTranslationResult =
+	// 		await response.Content.ReadFromJsonAsync<CreatePhraseTranslationResult>();
+	// 	return createPhraseTranslationResult;
+	// }
 
 	private async Task<CreateDictionaryResult> CreateDictionaryForLanguage(HttpClient httpClient, string languageCode, string importType)
 	{
@@ -341,26 +328,6 @@ public class Importer : ApiClientBase
 
 	
 
-	
-	
-	private async Task<IEnumerable<PhraseTranslation>> GetTranslationsForPhrase(SqlConnection sqlConnection,
-		Phrase phraseInLanguage)
-	{
-		string sqlCmd = @"select t.Translation,t.LanguageCode,pt.CreatedByUserName,pt.CreatedTimeStamp from Taggloo_Phrase p
-			inner join Taggloo_PhraseTranslation pt on p.id=pt.PhraseID
-			inner join Taggloo_Translation t on t.ID=pt.TranslationID
-			where p.Phrase=@phrase";
-
-		IEnumerable<PhraseTranslation> translations = await sqlConnection.QueryAsync<PhraseTranslation>(sqlCmd, new
-		{
-			Phrase = phraseInLanguage.ThePhrase
-		});
-		
-		// make sure all the returned languages are supported
-		IEnumerable<PhraseTranslation> translationsForPhrase = translations as PhraseTranslation[] ?? translations.ToArray();
-		return translationsForPhrase;
-		
-	}
 	
 	
 	
