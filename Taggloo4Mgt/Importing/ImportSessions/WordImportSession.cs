@@ -25,7 +25,7 @@ public class WordImportSession : IImportSession
         return _words.Count();
     }
 
-    public async Task Import(HttpClient httpClient, string languageCode, int dictionaryId)
+    public async Task Import(HttpClient httpClient, string languageCode, int dictionaryId, Dictionary<string, Dictionary<int, Guid>> originalIdsToImportIdsMap)
     {
 	    Word[] wordsInLanguage =
 		    _words.Where(q => q.LanguageCode.Equals(languageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
@@ -50,12 +50,14 @@ public class WordImportSession : IImportSession
 
 			try
 			{
-				_ = await PostWordToTarget(httpClient, wordInLanguage, dictionaryId);
+				CreateWordResult createWordResult = await PostWordToTarget(httpClient, wordInLanguage, dictionaryId);
 				Imported?.Invoke(this,new ImportedEventArgs()
 				{
 					LanguageCode = languageCode,
 					CurrentItem = wordInLanguage.TheWord,
-					IsSuccess = true
+					ImportGuid = createWordResult.ImportId,
+					IsSuccess = true,
+					SourceId = wordInLanguage.ID
 				});
 			}
 			catch (Exception ex)
@@ -77,7 +79,8 @@ public class WordImportSession : IImportSession
 				{
 					LanguageCode = languageCode,
 					CurrentItem = wordInLanguage.TheWord,
-					IsSuccess = false
+					IsSuccess = false,
+					SourceId = wordInLanguage.ID
 				});
 			}
 				

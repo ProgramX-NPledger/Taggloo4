@@ -61,6 +61,7 @@ public class WordsController : BaseApiController
 			CreatedByUserName = word.CreatedByUserName,
 			DictionaryId = word.DictionaryId,
 			ImportId = word.ImportId,
+			IetfLanguageTag = word.Dictionary?.IetfLanguageTag,
 			Links = new[]
 			{
 				new Link()
@@ -90,6 +91,7 @@ public class WordsController : BaseApiController
 			CreatedByUserName = word.CreatedByUserName,
 			DictionaryId = word.DictionaryId,
 			ImportId = word.ImportId,
+			IetfLanguageTag = word.Dictionary?.IetfLanguageTag,
 			Links = new[]
 			{
 				new Link()
@@ -132,6 +134,7 @@ public class WordsController : BaseApiController
 				CreatedByUserName = w.CreatedByUserName,
 				DictionaryId = w.DictionaryId,
 				ImportId = w.ImportId,
+				IetfLanguageTag = w.Dictionary?.IetfLanguageTag,
 				Links = new[]
 				{
 					new Link()

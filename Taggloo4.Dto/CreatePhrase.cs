@@ -18,4 +18,21 @@ public class CreatePhrase
 	/// </summary>
 	[Required]
 	public required string Phrase { get; set; }
+	
+	/// <summary>
+	/// If specified, updates the CreatedByUserName field.
+	/// </summary>
+	public string? CreatedByUserName { get; set; }
+
+	/// <summary>
+	/// If specified, updates the CreatedOn field.
+	/// </summary>
+	public string? CreatedOn { get; set; }
+	
+	/// <summary>
+	/// If specified, updates the CreatedAt field.
+	/// </summary>
+	public DateTime? CreatedAt { get; set; }
+	
+	
 }

@@ -187,8 +187,8 @@ public class PhrasesController : BaseApiController
 		
 		Guid importGuid = Guid.NewGuid();
 		_backgroundJobClient.Enqueue<ImportPhraseJob>(job =>
-			job.ImportPhrase(GetRemoteHostAddress(), 
-				GetCurrentUserName(), 
+			job.ImportPhrase(createPhrase.CreatedOn ?? GetRemoteHostAddress(), 
+				createPhrase.CreatedByUserName ?? GetCurrentUserName(), 
 				createPhrase.Phrase, 
 				dictionary.Id,
 				importGuid));
@@ -232,17 +232,7 @@ public class PhrasesController : BaseApiController
 		{
 
 		};
-
-		if (updatePhrase.Phrase!=null &&
-		    !phrase.ThePhrase.Equals(updatePhrase.Phrase))
-		{
-			// changing the word is dangerous. Ensure the new word doesn't already exist
-			IEnumerable<Phrase>? newPhrase = await _phraseRepository.GetPhrasesAsync(updatePhrase.Phrase,updatePhrase.DictionaryId,null);
-			if (newPhrase.Any()) return BadRequest("The Phrase is being renamed to another Phrase that already exists within the Dictionary");
-
-			phrase.ThePhrase = updatePhrase.Phrase;
-		}
-
+		
 		if (updatePhrase.MovePhraseToDictionaryId.HasValue &&
 		    phrase.DictionaryId != updatePhrase.MovePhraseToDictionaryId.Value)
 		{
@@ -288,8 +278,6 @@ public class PhrasesController : BaseApiController
 				HRef = $"{GetBaseApiPath()}/dictionaries/{phrase.DictionaryId}"
 			}
 		};
-		
-		// TODO: Scan phrases/etc. for instances of Word within this language and link
 		
 		return Ok(updatePhraseResult);
 		

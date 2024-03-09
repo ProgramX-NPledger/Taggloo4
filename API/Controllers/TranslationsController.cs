@@ -65,9 +65,9 @@ public class TranslationsController : BaseApiController
 
 		WordTranslation wordTranslation=new WordTranslation()
 		{
-			CreatedAt = DateTime.Now,
-			CreatedOn = GetRemoteHostAddress(),
-			CreatedByUserName = GetCurrentUserName(),
+			CreatedAt = createWordTranslation.CreatedAt ?? DateTime.Now,
+			CreatedOn = createWordTranslation.CreatedOn ?? GetRemoteHostAddress(),
+			CreatedByUserName = createWordTranslation.CreatedByUserName ?? GetCurrentUserName(),
 			DictionaryId = createWordTranslation.DictionaryId,
 			FromWordId = createWordTranslation.FromWordId,
 			ToWordId = createWordTranslation.ToWordId

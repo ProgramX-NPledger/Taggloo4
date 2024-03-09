@@ -16,6 +16,9 @@ public class Importer : ApiClientBase
 	private readonly ImportOptions _importOptions;
 	private readonly string? _logFileName;
 	private readonly IList<int> _millisecondsBetweenWords = new List<int>();
+
+	private Dictionary<string, Dictionary<int, Guid>> _originalIdsToImportIdsMap =
+		new Dictionary<string, Dictionary<int, Guid>>();
 	
 	public Importer(ImportOptions importOptions)
 	{
@@ -93,6 +96,16 @@ public class Importer : ApiClientBase
 					};
 					importSession.Imported += (sender, e) =>
 					{
+						if (!_originalIdsToImportIdsMap.ContainsKey(nameof(sender)))
+						{
+							_originalIdsToImportIdsMap.Add(nameof(sender),new Dictionary<int, Guid>());
+						}
+
+						if (e.ImportGuid.HasValue)
+						{
+							_originalIdsToImportIdsMap[nameof(sender)].Add(e.SourceId,e.ImportGuid.Value);	
+						}
+						
 						UpdateProgressBar(++totalImportedCount, toBeImportedCount, e.LanguageCode, e.CurrentItem);
 					};
 					importSessions.Add(importSession);
@@ -104,12 +117,12 @@ public class Importer : ApiClientBase
 					foreach (IImportSession importSession in importSessions)
 					{
 						// create a dictionary
-						CreateDictionaryResult dictionary =
+						CreateDictionaryResult createDictionaryResult =
 							await CreateDictionaryForLanguage(httpClient, languageCode, nameof(importSession));
 						if ((_importOptions.MaxItemsPerType ?? 0) < numberOfImportedItemsForType)
 						{
 							numberOfImportedItemsForType++;
-							importSession.Import(httpClient, languageCode, dictionary.Id);
+							importSession.Import(httpClient, languageCode, createDictionaryResult.Id, _originalIdsToImportIdsMap);
 						}
 					}
 
@@ -150,135 +163,6 @@ public class Importer : ApiClientBase
 		return sourceLanguageCodes;
 	}
 
-	private async Task ImportPhrases(HttpClient httpClient, SqlConnection sqlConnection, string languageCode, int processedCount, int totalProcessedCount, IDictionary<string,int> dictionariesForLanguageDictionary)
-	{
-		UpdateProgressBar(0, 0, "", "");
-
-		Log($"\t\t\tPhrases: {languageCode}");
-			
-		// get all words
-		IEnumerable<Phrase> phrasesInLanguage = await GetAllPhrasesForLanguage(sqlConnection,languageCode);
-		Log($"\t\t\t\t{phrasesInLanguage.Count()} Phrases in Language");
-		totalProcessedCount += phrasesInLanguage.Count();
-		int phrasesProcessedCount = 0;
-		
-		// for each Word in source
-		foreach (Phrase phraseInLanguage in phrasesInLanguage)
-		{
-			DateTime startTimeStamp = DateTime.Now;
-			
-			Log($"\t\t\t\t\t{phraseInLanguage.ThePhrase}");
-
-			if (_importOptions.MaxItemsPerLanguage.HasValue &&
-			    _importOptions.MaxItemsPerLanguage.Value < phrasesProcessedCount)
-			{
-				// already processed enough phrases, so ignore
-			}
-			else
-			{
-				try
-				{
-					phrasesProcessedCount++;
-					await ProcessPhrase(httpClient, sqlConnection, phraseInLanguage, dictionariesForLanguageDictionary, languageCode);
-				
-				}
-				catch (Exception ex)
-				{
-					await Console.Error.WriteLineAsync();
-					await Console.Error.WriteLineAsync($"Failed to import Phrase '{phraseInLanguage.ThePhrase}'");
-					Exception? exPtr = ex;
-					do
-					{
-						await Console.Error.WriteLineAsync(exPtr.Message);
-						Log($"ERROR: {exPtr.GetType().Name}: {exPtr.Message}");
-						exPtr = exPtr.InnerException;
-					} while (exPtr!=null);
-				}
-				
-			}
-
-			TimeSpan delta = DateTime.Now - startTimeStamp;
-			_millisecondsBetweenWords.Add((int)delta.TotalMilliseconds);
-			
-			
-			UpdateProgressBar(processedCount++, totalProcessedCount, languageCode, phraseInLanguage.ThePhrase);
-			
-			
-		}
-		
-	}
-
-	private async Task ProcessPhrase(HttpClient httpClient, SqlConnection sqlConnection, Phrase phraseInLanguage, IDictionary<string,int> dictionariesAtTargetDictionary, string languageCode)
-	{
-		
-		// does the phrase already exist?
-		GetPhrasesResult existingPhrase = await GetPhrase(httpClient, phraseInLanguage.ThePhrase,
-			dictionariesAtTargetDictionary[languageCode]);
-		if (existingPhrase.Results.Any())
-		{
-			// phrase already exists, so have to assume translations do too
-			Log($"\t\t\t\t\t\tPhrase already exists");
-		}
-		else
-		{
-			// post phrase
-			CreatePhraseResult createPhraseResult=await PostPhraseToTarget(httpClient, phraseInLanguage.ThePhrase, dictionariesAtTargetDictionary[languageCode]);
-			await UpdatePhraseAtTargetWithMetaData(httpClient, createPhraseResult.Id, phraseInLanguage.CreatedByUserName, phraseInLanguage.CreatedTimeStamp);
-			Log($"\t\t\t\t\t\tWord ID {createPhraseResult.Id} created");
-			
-			// get translations
-			IEnumerable<PhraseTranslation> translations = await GetTranslationsForPhrase(sqlConnection, phraseInLanguage);
-			Log($"\t\t\t\t\t\t{translations.Count()} Translations");
-			
-			foreach (PhraseTranslation translation in translations)
-			{
-				Log($"\t\t\t\t\t\t\t{translation.Translation} ({translation.LanguageCode})");
-				if (!dictionariesAtTargetDictionary.ContainsKey(translation.LanguageCode))
-				{
-					CreateDictionaryResult createOtherDictionaryResult =
-						await CreateDictionaryForLanguage(httpClient, translation.LanguageCode);
-					Log($"\t\t\t\t\t\t\tDictionary ID {createOtherDictionaryResult.Id} created for {translation.LanguageCode}");
-					dictionariesAtTargetDictionary.Add(translation.LanguageCode,createOtherDictionaryResult.Id);
-				}
-			
-				// post phrase
-				// we need to see if the phrase already exists. If it does, do not create another word, instead link the existing
-				GetPhrasesResult getOtherPhraseResult = await GetPhrase(httpClient,
-					translation.Translation, dictionariesAtTargetDictionary[translation.LanguageCode]);
-				int otherPhraseId;
-				if (getOtherPhraseResult.TotalItemsCount == 0)
-				{
-					// the phrase doesn't already exist
-					CreatePhraseResult otherCreatePhraseResult = await PostPhraseToTarget(httpClient,
-						translation.Translation,
-						dictionariesAtTargetDictionary[translation.LanguageCode]);
-					otherPhraseId = otherCreatePhraseResult.Id;
-
-					// this will set the creation meta data for the target word to that of the Translation
-					await UpdateWordAtTargetWithMetaData(httpClient, otherPhraseId, translation.CreatedByUserName,translation.CreatedAt);
-					Log($"\t\t\t\t\t\t\tPhrase ID {otherPhraseId} created");
-
-				}
-				else
-				{
-					otherPhraseId = getOtherPhraseResult.Results.First().Id;
-					Log($"\t\t\t\t\t\t\tPhrase ID {otherPhraseId} already exists, adding translation");
-				}
-				
-				// post translation
-				CreatePhraseTranslationResult? createPhraseTranslationResult = await PostTranslationBetweenPhrases(httpClient,createPhraseResult.Id,otherPhraseId,dictionariesAtTargetDictionary[languageCode]);
-
-				await UpdatePhraseTranslationAtTargetWithMetaData(httpClient,
-					createPhraseTranslationResult!.Id, translation.CreatedByUserName,
-					translation.CreatedAt);
-				Log($"\t\t\t\t\t\t\tTranslation ID {createPhraseTranslationResult.Id} created");
-				
-			}
-
-		
-		}
-		
-	}
 
 
 	
@@ -389,27 +273,7 @@ public class Importer : ApiClientBase
 		response.EnsureSuccessStatusCode();
 	}
 	
-	private async Task<CreateWordTranslationResult?> PostTranslationBetweenWords(HttpClient httpClient, int fromWordId, int toWordId, int dictionaryId)
-	{
-		string url = "/api/v4/translations/word";
-		CreateWordTranslation createWordTranslation = new CreateWordTranslation()
-		{
-			DictionaryId = dictionaryId,
-			FromWordId = fromWordId,
-			ToWordId = toWordId
-		};
 
-		HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createWordTranslation);
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException($"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
-		}
-
-		CreateWordTranslationResult? createWordTranslationResult =
-			await response.Content.ReadFromJsonAsync<CreateWordTranslationResult>();
-		return createWordTranslationResult;
-	}
-	
 	private async Task<CreatePhraseTranslationResult?> PostTranslationBetweenPhrases(HttpClient httpClient, int fromPhraseId, int toPhraseId, int dictionaryId)
 	{
 		string url = "/api/v4/translations/phrase";
@@ -476,44 +340,8 @@ public class Importer : ApiClientBase
 	
 
 	
-	private async Task<GetPhrasesResult> GetPhrase(HttpClient httpClient, string phrase, int dictionaryId)
-	{
-		string url = $"/api/v4/phrases?phrase={phrase}&dictionaryId={dictionaryId}";
-
-		HttpResponseMessage response = await httpClient.GetAsync(url);
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException(
-				$"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
-		}
-
-		GetPhrasesResult? getPhrasesResult = await response.Content.ReadFromJsonAsync<GetPhrasesResult>();
-		return getPhrasesResult!;
-
-	}
-
 
 	
-
-	
-	private async Task<IEnumerable<WordTranslation>> GetTranslationsForWord(SqlConnection sqlConnection,
-		Word wordInLanguage)
-	{
-		string sqlCmd = @"select toT.Translation as TheTranslation, toT.LanguageCode,fromWt.CreatedByUserName,fromWt.CreatedTimeStamp 
-							from Taggloo_Word fromWord 
-							inner join Taggloo_WordTranslation fromWt on fromWt.WordID=fromWord.ID
-							inner join Taggloo_Translation toT on fromWt.TranslationID=toT.ID
-							where fromWord.Word=@word";
-		IEnumerable<WordTranslation> translations = await sqlConnection.QueryAsync<WordTranslation>(sqlCmd, new
-		{
-			Word = wordInLanguage.TheWord
-		});
-		
-		// make sure all the returned languages are supported
-		IEnumerable<WordTranslation> translationsForWord = translations as WordTranslation[] ?? translations.ToArray();
-		return translationsForWord;
-		
-	}
 	
 	private async Task<IEnumerable<PhraseTranslation>> GetTranslationsForPhrase(SqlConnection sqlConnection,
 		Phrase phraseInLanguage)
@@ -536,58 +364,7 @@ public class Importer : ApiClientBase
 	
 	
 	
-	private async Task UpdateWordTranslationAtTargetWithMetaData(HttpClient httpClient, int id, string translationCreatedByUserName, DateTime translationCreatedAt)
-	{
-		string url = $"/api/v4/translations/word/{id}";
-		UpdateWordTranslation updateWordTranslation = new UpdateWordTranslation()
-		{
-			CreatedByUserName = translationCreatedByUserName,
-			CreatedAt = translationCreatedAt
-		};
-		
-		HttpResponseMessage response = await httpClient.PatchAsJsonAsync(url, updateWordTranslation);
-		response.EnsureSuccessStatusCode();
-	}
 	
-	
-	private async Task UpdatePhraseAtTargetWithMetaData(HttpClient httpClient, int id, string createdByUserName, DateTime createdAtTimeStamp)
-	{
-		string url = "/api/v4/phrases";
-		UpdatePhrase updatePhrase = new UpdatePhrase()
-		{
-			PhraseId = id,
-			CreatedByUserName = createdByUserName,
-			CreatedAt = createdAtTimeStamp
-		};
-		
-		HttpResponseMessage response = await httpClient.PatchAsJsonAsync(url, updatePhrase);
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException($"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
-		}
-	}
-	
-
-	private async Task<CreatePhraseResult> PostPhraseToTarget(HttpClient httpClient, string phraseInLanguage,
-		int dictionaryId)
-	{
-		string url = "/api/v4/phrases";
-		CreatePhrase createPhrase = new CreatePhrase()
-		{
-			Phrase = phraseInLanguage,
-			DictionaryId = dictionaryId
-		};
-		
-		HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createPhrase);
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException($"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
-		}
-
-		CreatePhraseResult? createPhraseResult=
-			await response.Content.ReadFromJsonAsync<CreatePhraseResult>();
-		return createPhraseResult!;
-	}
 
 
 	

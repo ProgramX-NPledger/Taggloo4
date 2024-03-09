@@ -44,5 +44,10 @@ public class GetWordResultItem
 	/// The unique identifier given to this Word during importing.
 	/// </summary>
 	public Guid? ImportId { get; set; }
+
+	/// <summary>
+	/// The IETF Language Tag for the Language this Word is in
+	/// </summary>
+	public string? IetfLanguageTag { get; set; }
 	
 }

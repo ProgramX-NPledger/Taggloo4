@@ -6,5 +6,6 @@ public class WordTranslation
 	public required string LanguageCode { get; set; }
 	public DateTime CreatedAt { get; set; }
 	public required string CreatedByUserName { get; set; }
-	
+
+	public int FromWordId { get; set; }
 }

@@ -11,13 +11,6 @@ public class UpdatePhrase
 	/// Identifier of Dictionary currently containing the Phrase
 	/// </summary>
 	public int DictionaryId { get; set; }
-	
-	
-	/// <summary>
-	/// The Phrase to update, in the language specified by <c>IetfLanguageTag</c>. Changing this will have the effect of
-	/// changing the word and compromising indexes.
-	/// </summary>
-	public string? Phrase { get; set; }
 
 	/// <summary>
 	/// If specified, causes the Phrase to be moved to another Dictionary. Identifier of the Dictionary that will contain the Phrase

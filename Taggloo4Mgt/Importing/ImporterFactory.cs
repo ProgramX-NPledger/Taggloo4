@@ -10,7 +10,7 @@ public class ImporterFactory
         {
             new WordImporter(),
             new PhraseImporter(),
-            new TranslationImporter()
+            new WordTranslationImporter()
         };
     }
 }
