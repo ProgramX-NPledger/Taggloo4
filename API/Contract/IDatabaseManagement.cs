@@ -6,5 +6,8 @@ public interface IDatabaseManagement
     void ShrinkDatabase();
 
     int DeleteOldestLogsByDay();
+
+    int DeleteLogsByPropertiesText(IEnumerable<string> textStrings);
     
+
 }
