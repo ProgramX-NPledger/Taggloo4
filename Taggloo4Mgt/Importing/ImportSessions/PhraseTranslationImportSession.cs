@@ -56,13 +56,13 @@ public class PhraseTranslationImportSession : IImportSession
 			{
 				Guid importGuidOfFromPhrase =
 					originalIdsToImportIdsMap[nameof(PhraseImportSession)][translation.FromPhraseId];
-
+				Guid importGuidOfToPhrase =
+					originalIdsToImportIdsMap[nameof(TranslatedPhraseImportSession)][translation.ToPhraseId];
+				
 				// need to get the true IDs of the words to import
 				int fromPhraseId = await GetPhraseByImportGuid(httpClient, importGuidOfFromPhrase);
-				// TODO the translation.Translation must have been imported first, need to get ID of this translation
-				// BUT this translation is imported asynchronously so is not yet available
-				int toPhraseId = await FindTranslatedPhrase(httpClient, translation.Translation, languageCode);
-
+				int toPhraseId = await GetPhraseByImportGuid(httpClient, importGuidOfToPhrase);
+				
 				// post translation
 				CreatePhraseTranslationResult? createPhraseTranslationResult = await PostTranslationBetweenPhrases(httpClient,
 					fromPhraseId, toPhraseId, dictionaryId, translation.CreatedAt, translation.CreatedByUserName);

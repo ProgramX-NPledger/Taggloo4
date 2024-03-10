@@ -27,7 +27,7 @@ public class PhraseImporter : IImporter
     private async Task<IEnumerable<Phrase>> GetAllPhrases(SqlConnection sqlConnection)
     {
         string sqlCmd =
-            "SELECT ID,Phrase as ThePhrase,LanguageCode,CreatedTimeStamp,CreatedByUserName, DictionaryID FROM Taggloo_Phrase";
+            @"SELECT ID,Phrase as ThePhrase,LanguageCode,CreatedTimeStamp,CreatedByUserName, DictionaryID FROM Taggloo_Phrase";
 
         return await sqlConnection.QueryAsync<Phrase>(sqlCmd);
     }

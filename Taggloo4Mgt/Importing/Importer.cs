@@ -111,10 +111,10 @@ public class Importer : ApiClientBase
 					importSessions.Add(importSession);
 				}
 
-				foreach (string languageCode in sourceLanguageCodes)
+				foreach (IImportSession importSession in importSessions)
 				{
 					int numberOfImportedItemsForType = 0;
-					foreach (IImportSession importSession in importSessions)
+					foreach (string languageCode in sourceLanguageCodes)
 					{
 						// create a dictionary
 						CreateDictionaryResult createDictionaryResult =

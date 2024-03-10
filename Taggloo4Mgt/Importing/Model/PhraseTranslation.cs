@@ -7,5 +7,6 @@ public class PhraseTranslation
 	public DateTime CreatedAt { get; set; }
 	public required string CreatedByUserName { get; set; }
 	public int FromPhraseId { get; set; }
+	public int ToPhraseId { get; set; }
 	
 }
