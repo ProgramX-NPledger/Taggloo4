@@ -17,7 +17,8 @@ public class ApiClientBase
         // 	new MediaTypeWithQualityHeaderValue("application/json"));
         httpClient.DefaultRequestHeaders.Add("User-Agent", "Taggloo4Mgt utility");
         httpClient.BaseAddress = new Uri(url);
-		
+        httpClient.Timeout = TimeSpan.FromMinutes(10);
+        
         return httpClient;
     }
 

@@ -78,37 +78,48 @@ public class Importer : ApiClientBase
 				List<double> millisecondsBetweenOperations = new List<double>();
 				foreach (IImporter importer in importers)
 				{
-					IImportSession importSession = await importer.CreateSession(sqlConnection);
-					toBeImportedCount += importSession.GetToBeImportedCount();
-					importSession.UpdateMetrics += (sender, e) =>
+					if (_importOptions.ImportTypes.Select(q=>q.ToLower()).Contains(importer.Key.ToLower()))
 					{
-						millisecondsBetweenOperations.Add(e.MillisecondsBetweenImports);
-					};
-					importSession.LogMessage += (sender, e) =>
-					{
-						StringBuilder tabsSb = new StringBuilder();
-						for (int i = 0; i < e.Indentation; i++)
+						IImportSession importSession = await importer.CreateSession(sqlConnection);
+						toBeImportedCount += importSession.GetToBeImportedCount();
+						importSession.UpdateMetrics += (sender, e) =>
 						{
-							tabsSb.Append("\t");
-						}
+							millisecondsBetweenOperations.Add(e.MillisecondsBetweenImports);
+						};
+						importSession.LogMessage += (sender, e) =>
+						{
+							StringBuilder tabsSb = new StringBuilder();
+							for (int i = 0; i < e.Indentation; i++)
+							{
+								tabsSb.Append("\t");
+							}
 
-						Log($"{tabsSb.ToString()}{e.LogMessage}");
-					};
-					importSession.Imported += (sender, e) =>
-					{
-						if (!_originalIdsToImportIdsMap.ContainsKey(nameof(sender)))
+							Log($"{tabsSb.ToString()}{e.LogMessage}");
+						};
+						importSession.Imported += (sender, e) =>
 						{
-							_originalIdsToImportIdsMap.Add(nameof(sender),new Dictionary<int, Guid>());
-						}
+							if (e.IsSuccess)
+							{
+								if (!_originalIdsToImportIdsMap.ContainsKey(nameof(sender)))
+								{
+									_originalIdsToImportIdsMap.Add(nameof(sender),new Dictionary<int, Guid>());
+								}
 
-						if (e.ImportGuid.HasValue)
-						{
-							_originalIdsToImportIdsMap[nameof(sender)].Add(e.SourceId,e.ImportGuid.Value);	
-						}
+								if (e.ImportGuid.HasValue)
+								{
+									_originalIdsToImportIdsMap[nameof(sender)].Add(e.SourceId,e.ImportGuid.Value);	
+								}
+								
+							}
+							else
+							{
+								Console.WriteLine("STOP");
+							}
 						
-						UpdateProgressBar(++totalImportedCount, toBeImportedCount, e.LanguageCode, e.CurrentItem);
-					};
-					importSessions.Add(importSession);
+							UpdateProgressBar(++totalImportedCount, toBeImportedCount, e.LanguageCode, e.CurrentItem);
+						};
+						importSessions.Add(importSession);
+					}
 				}
 
 				foreach (IImportSession importSession in importSessions)
@@ -119,7 +130,7 @@ public class Importer : ApiClientBase
 						// create a dictionary
 						CreateDictionaryResult createDictionaryResult =
 							await CreateDictionaryForLanguage(httpClient, languageCode, nameof(importSession));
-						if ((_importOptions.MaxItemsPerType ?? 0) < numberOfImportedItemsForType)
+						if (!_importOptions.MaxItemsPerType.HasValue || _importOptions.MaxItemsPerType >= numberOfImportedItemsForType)
 						{
 							numberOfImportedItemsForType++;
 							importSession.Import(httpClient, languageCode, createDictionaryResult.Id, _originalIdsToImportIdsMap);

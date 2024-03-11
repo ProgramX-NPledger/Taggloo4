@@ -189,12 +189,22 @@ public class PhrasesController : BaseApiController
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 		
 		Guid importGuid = Guid.NewGuid();
+#if !USE_HANGFIRE
+		ImportPhraseJob importPhraseJob =
+			new ImportPhraseJob(_wordRepository, _phraseRepository, _dictionaryRepository);
+		importPhraseJob.ImportPhrase(createPhrase.CreatedOn ?? GetRemoteHostAddress(), 
+			createPhrase.CreatedByUserName ?? GetCurrentUserName(), 
+			createPhrase.Phrase, 
+			dictionary.Id,
+			importGuid);
+#else
 		_backgroundJobClient.Enqueue<ImportPhraseJob>(job =>
 			job.ImportPhrase(createPhrase.CreatedOn ?? GetRemoteHostAddress(), 
 				createPhrase.CreatedByUserName ?? GetCurrentUserName(), 
 				createPhrase.Phrase, 
 				dictionary.Id,
 				importGuid));
+#endif
 
 		return Accepted(new CreatePhraseResult()
 		{

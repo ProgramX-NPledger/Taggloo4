@@ -13,6 +13,11 @@ public class ImportWordJob
 	private readonly IPhraseRepository _phraseRepository;
 	private readonly IDictionaryRepository _dictionaryRepository;
 
+	public ImportWordJob()
+	{
+		
+	}
+	
 	public ImportWordJob(IWordRepository wordRepository,
 	    IPhraseRepository phraseRepository,
 	    IDictionaryRepository dictionaryRepository)
