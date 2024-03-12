@@ -2,31 +2,51 @@
 
 using System.Diagnostics;
 using CommandLine;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Taggloo4Mgt;
 using Taggloo4Mgt.Importing;
 
-try
-{
-	CommandLine.Parser.Default.ParseArguments<ImportOptions>(args)
-		.MapResult(
-			(ImportOptions options) =>
-			{
-				Importer importer = new Importer(options);
-				return importer.Process().Result;
-			},
-			errors => 1);
-
-}
-catch (Exception ex)
-{
-	Exception? exPtr = ex;
-	do
+var builder = new HostBuilder()
+	.ConfigureServices((hostContext, services) =>
 	{
-		Console.Error.WriteLine($"{exPtr.Message}");
-		exPtr = exPtr.InnerException;
-	} while (exPtr!=null);
+		services.AddHttpClient()
+			.ConfigureHttpClientDefaults(c =>
+			{
+				c.ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+				{
+					HttpClientHandler httpClientHandler = new HttpClientHandler();
+#if DEBUG
+					httpClientHandler.ServerCertificateCustomValidationCallback =
+						HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+#endif
+					httpClientHandler.MaxConnectionsPerServer = 1;
+					return httpClientHandler;
+				});
+			});
+		services.AddTransient<MgtUtility>();
+	}).UseConsoleLifetime();
+ 
+var host = builder.Build();
+ 
+using (var serviceScope = host.Services.CreateScope())
+{
+	var services = serviceScope.ServiceProvider;
+ 
+	try
+	{
+		MgtUtility myService = services.GetRequiredService<MgtUtility>();
+		int result = await myService.Run(args);
+
+		return result;
+	}
+	catch (Exception ex)
+	{
+		Console.WriteLine("Error Occured");
+	}
 }
 
+return 0;
 
 
 

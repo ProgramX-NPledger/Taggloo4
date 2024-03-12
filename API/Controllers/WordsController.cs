@@ -183,20 +183,22 @@ public class WordsController : BaseApiController
 	[Authorize(Roles="administrator, dataImporter")]
 	public async Task<ActionResult<AppUser>> CreateWord(CreateWord createWord)
 	{
+		Thread.Sleep(1000);
+		
 		// try to resolve the dictionary
 		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createWord.DictionaryId);
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 
 		Guid importGuid = Guid.NewGuid();
-#if !USE_HANGFIRE
-			ImportWordJob importWordJob = new ImportWordJob(_wordRepository, _phraseRepository, _dictionaryRepository);
-			importWordJob.ImportWord(createWord.CreatedOn ?? GetRemoteHostAddress(), 
-				createWord.CreatedByUserName ?? GetCurrentUserName(), createWord.Word, dictionary.Id,importGuid,createWord.CreatedAt);
-#else
-			_backgroundJobClient.Enqueue<ImportWordJob>(job =>
-				job.ImportWord(createWord.CreatedOn ?? GetRemoteHostAddress(), 
-					createWord.CreatedByUserName ?? GetCurrentUserName(), createWord.Word, dictionary.Id,importGuid,createWord.CreatedAt));
-#endif
+// #if !USE_HANGFIRE
+// 			ImportWordJob importWordJob = new ImportWordJob(_wordRepository, _phraseRepository, _dictionaryRepository);
+// 			importWordJob.ImportWord(createWord.CreatedOn ?? GetRemoteHostAddress(), 
+// 				createWord.CreatedByUserName ?? GetCurrentUserName(), createWord.Word, dictionary.Id,importGuid,createWord.CreatedAt);
+// #else
+// 			_backgroundJobClient.Enqueue<ImportWordJob>(job =>
+// 				job.ImportWord(createWord.CreatedOn ?? GetRemoteHostAddress(), 
+// 					createWord.CreatedByUserName ?? GetCurrentUserName(), createWord.Word, dictionary.Id,importGuid,createWord.CreatedAt));
+// #endif
 
 
 		return Accepted(new CreateWordResult()

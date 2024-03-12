@@ -48,6 +48,7 @@ public class WordImportSession : IImportSession
 				Indentation = 5
 			});
 
+			
 			try
 			{
 				CreateWordResult createWordResult = await PostWordToTarget(httpClient, wordInLanguage, dictionaryId);
@@ -98,6 +99,8 @@ public class WordImportSession : IImportSession
     private async Task<CreateWordResult> PostWordToTarget(HttpClient httpClient, Word word,
 		int dictionaryId)
 	{
+		Thread.Sleep(1000);
+		
 		string url = "/api/v4/words";
 		CreateWord createWord = new CreateWord()
 		{

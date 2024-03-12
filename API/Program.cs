@@ -66,7 +66,7 @@ builder.Services.AddHangfire(configuration=>
     }));
 builder.Services.AddHangfireServer(options =>
 {
-    options.Queues = new string[] { "import" };
+    //options.Queues = new string[] { "import","default" };
 });
 
 // builder.Services.AddHttpLogging(o => { });

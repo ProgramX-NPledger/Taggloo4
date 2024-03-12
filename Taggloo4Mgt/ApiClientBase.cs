@@ -2,15 +2,18 @@
 
 public class ApiClientBase
 {
-    protected HttpClient CreateHttpClient(string url)
+    protected HttpClient CreateHttpClient(IHttpClientFactory httpClientFactory, string url)
     {
-        HttpClientHandler httpClientHandler = new HttpClientHandler();
-#if DEBUG
-        httpClientHandler.ServerCertificateCustomValidationCallback =
-            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-#endif
-		
-        HttpClient httpClient = new HttpClient(httpClientHandler);
+        
+            
+//         HttpClientHandler httpClientHandler = new HttpClientHandler();
+// #if DEBUG
+//         httpClientHandler.ServerCertificateCustomValidationCallback =
+//             HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+// #endif
+//         httpClientHandler.MaxConnectionsPerServer = 1;
+
+        HttpClient httpClient = httpClientFactory.CreateClient(); // new HttpClient(httpClientHandler);
         // Server rejects when added this header
         // httpClient.DefaultRequestHeaders.Accept.Clear();
         // httpClient.DefaultRequestHeaders.Accept.Add(

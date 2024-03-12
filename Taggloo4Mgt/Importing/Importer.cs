@@ -14,15 +14,17 @@ namespace Taggloo4Mgt.Importing;
 public class Importer : ApiClientBase
 {
 	private readonly ImportOptions _importOptions;
+	private readonly IHttpClientFactory _httpClientFactory;
 	private readonly string? _logFileName;
 	private readonly IList<int> _millisecondsBetweenWords = new List<int>();
 
 	private Dictionary<string, Dictionary<int, Guid>> _originalIdsToImportIdsMap =
 		new Dictionary<string, Dictionary<int, Guid>>();
 	
-	public Importer(ImportOptions importOptions)
+	public Importer(ImportOptions importOptions, IHttpClientFactory httpClientFactory)
 	{
 		_importOptions = importOptions;
+		_httpClientFactory = httpClientFactory;
 		_logFileName = CreateRandomLogFileName();
 		
 
@@ -43,7 +45,7 @@ public class Importer : ApiClientBase
 		{
 			Log("\tOk");
 			Log($"Connect to API at {_importOptions.Url}");
-			using (HttpClient httpClient = CreateHttpClient(_importOptions.Url))
+			using (HttpClient httpClient = CreateHttpClient(_httpClientFactory, _importOptions.Url))
 			{
 				Log("\tOk");
 
@@ -230,7 +232,7 @@ public class Importer : ApiClientBase
 		for (int i=(int)percentageBarFilled+1;i<percentageBarWidth; i++) Console.Write("-");
 
 		string s = $" {((int)percent).ToString(CultureInfo.InvariantCulture),3}% ({wordsProcessed}/{totalWords}) {languageCode} {theWord}";
-		Console.Write($"{s,-60}ETA: {eta:hh\\:mm\\:ss}");
+		Console.Write($"{s,-60}ETA: {eta:hh\\:mm\\:ss} (~ {DateTime.Now.Add(eta):hh\\:mm\\:ss})");
 		
 
 	}
