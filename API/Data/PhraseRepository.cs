@@ -53,8 +53,9 @@ public class PhraseRepository : IPhraseRepository
 	/// <param name="phrase">Phrase to match within the <seealso cref="Dictionary"/>.</param>
 	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
 	/// <param name="containingText">Filters response for presence of text (collation as per database).</param>
+	/// <param name="externalId">An externally determined identifier.</param>
 	/// <returns>A collection of matching <seealso cref="Phrase"/>s within the <seealso cref="Dictionary"/>.</returns>
-	public async Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId, string? containingText)
+	public async Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId, string? containingText, string? externalId)
 	{
 		IQueryable<Phrase> query = _dataContext.Phrases.AsQueryable();
 		if (!string.IsNullOrWhiteSpace(phrase))
@@ -71,6 +72,12 @@ public class PhraseRepository : IPhraseRepository
 		{
 			query = query.Where(q => q.ThePhrase.Contains(containingText));
 		}
+
+		if (!string.IsNullOrWhiteSpace(externalId))
+		{
+			query = query.Where(q => q.ExternalId == externalId);
+		}
+		
 		return await query.Include("Dictionary").ToArrayAsync();
 	}
 
@@ -84,9 +91,6 @@ public class PhraseRepository : IPhraseRepository
 		return await _dataContext.Phrases.SingleOrDefaultAsync(q => q.Id == id);
 	}
 	
-	public async Task<Phrase?> GetByImportIdAsync(Guid importId)
-	{
-		return await _dataContext.Phrases.SingleOrDefaultAsync(q => q.ImportId == importId);
-	}
+
 	
 }

@@ -41,7 +41,7 @@ public class WordsController : BaseApiController
 
 	[HttpGet("{importGuid}/externalid")]
 	[Authorize(Roles = "administrator,dataExporter")]
-	public async Task<ActionResult<GetWordsResult>> GetWordsByImportGuid(string externalId)
+	public async Task<ActionResult<GetWordsResult>> GetWordsByExternalId(string externalId)
 	{
 		return await GetWords(null, null, externalId);
 	}
@@ -151,7 +151,7 @@ public class WordsController : BaseApiController
 	/// </summary>
 	/// <param name="createWord">A <see cref="CreateWord"/> representing the Word to create.</param>
 	/// <returns>The created Word.</returns>
-	/// <response code="200">Word was created.</response>
+	/// <response code="201">Word was created.</response>
 	/// <response code="400">One or more validation errors prevented successful creation.</response>
 	/// <response code="403">Not permitted.</response>
 	[HttpPost]
@@ -162,7 +162,8 @@ public class WordsController : BaseApiController
 		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createWord.DictionaryId);
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 
-		IEnumerable<Word> existingWords = _wordRepository.GetWordsAsync(createWord.Word, createWord.DictionaryId,null).Result.ToArray();
+		IEnumerable<Word> existingWords =
+			await _wordRepository.GetWordsAsync(createWord.Word, createWord.DictionaryId, null);
 		if (existingWords.Any()) return BadRequest("Word already exists in Dictionary");
 
 		Word newWord = new Word()

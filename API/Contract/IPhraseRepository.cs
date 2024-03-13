@@ -31,8 +31,9 @@ public interface IPhraseRepository
 	/// <param name="phrase">Word to match within the <seealso cref="Dictionary"/>.</param>
 	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
 	/// <param name="containingText">Filters response for presence of text (collation as per database).</param>
+	/// <param name="externalId">An externally determined identifier.</param>
 	/// <returns>A collection of matching <seealso cref="Phrase"/>s within the <seealso cref="Dictionary"/>.</returns>
-	Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId, string? containingText);
+	Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId, string? containingText, string? externalId);
 	
 	/// <summary>
 	/// Retrieves a <seealso cref="Phrase"/> by its ID.
@@ -41,7 +42,7 @@ public interface IPhraseRepository
 	/// <returns>The requested <seealso cref="Phrase"/>, or <c>null</c> if no Phrase could be found./</returns>
 	Task<Phrase?> GetByIdAsync(int id);
 	
-	Task<Phrase?> GetByImportIdAsync(Guid importId);
+
 	
 
 

@@ -41,9 +41,9 @@ public class GetPhraseResultItem
 	public int DictionaryId { get; set; }
 	
 	/// <summary>
-	/// The unique identifier given to this Phrase during importing.
+	/// Externally created identifier.
 	/// </summary>
-	public Guid? ImportId { get; set; }
+	public string? ExternalId { get; set; }
 	
 	/// <summary>
 	/// The IETF Language Tag for the Language this Word is in

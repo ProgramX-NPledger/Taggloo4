@@ -57,9 +57,10 @@ public class Phrase
 //	public ICollection<WordTranslation> Translations { get; set; }
 
 	/// <summary>
-	/// The unique identifier given to this Word during importing.
+	/// An external identifier that can be applied to the entity for ready identification.
 	/// </summary>
-	public Guid? ImportId { get; set; }
+	[MaxLength(32)]
+	public string? ExternalId { get; set; }
 	
 	
 }
