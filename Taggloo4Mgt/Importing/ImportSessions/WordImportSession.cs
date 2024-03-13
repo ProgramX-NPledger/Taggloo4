@@ -25,7 +25,7 @@ public class WordImportSession : IImportSession
         return _words.Count();
     }
 
-    public async Task Import(HttpClient httpClient, string languageCode, int dictionaryId, Dictionary<string, Dictionary<int, Guid>> originalIdsToImportIdsMap)
+    public async Task Import(HttpClient httpClient, string languageCode, int dictionaryId, Dictionary<string, Dictionary<int, string>> originalIdsToImportIdsMap)
     {
 	    Word[] wordsInLanguage =
 		    _words.Where(q => q.LanguageCode.Equals(languageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
@@ -56,7 +56,7 @@ public class WordImportSession : IImportSession
 				{
 					LanguageCode = languageCode,
 					CurrentItem = wordInLanguage.TheWord,
-					ImportGuid = createWordResult.ImportId,
+					ExternalId = createWordResult.ExternalId,
 					IsSuccess = true,
 					SourceId = wordInLanguage.ID
 				});
@@ -99,15 +99,14 @@ public class WordImportSession : IImportSession
     private async Task<CreateWordResult> PostWordToTarget(HttpClient httpClient, Word word,
 		int dictionaryId)
 	{
-		Thread.Sleep(1000);
-		
 		string url = "/api/v4/words";
 		CreateWord createWord = new CreateWord()
 		{
 			Word = word.TheWord,
 			CreatedAt = word.CreatedTimeStamp,
 			CreatedByUserName = word.CreatedByUserName,
-			DictionaryId = dictionaryId
+			DictionaryId = dictionaryId,
+			ExternalId = $"Taggloo2/Word/{word.ID}"
 		};
 		
 		HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createWord);

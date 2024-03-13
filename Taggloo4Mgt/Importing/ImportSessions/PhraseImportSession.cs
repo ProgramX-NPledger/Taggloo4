@@ -24,7 +24,7 @@ public class PhraseImportSession : IImportSession
     public event EventHandler<ImportMetricsEventArgs>? UpdateMetrics;
     public event EventHandler<ImportedEventArgs>? Imported;
     
-    public async Task Import(HttpClient httpClient, string languageCode, int dictionaryId, Dictionary<string, Dictionary<int, Guid>> originalIdsToImportIdsMap)
+    public async Task Import(HttpClient httpClient, string languageCode, int dictionaryId, Dictionary<string, Dictionary<int, string>> originalIdsToImportIdsMap)
     {
         Phrase[] phrasesInLanguage =
         		    _phrases.Where(q => q.LanguageCode.Equals(languageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
@@ -55,7 +55,7 @@ public class PhraseImportSession : IImportSession
         			LanguageCode = languageCode,
         			CurrentItem = phraseInLanguage.ThePhrase,
         			IsSuccess = true,
-			        ImportGuid = createPhraseResult.ImportId,
+			        //ImportGuid = createPhraseResult.ImportId,
 			        SourceId = phraseInLanguage.ID
         		});
         	}

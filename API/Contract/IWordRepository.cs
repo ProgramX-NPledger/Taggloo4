@@ -30,8 +30,9 @@ public interface IWordRepository
 	/// </summary>
 	/// <param name="word">Word to match within the <seealso cref="Dictionary"/>.</param>
 	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
+	/// <param name="externalId">An externally determined identifier.</param>
 	/// <returns>A collection of matching <seealso cref="Word"/>s within the <seealso cref="Dictionary"/>.</returns>
-	Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId);
+	Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId, string? externalId);
 	
 	/// <summary>
 	/// Retrieves a <seealso cref="Word"/> by its ID.
@@ -40,7 +41,6 @@ public interface IWordRepository
 	/// <returns>The requested <seealso cref="Word"/>, or <c>null</c> if no Word could be found./</returns>
 	Task<Word?> GetByIdAsync(int id);
 
-	Task<Word?> GetByImportIdAsync(Guid importId);
 
 
 }

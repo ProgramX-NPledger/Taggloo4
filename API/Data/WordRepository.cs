@@ -52,8 +52,9 @@ public class WordRepository : IWordRepository
 	/// </summary>
 	/// <param name="word">Word to match within the <seealso cref="Dictionary"/>.</param>
 	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
+	/// <param name="externalId">An externally determined identifier.</param>
 	/// <returns>A collection of matching <seealso cref="Word"/>s within the <seealso cref="Dictionary"/>.</returns>
-	public async Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId)
+	public async Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId, string? externalId)
 	{
 		IQueryable<Word> query = _dataContext.Words.AsQueryable();
 		if (!string.IsNullOrWhiteSpace(word))
@@ -64,6 +65,11 @@ public class WordRepository : IWordRepository
 		if (dictionaryId.HasValue)
 		{
 			query = query.Where(q => q.DictionaryId == dictionaryId.Value);
+		}
+
+		if (!string.IsNullOrWhiteSpace(externalId))
+		{
+			query = query.Where(q => q.ExternalId == externalId);
 		}
 
 		return await query.Include("Dictionary").ToArrayAsync();
@@ -79,8 +85,5 @@ public class WordRepository : IWordRepository
 		return await _dataContext.Words.SingleOrDefaultAsync(q => q.Id == id);
 	}
 
-	public async Task<Word?> GetByImportIdAsync(Guid importId)
-	{
-		return await _dataContext.Words.SingleOrDefaultAsync(q => q.ImportId == importId);
-	}
+
 }

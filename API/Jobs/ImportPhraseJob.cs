@@ -46,7 +46,7 @@ public class ImportPhraseJob
 		string[] wordsInPhrase = thePhrase.Split(new char[] { ' ' });
 		foreach (string wordInPhrase in wordsInPhrase)
 		{
-			IEnumerable<Word> existingWordsInPhrase = _wordRepository.GetWordsAsync(wordInPhrase, null).Result;
+			IEnumerable<Word> existingWordsInPhrase = _wordRepository.GetWordsAsync(wordInPhrase, null, null).Result;
 			bool foundWord = false;
 			foreach (Word existingWordInPhrase in existingWordsInPhrase)
 			{
@@ -119,13 +119,6 @@ public class ImportPhraseJob
 		}
 	}
 
-	private bool IsWordADiscreteWordWithinPhrase(string word, string phrase)
-    {
-	    string lowerPhrase = phrase.ToLower();
-	    string lowerWord = word.ToLower();
-	    return lowerPhrase == lowerWord ||
-	           lowerPhrase.Contains(lowerWord + " ") ||
-	           lowerPhrase.Contains(" " + lowerWord);
-    }
+
     
 }

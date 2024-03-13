@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Collections.ObjectModel;
+using System.Security.Cryptography;
 using System.Text;
 using API.Contract;
 using API.Data;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Taggloo4.Dto;
+using Taggloo4.Model.Exceptions;
 
 namespace API.Controllers;
 
@@ -23,56 +25,25 @@ namespace API.Controllers;
 public class WordsController : BaseApiController
 {
 	private readonly IWordRepository _wordRepository;
-	private readonly IPhraseRepository _phraseRepository;
 	private readonly IDictionaryRepository _dictionaryRepository;
-	private readonly IBackgroundJobClient _backgroundJobClient;
 
 	/// <summary>
 	/// Constructor with injected parameters.
 	/// </summary>
 	/// <param name="wordRepository">Implementation of <see cref="IWordRepository"/>.</param>
-	/// <param name="phraseRepository">Implementation of <see cref="IPhraseRepository"/>.</param>
 	/// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
-	/// <param name="backgroundJobClient">Implementation of <see cref="IBackgroundJobClient" />.</param>
 	public WordsController(IWordRepository wordRepository,
-		IPhraseRepository phraseRepository,
-		IDictionaryRepository dictionaryRepository,
-		IBackgroundJobClient backgroundJobClient)
+		IDictionaryRepository dictionaryRepository)
 	{
 		_wordRepository = wordRepository;
-		_phraseRepository = phraseRepository;
 		_dictionaryRepository = dictionaryRepository;
-		_backgroundJobClient = backgroundJobClient;
 	}
 
-	[HttpGet("{importGuid}/importguid")]
+	[HttpGet("{importGuid}/externalid")]
 	[Authorize(Roles = "administrator,dataExporter")]
-	public async Task<ActionResult<GetWordResultItem>> GetWordByImportGuid(Guid importGuid)
+	public async Task<ActionResult<GetWordsResult>> GetWordsByImportGuid(string externalId)
 	{
-		Word? word = await _wordRepository.GetByImportIdAsync(importGuid);
-		if (word == null) return NotFound();
-
-		return Ok(new GetWordResultItem()
-		{
-			Word = word.TheWord,
-			Id = word.Id,
-			CreatedAt = word.CreatedAt,
-			CreatedOn = word.CreatedOn,
-			CreatedByUserName = word.CreatedByUserName,
-			DictionaryId = word.DictionaryId,
-			ImportId = word.ImportId,
-			IetfLanguageTag = word.Dictionary?.IetfLanguageTag,
-			Links = new[]
-			{
-				new Link()
-				{
-					Action = "get",
-					Rel = "self",
-					HRef = $"{GetBaseApiPath()}/words/{word.Id}",
-					Types = new[] { JSON_MIME_TYPE }
-				}
-			}
-		});
+		return await GetWords(null, null, externalId);
 	}
 
 	[HttpGet("{id}")]
@@ -86,11 +57,12 @@ public class WordsController : BaseApiController
 		{
 			Word = word.TheWord,
 			Id = word.Id,
+			ExternalId = word.ExternalId,
 			CreatedAt = word.CreatedAt,
 			CreatedOn = word.CreatedOn,
 			CreatedByUserName = word.CreatedByUserName,
 			DictionaryId = word.DictionaryId,
-			ImportId = word.ImportId,
+			
 			IetfLanguageTag = word.Dictionary?.IetfLanguageTag,
 			Links = new[]
 			{
@@ -117,11 +89,14 @@ public class WordsController : BaseApiController
 	/// <response code="403">Not permitted.</response>
 	[HttpGet()]
 	[Authorize(Roles="administrator, dataExporter")]
-	public async Task<ActionResult<GetWordsResult>> GetWords(string? word, int? dictionaryId, int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
+	public async Task<ActionResult<GetWordsResult>> GetWords(string? word, 
+		int? dictionaryId, 
+		string? externalId,
+		int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
 	{
 		AssertApiConstraints(pageSize);
 		
-		IEnumerable<Word> words = (await _wordRepository.GetWordsAsync(word, dictionaryId)).ToArray();
+		IEnumerable<Word> words = (await _wordRepository.GetWordsAsync(word, dictionaryId, externalId)).ToArray();
 
 		GetWordsResult getWordsResult = new GetWordsResult()
 		{
@@ -133,7 +108,7 @@ public class WordsController : BaseApiController
 				CreatedOn = w.CreatedOn,
 				CreatedByUserName = w.CreatedByUserName,
 				DictionaryId = w.DictionaryId,
-				ImportId = w.ImportId,
+				ExternalId = w.ExternalId,
 				IetfLanguageTag = w.Dictionary?.IetfLanguageTag,
 				Links = new[]
 				{
@@ -176,41 +151,48 @@ public class WordsController : BaseApiController
 	/// </summary>
 	/// <param name="createWord">A <see cref="CreateWord"/> representing the Word to create.</param>
 	/// <returns>The created Word.</returns>
-	/// <response code="202">Word creation was accepted.</response>
+	/// <response code="200">Word was created.</response>
 	/// <response code="400">One or more validation errors prevented successful creation.</response>
 	/// <response code="403">Not permitted.</response>
 	[HttpPost]
 	[Authorize(Roles="administrator, dataImporter")]
-	public async Task<ActionResult<AppUser>> CreateWord(CreateWord createWord)
+	public async Task<ActionResult<CreateWordResult>> CreateWord(CreateWord createWord)
 	{
-		Thread.Sleep(1000);
-		
 		// try to resolve the dictionary
 		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createWord.DictionaryId);
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 
-		Guid importGuid = Guid.NewGuid();
-// #if !USE_HANGFIRE
-// 			ImportWordJob importWordJob = new ImportWordJob(_wordRepository, _phraseRepository, _dictionaryRepository);
-// 			importWordJob.ImportWord(createWord.CreatedOn ?? GetRemoteHostAddress(), 
-// 				createWord.CreatedByUserName ?? GetCurrentUserName(), createWord.Word, dictionary.Id,importGuid,createWord.CreatedAt);
-// #else
-// 			_backgroundJobClient.Enqueue<ImportWordJob>(job =>
-// 				job.ImportWord(createWord.CreatedOn ?? GetRemoteHostAddress(), 
-// 					createWord.CreatedByUserName ?? GetCurrentUserName(), createWord.Word, dictionary.Id,importGuid,createWord.CreatedAt));
-// #endif
+		IEnumerable<Word> existingWords = _wordRepository.GetWordsAsync(createWord.Word, createWord.DictionaryId,null).Result.ToArray();
+		if (existingWords.Any()) return BadRequest("Word already exists in Dictionary");
 
-
-		return Accepted(new CreateWordResult()
+		Word newWord = new Word()
 		{
-			ImportId = importGuid,
+			CreatedAt = createWord.CreatedAt ?? DateTime.Now,
+			CreatedOn = createWord.CreatedOn ?? GetRemoteHostAddress(),
+			CreatedByUserName = createWord.CreatedByUserName ?? GetCurrentUserName(),
+			TheWord = createWord.Word,
+			DictionaryId = createWord.DictionaryId,
+			ExternalId = createWord.ExternalId ?? Guid.NewGuid().ToString(),
+			Phrases = new Collection<Phrase>()
+		};
+
+		_wordRepository.Create(newWord);
+		if (!await _wordRepository.SaveAllAsync()) return BadRequest();
+
+		string url = $"{GetBaseApiPath()}/words/{newWord.Id}";
+
+		return Created(url,new CreateWordResult()
+		{
+			ExternalId = newWord.ExternalId,
+			WordId = newWord.Id,
+			RequiresReindexing = true,
 			Links = new []
 			{
 				new Link()
 				{
 					Action = "get",
 					Rel = "self",
-					HRef = $"{GetBaseApiPath()}/words/{importGuid}/importguid",
+					HRef = url,
 					Types = new []{ JSON_MIME_TYPE }
 				}
 			}
@@ -218,7 +200,7 @@ public class WordsController : BaseApiController
 		
 	}
 
-
+    
 
 	/// <summary>
 	/// Update an existing Word with meta-data.

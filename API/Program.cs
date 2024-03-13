@@ -64,10 +64,7 @@ builder.Services.AddHangfire(configuration=>
         PrepareSchemaIfNecessary = false,
         TryAutoDetectSchemaDependentOptions = false
     }));
-builder.Services.AddHangfireServer(options =>
-{
-    //options.Queues = new string[] { "import","default" };
-});
+builder.Services.AddHangfireServer();
 
 // builder.Services.AddHttpLogging(o => { });
 // builder.Services.AddHttpLoggingInterceptor<HttpLoggingInterceptor>();
@@ -98,7 +95,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 #endif
 
-app.UseAuthorization();
+//app.UseAuthorization();
 
 //app.UseCors(builder => builder.AllowANyHeader().AllowAnyMethod()).WithOrigins("http://localhost:123"));
 

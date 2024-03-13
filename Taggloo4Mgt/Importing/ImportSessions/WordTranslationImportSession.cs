@@ -25,7 +25,7 @@ public class WordTranslationImportSession : IImportSession
 	}
 
 	public async Task Import(HttpClient httpClient, string languageCode, int dictionaryId,
-		Dictionary<string, Dictionary<int, Guid>> originalIdsToImportIdsMap)
+		Dictionary<string, Dictionary<int, string>> originalIdsToImportIdsMap)
 	{
 		WordTranslation[] wordTranslationsInLanguage = _wordTranslations
 			.Where(q => q.LanguageCode.Equals(languageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
@@ -54,7 +54,7 @@ public class WordTranslationImportSession : IImportSession
 			}
 			else
 			{
-				Guid importGuidOfFromWord =
+				string importGuidOfFromWord =
 					originalIdsToImportIdsMap[nameof(WordImportSession)][translation.FromWordId];
 
 				// need to get the true IDs of the words to import
@@ -127,7 +127,7 @@ public class WordTranslationImportSession : IImportSession
 		return wordsInOtherLanguage.First().Id;
 	}
 
-	private async Task<int> GetWordByImportGuid(HttpClient httpClient, Guid importGuidOfFromWord)
+	private async Task<int> GetWordByImportGuid(HttpClient httpClient, string importGuidOfFromWord)
 	{
 		string url = $"/api/v4/words/{importGuidOfFromWord}/importguid";
 		HttpResponseMessage response = await httpClient.GetAsync(url);

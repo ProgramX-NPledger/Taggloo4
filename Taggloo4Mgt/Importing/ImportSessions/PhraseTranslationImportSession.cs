@@ -25,7 +25,7 @@ public class PhraseTranslationImportSession : IImportSession
 	}
 
 	public async Task Import(HttpClient httpClient, string languageCode, int dictionaryId,
-		Dictionary<string, Dictionary<int, Guid>> originalIdsToImportIdsMap)
+		Dictionary<string, Dictionary<int, string>> originalIdsToImportIdsMap)
 	{
 		PhraseTranslation[] phraseTranslationsInLanguage = _phraseTranslations
 			.Where(q => q.LanguageCode.Equals(languageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
@@ -54,9 +54,9 @@ public class PhraseTranslationImportSession : IImportSession
 			}
 			else
 			{
-				Guid importGuidOfFromPhrase =
+				string importGuidOfFromPhrase =
 					originalIdsToImportIdsMap[nameof(PhraseImportSession)][translation.FromPhraseId];
-				Guid importGuidOfToPhrase =
+				string importGuidOfToPhrase =
 					originalIdsToImportIdsMap[nameof(TranslatedPhraseImportSession)][translation.ToPhraseId];
 				
 				// need to get the true IDs of the words to import
@@ -129,7 +129,7 @@ public class PhraseTranslationImportSession : IImportSession
 		return phrasesInOtherLanguage.First().Id;
 	}
 
-	private async Task<int> GetPhraseByImportGuid(HttpClient httpClient, Guid importGuidOfFromPhrase)
+	private async Task<int> GetPhraseByImportGuid(HttpClient httpClient, string importGuidOfFromPhrase)
 	{
 		string url = $"/api/v4/phrases/{importGuidOfFromPhrase}/importguid";
 		HttpResponseMessage response = await httpClient.GetAsync(url);

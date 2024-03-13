@@ -39,11 +39,11 @@ public class GetWordResultItem
 	/// Identifier of owning <seealso cref="Dictionary"/>.
 	/// </summary>
 	public int DictionaryId { get; set; }
-	
+
 	/// <summary>
-	/// The unique identifier given to this Word during importing.
+	/// Externally created identifier.
 	/// </summary>
-	public Guid? ImportId { get; set; }
+	public string? ExternalId { get; set; }
 
 	/// <summary>
 	/// The IETF Language Tag for the Language this Word is in

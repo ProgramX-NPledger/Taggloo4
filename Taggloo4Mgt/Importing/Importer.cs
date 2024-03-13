@@ -16,10 +16,10 @@ public class Importer : ApiClientBase
 	private readonly ImportOptions _importOptions;
 	private readonly IHttpClientFactory _httpClientFactory;
 	private readonly string? _logFileName;
-	private readonly IList<int> _millisecondsBetweenWords = new List<int>();
+	private readonly IList<double> _millisecondsBetweenWords = new List<double>();
 
-	private Dictionary<string, Dictionary<int, Guid>> _originalIdsToImportIdsMap =
-		new Dictionary<string, Dictionary<int, Guid>>();
+	private Dictionary<string, Dictionary<int, string>> _originalIdsToImportIdsMap =
+		new Dictionary<string, Dictionary<int, string>>();
 	
 	public Importer(ImportOptions importOptions, IHttpClientFactory httpClientFactory)
 	{
@@ -45,103 +45,103 @@ public class Importer : ApiClientBase
 		{
 			Log("\tOk");
 			Log($"Connect to API at {_importOptions.Url}");
-			using (HttpClient httpClient = CreateHttpClient(_httpClientFactory, _importOptions.Url))
+			HttpClient httpClient = CreateHttpClient(_httpClientFactory, _importOptions.Url);
+		
+			Log("\tOk");
+
+			Log($"\tLog in to API as {_importOptions.UserName}");
+			LoginUserResult loginUserResult = await ConnectToApi(httpClient);
+			if (loginUserResult == null) throw new InvalidOperationException("Failed to log in to API");
+			Log("\t\tOk");
+
+			httpClient.DefaultRequestHeaders.Authorization =
+				new AuthenticationHeaderValue("Bearer", loginUserResult.Token);
+
+			IEnumerable<string> sourceLanguageCodes =
+				await GetLanguagesFromSourceAndEnforceAtTarget(sqlConnection, httpClient);
+
+			if (_importOptions.ResetAllDictionaries)
 			{
-				Log("\tOk");
+				// reset all existing dictionaries for languages prior to import
+				await DeleteAllDictionariesForLanguage(httpClient, sourceLanguageCodes);
+			}
 
-				Log($"\tLog in to API as {_importOptions.UserName}");
-				LoginUserResult loginUserResult = await ConnectToApi(httpClient);
-				if (loginUserResult == null) throw new InvalidOperationException("Failed to log in to API");
-				Log("\t\tOk");
+			IEnumerable<IImporter> importers = ImporterFactory.GetImporters();
 
-				httpClient.DefaultRequestHeaders.Authorization =
-					new AuthenticationHeaderValue("Bearer", loginUserResult.Token);
+			// if no import types specified, select all
+			if (!_importOptions.ImportTypes.Any())
+				_importOptions.ImportTypes = importers.Select(q => q.Key);
+			Log($"\t\tImporting: {string.Join(", ", _importOptions.ImportTypes.ToArray())}");
 
-				IEnumerable<string> sourceLanguageCodes =
-					await GetLanguagesFromSourceAndEnforceAtTarget(sqlConnection, httpClient);
-
-				if (_importOptions.ResetAllDictionaries)
+			// prepare all imports
+			List<IImportSession> importSessions = new List<IImportSession>();
+			int toBeImportedCount = 0;
+			int totalImportedCount = 0;
+			
+			foreach (IImporter importer in importers)
+			{
+				if (_importOptions.ImportTypes.Select(q=>q.ToLower()).Contains(importer.Key.ToLower()))
 				{
-					// reset all existing dictionaries for languages prior to import
-					await DeleteAllDictionariesForLanguage(httpClient, sourceLanguageCodes);
-				}
-
-				IEnumerable<IImporter> importers = ImporterFactory.GetImporters();
-
-				// if no import types specified, select all
-				if (!_importOptions.ImportTypes.Any())
-					_importOptions.ImportTypes = importers.Select(q => q.Key);
-				Log($"\t\tImporting: {string.Join(", ", _importOptions.ImportTypes.ToArray())}");
-
-				// prepare all imports
-				List<IImportSession> importSessions = new List<IImportSession>();
-				int toBeImportedCount = 0;
-				int totalImportedCount = 0;
-				List<double> millisecondsBetweenOperations = new List<double>();
-				foreach (IImporter importer in importers)
-				{
-					if (_importOptions.ImportTypes.Select(q=>q.ToLower()).Contains(importer.Key.ToLower()))
+					IImportSession importSession = await importer.CreateSession(sqlConnection);
+					toBeImportedCount += importSession.GetToBeImportedCount();
+					importSession.UpdateMetrics += (sender, e) =>
 					{
-						IImportSession importSession = await importer.CreateSession(sqlConnection);
-						toBeImportedCount += importSession.GetToBeImportedCount();
-						importSession.UpdateMetrics += (sender, e) =>
-						{
-							millisecondsBetweenOperations.Add(e.MillisecondsBetweenImports);
-						};
-						importSession.LogMessage += (sender, e) =>
-						{
-							StringBuilder tabsSb = new StringBuilder();
-							for (int i = 0; i < e.Indentation; i++)
-							{
-								tabsSb.Append("\t");
-							}
-
-							Log($"{tabsSb.ToString()}{e.LogMessage}");
-						};
-						importSession.Imported += (sender, e) =>
-						{
-							if (e.IsSuccess)
-							{
-								if (!_originalIdsToImportIdsMap.ContainsKey(nameof(sender)))
-								{
-									_originalIdsToImportIdsMap.Add(nameof(sender),new Dictionary<int, Guid>());
-								}
-
-								if (e.ImportGuid.HasValue)
-								{
-									_originalIdsToImportIdsMap[nameof(sender)].Add(e.SourceId,e.ImportGuid.Value);	
-								}
-								
-							}
-							else
-							{
-								Console.WriteLine("STOP");
-							}
-						
-							UpdateProgressBar(++totalImportedCount, toBeImportedCount, e.LanguageCode, e.CurrentItem);
-						};
-						importSessions.Add(importSession);
-					}
-				}
-
-				foreach (IImportSession importSession in importSessions)
-				{
-					int numberOfImportedItemsForType = 0;
-					foreach (string languageCode in sourceLanguageCodes)
+						_millisecondsBetweenWords.Add(e.MillisecondsBetweenImports);
+					};
+					importSession.LogMessage += (sender, e) =>
 					{
-						// create a dictionary
-						CreateDictionaryResult createDictionaryResult =
-							await CreateDictionaryForLanguage(httpClient, languageCode, nameof(importSession));
-						if (!_importOptions.MaxItemsPerType.HasValue || _importOptions.MaxItemsPerType >= numberOfImportedItemsForType)
+						StringBuilder tabsSb = new StringBuilder();
+						for (int i = 0; i < e.Indentation; i++)
 						{
-							numberOfImportedItemsForType++;
-							importSession.Import(httpClient, languageCode, createDictionaryResult.Id, _originalIdsToImportIdsMap);
+							tabsSb.Append("\t");
 						}
-					}
 
+						Log($"{tabsSb.ToString()}{e.LogMessage}");
+					};
+					importSession.Imported += (sender, e) =>
+					{
+						if (e.IsSuccess)
+						{
+							if (!_originalIdsToImportIdsMap.ContainsKey(nameof(sender)))
+							{
+								_originalIdsToImportIdsMap.Add(nameof(sender),new Dictionary<int, string>());
+							}
+
+							if (!string.IsNullOrWhiteSpace(e.ExternalId))
+							{
+								_originalIdsToImportIdsMap[nameof(sender)].Add(e.SourceId,e.ExternalId);	
+							}
+							
+						}
+						else
+						{
+							Console.WriteLine("STOP");
+						}
+					
+						UpdateProgressBar(++totalImportedCount, toBeImportedCount, e.LanguageCode, e.CurrentItem);
+					};
+					importSessions.Add(importSession);
+				}
+			}
+
+			foreach (IImportSession importSession in importSessions)
+			{
+				int numberOfImportedItemsForType = 0;
+				foreach (string languageCode in sourceLanguageCodes)
+				{
+					// create a dictionary
+					CreateDictionaryResult createDictionaryResult =
+						await CreateDictionaryForLanguage(httpClient, languageCode, nameof(importSession));
+					if (!_importOptions.MaxItemsPerType.HasValue || _importOptions.MaxItemsPerType >= numberOfImportedItemsForType)
+					{
+						numberOfImportedItemsForType++;
+						await importSession.Import(httpClient, languageCode, createDictionaryResult.Id, _originalIdsToImportIdsMap);
+					}
 				}
 
 			}
+
+			
 
 		}
 
