@@ -131,7 +131,7 @@ public class Importer : ApiClientBase
 				{
 					// create a dictionary
 					CreateDictionaryResult createDictionaryResult =
-						await CreateDictionaryForLanguage(httpClient, languageCode, nameof(importSession));
+						await CreateDictionaryForLanguage(httpClient, languageCode, importSession.GetType().Name);
 					if (!_importOptions.MaxItemsPerType.HasValue || _importOptions.MaxItemsPerType >= numberOfImportedItemsForType)
 					{
 						numberOfImportedItemsForType++;
@@ -235,7 +235,7 @@ public class Importer : ApiClientBase
 		if (limitedWord.Length > 30) limitedWord = limitedWord.Substring(0, 26) + " ...";
 		
 		string s = $" {((int)percent).ToString(CultureInfo.InvariantCulture),3}% ({wordsProcessed}/{totalWords}) {languageCode} {limitedWord}";
-		Console.Write($"{s,-60}ETA: {eta:hh\\:mm\\:ss} (~ {DateTime.Now.Add(eta):hh\\:mm\\:ss})");
+		Console.Write($"{s,-60}ETA: {eta:hh\\:mm\\:ss} (~ {DateTime.Now.Add(eta):HH\\:mm\\:ss})");
 		
 
 	}
