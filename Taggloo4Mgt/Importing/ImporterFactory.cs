@@ -11,8 +11,8 @@ public class ImporterFactory
             new WordImporter(),
             new PhraseImporter(),
             new WordTranslationImporter(),
-            new PhraseTranslationImporter(),
-            new TranslatedPhraseImporter()
+            new PhraseTranslationImporter()
+            
         }.OrderBy(q=>q.Ordinal);
     }
 }
