@@ -105,6 +105,7 @@ public class PhraseImportSession : IImportSession
 		    DictionaryId = dictionaryId,
 		    CreatedAt = phrase.CreatedTimeStamp,
 		    CreatedByUserName = phrase.CreatedByUserName,
+		    ExternalId = $"Taggloo2/Phrase/{phrase.ID}"
 	    };
 		
 	    HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createPhrase);

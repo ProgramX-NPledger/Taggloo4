@@ -8,5 +8,6 @@ public class PhraseTranslation
 	public required string CreatedByUserName { get; set; }
 	public int FromPhraseId { get; set; }
 	public int ToPhraseId { get; set; }
+	public int Id { get; set; }
 	
 }

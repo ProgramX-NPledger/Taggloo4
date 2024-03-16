@@ -24,7 +24,7 @@ public class PhraseTranslationImporter : IImporter
 	
     private async Task<IEnumerable<PhraseTranslation>> GetTranslations(SqlConnection sqlConnection)
     {
-	    string sqlCmd = @"select pt.PhraseID as FromPhraseId, t.ID as ToPhraseID, t.Translation,t.LanguageCode,pt.CreatedByUserName,pt.CreatedTimeStamp from Taggloo_Phrase p
+	    string sqlCmd = @"select t.ID,pt.PhraseID as FromPhraseId, t.ID as ToPhraseID, t.Translation,t.LanguageCode,pt.CreatedByUserName,pt.CreatedTimeStamp from Taggloo_Phrase p
 			inner join Taggloo_PhraseTranslation pt on p.id=pt.PhraseID
 			inner join Taggloo_Translation t on t.ID=pt.TranslationID";
 

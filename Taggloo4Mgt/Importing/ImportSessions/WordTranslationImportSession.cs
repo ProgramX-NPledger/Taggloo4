@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using Taggloo4.Dto;
+using Taggloo4.Model.Exceptions;
 using Taggloo4Mgt.Importing.Importers;
 using Taggloo4Mgt.Importing.Model;
 
@@ -40,41 +41,148 @@ public class WordTranslationImportSession : IImportSession
 
 		foreach (WordTranslation translation in _wordTranslations)
 		{
-			// get the ID of the Word
-			if (!originalIdsToImportIdsMap.ContainsKey(nameof(WordImportSession)))
+			DateTime startTimeStamp = DateTime.Now;
+			
+			LogMessage?.Invoke(this,new ImportEventArgs()
 			{
-				throw new InvalidOperationException(
-					$"Dictionary of previously imported Words does not include for type {nameof(WordImportSession)}");
-			}
-
-			if (!originalIdsToImportIdsMap[nameof(WordImportSession)].ContainsKey(translation.FromWordId))
+				LogMessage = $"{translation.TheTranslation}",
+				Indentation = 5
+			});
+			
+			try
 			{
-				// the original word was not previously created, which is a problem
+				// if word is already present, get the existing ID, otherwise, create new for language
+				int? fromWordId = await GetWordByOriginalId(httpClient, translation.FromWordId, translation.LanguageCode);
+				if (!fromWordId.HasValue)
+					throw new ImportException(
+						$"Original Word with ID {translation.FromWordId} not already in imported corpus, no translation can be made");
+				
+				int? toWordId = await GetWordInDictionary(httpClient,translation.TheTranslation, translation.LanguageCode, dictionaryId);
+				if (!toWordId.HasValue)
+				{
+					// word not already imported, so create it
+					CreateWordResult createWordResult = await PostWordToTarget(httpClient, translation.TheTranslation, translation.CreatedAt, translation.CreatedByUserName, dictionaryId,
+						translation.Id);
+					toWordId = createWordResult.WordId;
+				}
 
+				CreateWordTranslationResult createWordTranslationResult =
+					await PostTranslationBetweenWords(httpClient, fromWordId.Value, toWordId.Value, dictionaryId, translation.CreatedAt, translation.CreatedByUserName);
+				Imported?.Invoke(this,new ImportedEventArgs()
+				{
+					LanguageCode = languageCode,
+					CurrentItem = translation.TheTranslation,
+					IsSuccess = true,
+					SourceId = translation.Id
+				});
 			}
-			else
+			catch (Exception ex)
 			{
-				string importGuidOfFromWord =
-					originalIdsToImportIdsMap[nameof(WordImportSession)][translation.FromWordId];
-
-				// need to get the true IDs of the words to import
-				int fromWordId = await GetWordByImportGuid(httpClient, importGuidOfFromWord);
-				int toWordId = await FindTranslatedWord(httpClient, translation.TheTranslation, languageCode);
-
-				// post translation
-				CreateWordTranslationResult? createWordTranslationResult = await PostTranslationBetweenWords(httpClient,
-					fromWordId, toWordId, dictionaryId, translation.CreatedAt, translation.CreatedByUserName);
-
-
-
-
+				await Console.Error.WriteLineAsync();
+				await Console.Error.WriteLineAsync($"Failed to import Word Translation '{translation.TheTranslation}'");
+				Exception? exPtr = ex;
+				do
+				{
+					await Console.Error.WriteLineAsync(exPtr.Message);
+					LogMessage?.Invoke(this, new ImportEventArgs()
+					{
+						LogMessage = $"ERROR: {exPtr.GetType().Name}: {exPtr.Message}",
+						Indentation = 6
+					});
+					exPtr = exPtr.InnerException;
+				} while (exPtr!=null);
+				Imported?.Invoke(this,new ImportedEventArgs()
+				{
+					LanguageCode = languageCode,
+					CurrentItem = translation.TheTranslation,
+					IsSuccess = false
+				});
 			}
+				
+			TimeSpan delta = DateTime.Now - startTimeStamp;
+        	
+			UpdateMetrics?.Invoke(this,new ImportMetricsEventArgs()
+			{
+				MillisecondsBetweenImports = delta.TotalMilliseconds,
+			});
 		}
 
 
 	}
 
-	private async Task<CreateWordTranslationResult?> PostTranslationBetweenWords(HttpClient httpClient, 
+	private async Task<int?> GetWordInDictionary(HttpClient httpClient, string word, string languageCode, int dictionaryId)
+	{
+		string url = $"/api/v4/words?word={word}&dictionaryId={dictionaryId}";
+		HttpResponseMessage response = await httpClient.GetAsync(url);
+		if (response.StatusCode == HttpStatusCode.NotFound)
+			throw new InvalidOperationException($"Cannot resolve imported Word Translation for Word '{word}'");
+
+		if (!response.IsSuccessStatusCode)
+		{
+			throw new InvalidOperationException(
+				$"Error resolving imported Word Translation for Word '{word}'");
+		}
+
+		GetWordsResult? getWordsResult = await response.Content.ReadFromJsonAsync<GetWordsResult>();
+		if (getWordsResult == null) throw new NullReferenceException("getWordsResult");
+
+		IEnumerable<GetWordResultItem> matchingLanguage=getWordsResult.Results.Where(q =>
+			!string.IsNullOrWhiteSpace(q.IetfLanguageTag) &&
+			q.IetfLanguageTag.Equals(languageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
+		
+		switch (matchingLanguage.Count())
+		{
+			case 0:
+				// word hasn't been previously imported
+				return null;
+			case 1:
+				return getWordsResult.Results.Single().Id;
+				break;
+			default:
+				// ambiguous result. 
+				throw new ImportException(
+					$"Expected zero or one results getting matching Words for '{word}' in Dictionary ID {dictionaryId} but got {matchingLanguage.Count()} which is ambiguous");
+		}
+
+	}
+
+	private async Task<int?> GetWordByOriginalId(HttpClient httpClient, int originalWordId, string languageCode)
+	{
+		string externalId = $"Taggloo2/Word/{originalWordId}";
+		string url = $"/api/v4/words/{externalId}/externalId";
+		HttpResponseMessage response = await httpClient.GetAsync(url);
+		if (response.StatusCode == HttpStatusCode.NotFound)
+			throw new InvalidOperationException($"Cannot resolve imported Word for External ID {externalId}");
+
+		if (!response.IsSuccessStatusCode)
+		{
+			throw new InvalidOperationException(
+				$"Error resolving imported Word for External ID {externalId}");
+		}
+
+		GetWordsResult? getWordsResult = await response.Content.ReadFromJsonAsync<GetWordsResult>();
+		if (getWordsResult == null) throw new NullReferenceException("getWordsResult");
+
+		IEnumerable<GetWordResultItem> matchingLanguage=getWordsResult.Results.Where(q =>
+			!string.IsNullOrWhiteSpace(q.IetfLanguageTag) &&
+			q.IetfLanguageTag.Equals(languageCode, StringComparison.OrdinalIgnoreCase));
+		
+		switch (matchingLanguage.Count())
+		{
+			case 0:
+				// word hasn't been previously imported
+				return null;
+			case 1:
+				return getWordsResult.Results.Single().Id;
+				break;
+			default:
+				// ambiguous result. 
+				return null;
+		}
+
+	}
+
+	private async Task<CreateWordTranslationResult> PostTranslationBetweenWords(HttpClient httpClient, 
 		int fromWordId, 
 		int toWordId, 
 		int dictionaryId,
@@ -102,46 +210,31 @@ public class WordTranslationImportSession : IImportSession
 		return createWordTranslationResult;
 	}
 
+	private async Task<CreateWordResult> PostWordToTarget(HttpClient httpClient, string word, DateTime createdAt, string createdBy,
+		int dictionaryId, int originalTranslationId)
+	{
+		string url = "/api/v4/words";
+		CreateWord createWord = new CreateWord()
+		{
+			Word = word,
+			CreatedAt = createdAt,
+			CreatedByUserName = createdBy,
+			DictionaryId = dictionaryId,
+			ExternalId = $"Taggloo2/TranslatedWord/{originalTranslationId}"
+		};
+		
+		HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createWord);
+		if (!response.IsSuccessStatusCode)
+		{
+			throw new InvalidOperationException($"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
+		}
+		
+		CreateWordResult? createWordResult =
+			await response.Content.ReadFromJsonAsync<CreateWordResult>();
+		if (createWordResult == null) throw new NullReferenceException("createWordResult");
+		return createWordResult; 
+	}
+
 	
-	private async Task<int> FindTranslatedWord(HttpClient httpClient, string translationTheTranslation, string languageCode)
-	{
-		string url = $"/api/v4/words?word={translationTheTranslation}"; // this will return across Dictionaries
-		HttpResponseMessage response = await httpClient.GetAsync(url);
-
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException(
-				$"Error finding matching Word for '{translationTheTranslation}'");
-		}
-
-		GetWordsResult? getWordsResult = await response.Content.ReadFromJsonAsync<GetWordsResult>();
-		if (getWordsResult == null) throw new NullReferenceException("getWordsResult");
-		
-		// get for the other Dictionary (there are only two languages, so the other must be the right one)
-		GetWordResultItem[] wordsInOtherLanguage= getWordsResult.Results.Where(q => !q.IetfLanguageTag.Equals(languageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
-		if (wordsInOtherLanguage.Count() == 0)
-		{
-			throw new InvalidOperationException($"Failed to find matching Word for '{translationTheTranslation} which is not in Language {languageCode}");
-		}
-		
-		return wordsInOtherLanguage.First().Id;
-	}
-
-	private async Task<int> GetWordByImportGuid(HttpClient httpClient, string importGuidOfFromWord)
-	{
-		string url = $"/api/v4/words/{importGuidOfFromWord}/importguid";
-		HttpResponseMessage response = await httpClient.GetAsync(url);
-		if (response.StatusCode == HttpStatusCode.NotFound)
-			throw new InvalidOperationException($"Cannot resolve imported Word for Import Guid {importGuidOfFromWord}");
-
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException(
-				$"Error resolving imported Word for Import Guid {importGuidOfFromWord}");
-		}
-
-		GetWordResultItem? getWordResultItem = await response.Content.ReadFromJsonAsync<GetWordResultItem>();
-		if (getWordResultItem == null) throw new NullReferenceException("getWordResultItem");
-		return getWordResultItem.Id;
-	}
+	
 }

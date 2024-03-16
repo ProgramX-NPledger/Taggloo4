@@ -231,7 +231,10 @@ public class Importer : ApiClientBase
 		for (int i=1; i< percentageBarFilled; i++) Console.Write("#");
 		for (int i=(int)percentageBarFilled+1;i<percentageBarWidth; i++) Console.Write("-");
 
-		string s = $" {((int)percent).ToString(CultureInfo.InvariantCulture),3}% ({wordsProcessed}/{totalWords}) {languageCode} {theWord}";
+		string limitedWord = theWord;
+		if (limitedWord.Length > 30) limitedWord = limitedWord.Substring(0, 26) + " ...";
+		
+		string s = $" {((int)percent).ToString(CultureInfo.InvariantCulture),3}% ({wordsProcessed}/{totalWords}) {languageCode} {limitedWord}";
 		Console.Write($"{s,-60}ETA: {eta:hh\\:mm\\:ss} (~ {DateTime.Now.Add(eta):hh\\:mm\\:ss})");
 		
 
