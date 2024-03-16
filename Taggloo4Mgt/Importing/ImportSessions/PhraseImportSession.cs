@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using Taggloo4.Dto;
+using Taggloo4.Model.Exceptions;
 using Taggloo4Mgt.Importing.Importers;
 using Taggloo4Mgt.Importing.Model;
 
@@ -49,15 +50,25 @@ public class PhraseImportSession : IImportSession
 
         	try
         	{
-        		CreatePhraseResult createPhraseResult = await PostPhraseToTarget(httpClient, phraseInLanguage, dictionaryId);
-        		Imported?.Invoke(this,new ImportedEventArgs()
-        		{
-        			LanguageCode = languageCode,
-        			CurrentItem = phraseInLanguage.ThePhrase,
-        			IsSuccess = true,
-			        //ImportGuid = createPhraseResult.ImportId,
-			        SourceId = phraseInLanguage.ID
-        		});
+		        // verify that word doesn't already exist
+		        bool phraseAlreadyExists = await IsPhraseExtant(httpClient, phraseInLanguage, dictionaryId);
+		        if (phraseAlreadyExists)
+		        {
+			        CreatePhraseResult createPhraseResult = await PostPhraseToTarget(httpClient, phraseInLanguage, dictionaryId);
+			        Imported?.Invoke(this,new ImportedEventArgs()
+			        {
+				        LanguageCode = languageCode,
+				        CurrentItem = phraseInLanguage.ThePhrase,
+				        IsSuccess = true,
+				        //ImportGuid = createPhraseResult.ImportId,
+				        SourceId = phraseInLanguage.ID
+			        });
+		        }
+		        else
+		        {
+			        throw new ImportException(
+				        $"Phrase '{phraseInLanguage}' already exists in Dictionary ID {dictionaryId}");
+		        }
         	}
         	catch (Exception ex)
         	{
@@ -92,8 +103,22 @@ public class PhraseImportSession : IImportSession
         }
 		        
     }
-    
-    
+
+    private async Task<bool> IsPhraseExtant(HttpClient httpClient, Phrase phrase, int dictionaryId)
+    {
+	    string url = $"/api/v4/phrases?phrase={phrase}&dictionaryId={dictionaryId}";
+	    HttpResponseMessage response = await httpClient.GetAsync(url);
+	    response.EnsureSuccessStatusCode();
+	    
+	    GetPhrasesResult? getPhrasesResult = await response.Content.ReadFromJsonAsync<GetPhrasesResult>();
+	    if (getPhrasesResult == null) throw new NullReferenceException("getPhrasesResult");
+
+	    IEnumerable<GetPhraseResultItem> matchingDictionary=getPhrasesResult.Results.Where(q =>
+		    q.DictionaryId==dictionaryId).ToArray();
+
+	    return !matchingDictionary.Any();
+    }
+
 
     private async Task<CreatePhraseResult> PostPhraseToTarget(HttpClient httpClient, Phrase phrase,
 	    int dictionaryId)

@@ -1,5 +1,7 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using Taggloo4.Dto;
+using Taggloo4.Model.Exceptions;
 using Taggloo4Mgt.Importing.Importers;
 using Taggloo4Mgt.Importing.Model;
 
@@ -51,15 +53,25 @@ public class WordImportSession : IImportSession
 			
 			try
 			{
-				CreateWordResult createWordResult = await PostWordToTarget(httpClient, wordInLanguage, dictionaryId);
-				Imported?.Invoke(this,new ImportedEventArgs()
+				// verify that word doesn't already exist
+				bool wordAlreadyExists = await IsWordExtant(httpClient, wordInLanguage, dictionaryId);
+				if (!wordAlreadyExists)
 				{
-					LanguageCode = languageCode,
-					CurrentItem = wordInLanguage.TheWord,
-					ExternalId = createWordResult.ExternalId,
-					IsSuccess = true,
-					SourceId = wordInLanguage.ID
-				});
+					CreateWordResult createWordResult = await PostWordToTarget(httpClient, wordInLanguage, dictionaryId);
+					Imported?.Invoke(this,new ImportedEventArgs()
+					{
+						LanguageCode = languageCode,
+						CurrentItem = wordInLanguage.TheWord,
+						ExternalId = createWordResult.ExternalId,
+						IsSuccess = true,
+						SourceId = wordInLanguage.ID
+					});
+				}
+				else
+				{
+					throw new ImportException(
+						$"Word '{wordInLanguage.TheWord}' already exists in Dictionary ID {dictionaryId}");
+				}
 			}
 			catch (Exception ex)
 			{
@@ -95,7 +107,23 @@ public class WordImportSession : IImportSession
 		}
 	}
 
-    
+    private async Task<bool> IsWordExtant(HttpClient httpClient, Word word, int dictionaryId)
+    {
+	    string url = $"/api/v4/words?word={word}&dictionaryId={dictionaryId}";
+	    HttpResponseMessage response = await httpClient.GetAsync(url);
+	    response.EnsureSuccessStatusCode();
+	    
+	    GetWordsResult? getWordsResult = await response.Content.ReadFromJsonAsync<GetWordsResult>();
+	    if (getWordsResult == null) throw new NullReferenceException("getWordsResult");
+
+	    IEnumerable<GetWordResultItem> matchingDictionary=getWordsResult.Results.Where(q =>
+		    q.DictionaryId==dictionaryId).ToArray();
+
+	    return !matchingDictionary.Any();
+	    
+    }
+
+
     private async Task<CreateWordResult> PostWordToTarget(HttpClient httpClient, Word word,
 		int dictionaryId)
 	{
