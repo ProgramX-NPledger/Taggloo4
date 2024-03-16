@@ -119,7 +119,7 @@ public class WordImportSession : IImportSession
 	    IEnumerable<GetWordResultItem> matchingDictionary=getWordsResult.Results.Where(q =>
 		    q.DictionaryId==dictionaryId).ToArray();
 
-	    return !matchingDictionary.Any();
+	    return matchingDictionary.Any();
 	    
     }
 
