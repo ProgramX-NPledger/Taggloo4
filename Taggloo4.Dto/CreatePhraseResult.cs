@@ -24,4 +24,8 @@ public class CreatePhraseResult
 	[JsonPropertyName("links")]
 	public IEnumerable<Link>? Links { get; set; }
 	
+	/// <summary>
+	/// When set indicates that the action will require a reindex operation.
+	/// </summary>
+	public bool RequiresReindexing { get; set; }
 }

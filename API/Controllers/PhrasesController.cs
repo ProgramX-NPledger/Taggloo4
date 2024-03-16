@@ -183,6 +183,7 @@ public class PhrasesController : BaseApiController
 		{
 			ExternalId = newPhrase.ExternalId,
 			PhraseId = newPhrase.Id,
+			RequiresReindexing = true,
 			Links = new []
 			{
 				new Link()
