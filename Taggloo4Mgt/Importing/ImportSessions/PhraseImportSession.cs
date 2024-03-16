@@ -52,7 +52,7 @@ public class PhraseImportSession : IImportSession
         	{
 		        // verify that word doesn't already exist
 		        bool phraseAlreadyExists = await IsPhraseExtant(httpClient, phraseInLanguage, dictionaryId);
-		        if (phraseAlreadyExists)
+		        if (!phraseAlreadyExists)
 		        {
 			        CreatePhraseResult createPhraseResult = await PostPhraseToTarget(httpClient, phraseInLanguage, dictionaryId);
 			        Imported?.Invoke(this,new ImportedEventArgs()
@@ -116,7 +116,7 @@ public class PhraseImportSession : IImportSession
 	    IEnumerable<GetPhraseResultItem> matchingDictionary=getPhrasesResult.Results.Where(q =>
 		    q.DictionaryId==dictionaryId).ToArray();
 
-	    return !matchingDictionary.Any();
+	    return matchingDictionary.Any();
     }
 
 
