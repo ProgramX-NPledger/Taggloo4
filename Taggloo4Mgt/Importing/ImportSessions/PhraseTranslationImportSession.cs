@@ -57,7 +57,7 @@ public class PhraseTranslationImportSession : IImportSession
 					throw new ImportException(
 						$"Original Phrase with ID {translation.FromPhraseId} not already in imported corpus, no translation can be made");
 				
-				int? toPhraseId = await GetPhraseInDictionary(httpClient,translation.Translation, translation.LanguageCode, dictionaryId);
+				int? toPhraseId = await GetPhraseInDictionary(httpClient,translation.Translation, languageCode, dictionaryId);
 				if (!toPhraseId.HasValue)
 				{
 					// phrase not already imported, so create it
@@ -193,7 +193,7 @@ public class PhraseTranslationImportSession : IImportSession
 
 		IEnumerable<GetPhraseResultItem> matchingLanguage=getPhrasesResult.Results.Where(q =>
 			!string.IsNullOrWhiteSpace(q.IetfLanguageTag) &&
-			q.IetfLanguageTag.Equals(languageCode, StringComparison.OrdinalIgnoreCase));
+			!q.IetfLanguageTag.Equals(languageCode, StringComparison.OrdinalIgnoreCase)); // not this language implies the other language
 		
 		switch (matchingLanguage.Count())
 		{

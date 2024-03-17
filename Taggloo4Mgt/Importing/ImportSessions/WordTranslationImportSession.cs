@@ -52,7 +52,7 @@ public class WordTranslationImportSession : IImportSession
 			try
 			{
 				// if word is already present, get the existing ID, otherwise, create new for language
-				int? fromWordId = await GetWordByOriginalId(httpClient, translation.FromWordId, translation.LanguageCode);
+				int? fromWordId = await GetWordByOriginalId(httpClient, translation.FromWordId, languageCode);
 				if (!fromWordId.HasValue)
 					throw new ImportException(
 						$"Original Word with ID {translation.FromWordId} not already in imported corpus, no translation can be made");
@@ -165,7 +165,7 @@ public class WordTranslationImportSession : IImportSession
 
 		IEnumerable<GetWordResultItem> matchingLanguage=getWordsResult.Results.Where(q =>
 			!string.IsNullOrWhiteSpace(q.IetfLanguageTag) &&
-			q.IetfLanguageTag.Equals(languageCode, StringComparison.OrdinalIgnoreCase));
+			!q.IetfLanguageTag.Equals(languageCode, StringComparison.OrdinalIgnoreCase)); // not this language implies the other language
 		
 		switch (matchingLanguage.Count())
 		{
