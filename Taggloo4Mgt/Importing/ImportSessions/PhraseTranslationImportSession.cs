@@ -123,7 +123,7 @@ public class PhraseTranslationImportSession : IImportSession
 			CreatedAt = createdAt,
 			CreatedByUserName = createdBy,
 			DictionaryId = dictionaryId,
-			ExternalId = $"Taggloo2/TranslatedPhrase/{originalTranslationId}"
+			ExternalId = $"Taggloo2-TranslatedPhrase-{originalTranslationId}"
 		};
 		
 		HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createPhrase);
@@ -176,7 +176,7 @@ public class PhraseTranslationImportSession : IImportSession
 
 	private async Task<int?> GetPhraseByOriginalId(HttpClient httpClient, int originalPhraseId, string languageCode)
 	{
-		string externalId = $"Taggloo2/Phrase/{originalPhraseId}";
+		string externalId = $"Taggloo2-Phrase-{originalPhraseId}";
 		string url = $"/api/v4/phrases/{externalId}/externalId";
 		HttpResponseMessage response = await httpClient.GetAsync(url);
 		if (response.StatusCode == HttpStatusCode.NotFound)
@@ -243,47 +243,4 @@ public class PhraseTranslationImportSession : IImportSession
 	
 	
 	
-	
-	
-	private async Task<int> FindTranslatedPhrase(HttpClient httpClient, string translationTheTranslation, string languageCode)
-	{
-		string url = $"/api/v4/phrases?phrase={translationTheTranslation}"; // this will return across Dictionaries
-		HttpResponseMessage response = await httpClient.GetAsync(url);
-
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException(
-				$"Error finding matching Phrase for '{translationTheTranslation}'");
-		}
-
-		GetPhrasesResult? getPhrasesResult = await response.Content.ReadFromJsonAsync<GetPhrasesResult>();
-		if (getPhrasesResult == null) throw new NullReferenceException("getPhrasesResult");
-		
-		// get for the other Dictionary (there are only two languages, so the other must be the right one)
-		GetPhraseResultItem[] phrasesInOtherLanguage= getPhrasesResult.Results.Where(q => !q.IetfLanguageTag.Equals(languageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
-		if (phrasesInOtherLanguage.Count() == 0)
-		{
-			throw new InvalidOperationException($"Failed to find matching Phrase for '{translationTheTranslation} which is not in Language {languageCode}");
-		}
-		
-		return phrasesInOtherLanguage.First().Id;
-	}
-
-	private async Task<int> GetPhraseByImportGuid(HttpClient httpClient, string importGuidOfFromPhrase)
-	{
-		string url = $"/api/v4/phrases/{importGuidOfFromPhrase}/importguid";
-		HttpResponseMessage response = await httpClient.GetAsync(url);
-		if (response.StatusCode == HttpStatusCode.NotFound)
-			throw new InvalidOperationException($"Cannot resolve imported Phrase for Import Guid {importGuidOfFromPhrase}");
-
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException(
-				$"Error resolving imported Phrase for Import Guid {importGuidOfFromPhrase}");
-		}
-
-		GetPhraseResultItem? getPhraseResultItem = await response.Content.ReadFromJsonAsync<GetPhraseResultItem>();
-		if (getPhraseResultItem == null) throw new NullReferenceException("getPhraseResultItem");
-		return getPhraseResultItem.Id;
-	}
 }

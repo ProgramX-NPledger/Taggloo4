@@ -134,7 +134,7 @@ public class WordImportSession : IImportSession
 			CreatedAt = word.CreatedTimeStamp,
 			CreatedByUserName = word.CreatedByUserName,
 			DictionaryId = dictionaryId,
-			ExternalId = $"Taggloo2/Word/{word.ID}"
+			ExternalId = $"Taggloo2-Word-{word.ID}"
 		};
 		
 		HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createWord);

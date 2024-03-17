@@ -148,7 +148,7 @@ public class WordTranslationImportSession : IImportSession
 
 	private async Task<int?> GetWordByOriginalId(HttpClient httpClient, int originalWordId, string languageCode)
 	{
-		string externalId = $"Taggloo2/Word/{originalWordId}";
+		string externalId = $"Taggloo2-Word-{originalWordId}";
 		string url = $"/api/v4/words/{externalId}/externalId";
 		HttpResponseMessage response = await httpClient.GetAsync(url);
 		if (response.StatusCode == HttpStatusCode.NotFound)
@@ -220,7 +220,7 @@ public class WordTranslationImportSession : IImportSession
 			CreatedAt = createdAt,
 			CreatedByUserName = createdBy,
 			DictionaryId = dictionaryId,
-			ExternalId = $"Taggloo2/TranslatedWord/{originalTranslationId}"
+			ExternalId = $"Taggloo2-TranslatedWord-{originalTranslationId}"
 		};
 		
 		HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createWord);
