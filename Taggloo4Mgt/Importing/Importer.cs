@@ -118,7 +118,7 @@ public class Importer : ApiClientBase
 							Console.WriteLine("STOP");
 						}
 					
-						UpdateProgressBar(++totalImportedCount, toBeImportedCount, e.LanguageCode, e.CurrentItem);
+						UpdateProgressBar(++totalImportedCount, toBeImportedCount, e.LanguageCode, e.CurrentItem, importer.Key);
 					};
 					importSessions.Add(importSession);
 				}
@@ -215,7 +215,7 @@ public class Importer : ApiClientBase
 	}
 
 
-	private void UpdateProgressBar(int wordsProcessed, int totalWords, string languageCode, string theWord)
+	private void UpdateProgressBar(int wordsProcessed, int totalWords, string languageCode, string theWord, string importType)
 	{
 		
 		Console.CursorLeft = 0;
@@ -233,9 +233,12 @@ public class Importer : ApiClientBase
 
 		string limitedWord = theWord;
 		if (limitedWord.Length > 30) limitedWord = limitedWord.Substring(0, 26) + " ...";
+
+		string limitedImportType = importType;
+		if (limitedImportType.Length > 15) limitedImportType = limitedImportType.Substring(0, 15) + " ...";
 		
 		string s = $" {((int)percent).ToString(CultureInfo.InvariantCulture),3}% ({wordsProcessed}/{totalWords}) {languageCode} {limitedWord}";
-		Console.Write($"{s,-60}ETA: {eta:hh\\:mm\\:ss} (~ {DateTime.Now.Add(eta):HH\\:mm\\:ss})");
+		Console.Write($"{s,-60}ETA: {eta:hh\\:mm\\:ss} (~ {DateTime.Now.Add(eta):HH\\:mm\\:ss}) {limitedImportType}");
 		
 
 	}
