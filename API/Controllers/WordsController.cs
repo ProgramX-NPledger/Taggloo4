@@ -39,12 +39,6 @@ public class WordsController : BaseApiController
 		_dictionaryRepository = dictionaryRepository;
 	}
 
-	[HttpGet("{importGuid}/externalid")]
-	[Authorize(Roles = "administrator,dataExporter")]
-	public async Task<ActionResult<GetWordsResult>> GetWordsByExternalId(string externalId)
-	{
-		return await GetWords(null, null, externalId);
-	}
 
 	[HttpGet("{id}")]
 	[Authorize(Roles = "administrator,dataExporter")]

@@ -149,7 +149,7 @@ public class WordTranslationImportSession : IImportSession
 	private async Task<int?> GetWordByOriginalId(HttpClient httpClient, int originalWordId, string languageCode)
 	{
 		string externalId = $"Taggloo2-Word-{originalWordId}";
-		string url = $"/api/v4/words/{externalId}/externalId";
+		string url = $"/api/v4/words?externalId={externalId}";
 		HttpResponseMessage response = await httpClient.GetAsync(url);
 		if (response.StatusCode == HttpStatusCode.NotFound)
 			throw new InvalidOperationException($"Cannot resolve imported Word for External ID {externalId}");

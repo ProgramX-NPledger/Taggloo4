@@ -38,12 +38,6 @@ public class PhrasesController : BaseApiController
 	}
 	
 	
-	[HttpGet("{importGuid}/externalid")]
-	[Authorize(Roles = "administrator,dataExporter")]
-	public async Task<ActionResult<GetPhrasesResult>> GetPhraseByExternalId(string externalId)
-	{
-		return await GetPhrases(null, null, externalId);
-	}
 
 	[HttpGet("{id}")]
 	[Authorize(Roles = "administrator,dataExporter")]
