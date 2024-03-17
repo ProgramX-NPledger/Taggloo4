@@ -26,7 +26,7 @@ public class ImportOptions
 	[Option(HelpText = "Delete all Dictionaries for detected Languages before importing")]
 	public bool ResetAllDictionaries { get; set; } = false;
 	
-	[Option(HelpText = "List of import types (\"Words\", \"Phrases\"")]
+	[Option(HelpText = "List of import types (eg. \"Words\", \"Phrases\"",Separator = ',')]
 	public IEnumerable<string> ImportTypes { get; set; }
 
 }
