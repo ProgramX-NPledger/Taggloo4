@@ -195,7 +195,7 @@ public class WordTranslationImportSession : IImportSession
 			DictionaryId = dictionaryId,
 			FromWordId = fromWordId,
 			ToWordId = toWordId,
-			CreatedAt = createdAt,
+			CreatedAt = createdAt, //TODO is this date correct?
 			CreatedByUserName = createdBy
 		};
 
