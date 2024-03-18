@@ -80,7 +80,7 @@ jobs:
       run: echo ${{ github.run_number }}
     - name: Output Run Attempt
       run: echo ${{ github.run_attempt }}
-    - name: Host step ONE Prepare work area
+    - name: 1. Prepare work area
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
@@ -89,4 +89,4 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         connect_timeout: 10s
         script: |
-          ~/taggloo.im/scripts/01-prepare-workarea.sh
+          ~/taggloo.im/scripts/01-prepare-workarea.sh ${{ github.sha }}
