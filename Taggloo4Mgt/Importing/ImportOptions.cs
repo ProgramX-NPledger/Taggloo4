@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace Taggloo4Mgt;
+namespace Taggloo4Mgt.Importing;
 
 [Verb("import", HelpText = "Import from a Taggloo v2 SQL Server data source")]
 public class ImportOptions
@@ -20,11 +20,13 @@ public class ImportOptions
 	[Option(HelpText = "Log processing")]
 	public bool Log { get; set; } = false;
 
-	[Option('m',HelpText = "Maximum Words to import per language")]
-	public int? MaxWordsPerLanguage { get; set; }
+	[Option('m',HelpText = "Maximum items (per type) to import per type")]
+	public int? MaxItemsPerType { get; set; }
 
 	[Option(HelpText = "Delete all Dictionaries for detected Languages before importing")]
 	public bool ResetAllDictionaries { get; set; } = false;
 	
+	[Option(HelpText = "List of import types (eg. \"Words\", \"Phrases\"",Separator = ',')]
+	public IEnumerable<string> ImportTypes { get; set; }
 
 }

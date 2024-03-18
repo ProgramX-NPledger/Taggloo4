@@ -63,6 +63,18 @@ public class Dictionary
 	/// <seealso cref="WordTranslation"/>s in Dictionary.
 	/// </summary>
 	public ICollection<WordTranslation>? WordTranslations { get; set; }
+
+	/// <summary>
+	/// <seealso cref="Phrase"/>s in Dictionary
+	/// </summary>
+	public ICollection<Phrase>? Phrases { get; set; }
+	
+	/// <summary>
+	/// <seealso cref="PhraseTranslation"/>s in Dictionary.
+	/// </summary>
+	public ICollection<PhraseTranslation>? PhraseTranslations { get; set; }
+	
+	
 	
 	
 }
