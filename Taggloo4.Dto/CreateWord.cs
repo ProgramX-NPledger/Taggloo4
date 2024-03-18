@@ -18,4 +18,26 @@ public class CreateWord
 	/// </summary>
 	[Required]
 	public required string Word { get; set; }
+
+	/// <summary>
+	/// If specified, updates the CreatedByUserName field.
+	/// </summary>
+	public string? CreatedByUserName { get; set; }
+
+	/// <summary>
+	/// If specified, updates the CreatedOn field.
+	/// </summary>
+	public string? CreatedOn { get; set; }
+	
+	/// <summary>
+	/// If specified, updates the CreatedAt field.
+	/// </summary>
+	public DateTime? CreatedAt { get; set; }
+
+	/// <summary>
+	/// Assign an external identifier to the entity.
+	/// </summary>
+	/// <remarks>This should be externally conistent and unique. Taggloo cannot guarantee or assume uniqueness.</remarks>
+	public string? ExternalId { get; set; }
+	
 }

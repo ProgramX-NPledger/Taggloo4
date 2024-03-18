@@ -95,7 +95,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 #endif
 
-app.UseAuthorization();
+//app.UseAuthorization();
 
 //app.UseCors(builder => builder.AllowANyHeader().AllowAnyMethod()).WithOrigins("http://localhost:123"));
 

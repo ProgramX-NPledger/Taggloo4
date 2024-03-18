@@ -51,12 +51,37 @@ public class DatabaseManagement : IDatabaseManagement
             string sqlCmd = @"delete from Serilog where convert(date,[timestamp])=(select min(convert(date,[timestamp])) from SeriLog);";
             using (SqlCommand sqlCommand = new SqlCommand(sqlCmd, sqlConnection))
             {
+                sqlCommand.CommandTimeout = 0; // disable timeouts
                 int rowsAffected=sqlCommand.ExecuteNonQuery();
                 return rowsAffected;
             }
         }
     }
-    
+
+    public int DeleteLogsByPropertiesText(IEnumerable<string> textStrings)
+    {
+        using (SqlConnection sqlConnection = new SqlConnection(_dataContext.Database.GetConnectionString()))
+        {
+            sqlConnection.Open();
+            int recordsAffected = 0;
+            
+            foreach (string textString in textStrings)
+            {
+                string sqlCmd = @"delete from Serilog where properties like @t";
+                using (SqlCommand sqlCommand = new SqlCommand(sqlCmd, sqlConnection))
+                {
+                    sqlCommand.CommandTimeout = 0; // disable timeouts
+                    sqlCommand.Parameters.AddWithValue("@t", $"%{textString}%");
+                    recordsAffected+=sqlCommand.ExecuteNonQuery();
+                    
+                }
+                
+            }
+
+            return recordsAffected;
+        }
+    }
+
     public void ShrinkDatabase()
     {
         using (SqlConnection sqlConnection = new SqlConnection(_dataContext.Database.GetConnectionString()))

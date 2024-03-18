@@ -8,14 +8,25 @@ namespace Taggloo4.Dto;
 public class CreateWordResult
 {
 	/// <summary>
-	/// Internal identification of Word
+	/// Externally determined identifier, or a GUID if not provided. This is saved alongside the Word to allow
+	/// retrieval by a secondary key.
 	/// </summary>
-	public int Id { get; set; }
+	public string? ExternalId { get; set; }
+
+	/// <summary>
+	/// Identifier of the Word.
+	/// </summary>
+	public int WordId { get; set; }
 	
 	/// <summary>
 	/// List of related Entities
 	/// </summary>
 	[JsonPropertyName("links")]
 	public IEnumerable<Link>? Links { get; set; }
+
+	/// <summary>
+	/// When set indicates that the action will require a reindex operation.
+	/// </summary>
+	public bool RequiresReindexing { get; set; }
 	
 }

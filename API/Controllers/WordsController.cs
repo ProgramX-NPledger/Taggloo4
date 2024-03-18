@@ -1,15 +1,20 @@
-﻿using System.Security.Cryptography;
+﻿using System.Collections.ObjectModel;
+using System.Security.Cryptography;
 using System.Text;
 using API.Contract;
 using API.Data;
 using API.Helper;
+using API.Jobs;
 using API.Model;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Taggloo4.Dto;
+using Taggloo4.Model.Exceptions;
 
 namespace API.Controllers;
 
@@ -25,32 +30,67 @@ public class WordsController : BaseApiController
 	/// <summary>
 	/// Constructor with injected parameters.
 	/// </summary>
-	/// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
-	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
-	public WordsController(IWordRepository wordRepository, 
+	/// <param name="wordRepository">Implementation of <see cref="IWordRepository"/>.</param>
+	/// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
+	public WordsController(IWordRepository wordRepository,
 		IDictionaryRepository dictionaryRepository)
 	{
 		_wordRepository = wordRepository;
 		_dictionaryRepository = dictionaryRepository;
-		
 	}
 
+
+	[HttpGet("{id}")]
+	[Authorize(Roles = "administrator,dataExporter")]
+	public async Task<ActionResult<GetWordResultItem>> GetWordById(int id)
+	{
+		Word? word = await _wordRepository.GetByIdAsync(id);
+		if (word == null) return NotFound();
+
+		return Ok(new GetWordResultItem()
+		{
+			Word = word.TheWord,
+			Id = word.Id,
+			ExternalId = word.ExternalId,
+			CreatedAt = word.CreatedAt,
+			CreatedOn = word.CreatedOn,
+			CreatedByUserName = word.CreatedByUserName,
+			DictionaryId = word.DictionaryId,
+			
+			IetfLanguageTag = word.Dictionary?.IetfLanguageTag,
+			Links = new[]
+			{
+				new Link()
+				{
+					Action = "get",
+					Rel = "self",
+					HRef = $"{GetBaseApiPath()}/words/{word.Id}",
+					Types = new[] { JSON_MIME_TYPE }
+				}
+			}
+		});
+	}
+
+	
 	/// <summary>
 	/// Retrieve matching Words from an optional Dictionary.
 	/// </summary>
 	/// <param name="word">The word to search for.</param>
 	/// <param name="dictionaryId">If specified, searches within the Dictionary represented by the ID.</param>
-	/// <param name="offsetIndex">If specified, returns results starting at the specified offset position (starting index 0) Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
-	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
+	/// <param name="offsetIndex">If specified, returns results starting at the specified offset position (starting index 0) Default is defined by <see cref="Defaults.OffsetIndex"/>.</param>
+	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <see cref="Defaults.MaxItems" />.</param>
 	/// <response code="200">Results prepared.</response>
 	/// <response code="403">Not permitted.</response>
 	[HttpGet()]
 	[Authorize(Roles="administrator, dataExporter")]
-	public async Task<ActionResult<GetWordsResult>> GetWords(string? word, int? dictionaryId, int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
+	public async Task<ActionResult<GetWordsResult>> GetWords(string? word, 
+		int? dictionaryId, 
+		string? externalId,
+		int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
 	{
 		AssertApiConstraints(pageSize);
 		
-		IEnumerable<Word> words = (await _wordRepository.GetWordsAsync(word, dictionaryId)).ToArray();
+		IEnumerable<Word> words = (await _wordRepository.GetWordsAsync(word, dictionaryId, externalId)).ToArray();
 
 		GetWordsResult getWordsResult = new GetWordsResult()
 		{
@@ -58,6 +98,12 @@ public class WordsController : BaseApiController
 			{
 				Id = w.Id,
 				Word = w.TheWord,
+				CreatedAt = w.CreatedAt,
+				CreatedOn = w.CreatedOn,
+				CreatedByUserName = w.CreatedByUserName,
+				DictionaryId = w.DictionaryId,
+				ExternalId = w.ExternalId,
+				IetfLanguageTag = w.Dictionary?.IetfLanguageTag,
 				Links = new[]
 				{
 					new Link()
@@ -83,7 +129,7 @@ public class WordsController : BaseApiController
 					Action = "get",
 					Rel = "self",
 					Types = new[] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/words/{word}?offsetIndex={offsetIndex}&pageSize={pageSize}"
+					HRef = $"{GetBaseApiPath()}/words?word={word}&offsetIndex={offsetIndex}&pageSize={pageSize}"
 				}
 			},
 			FromIndex = offsetIndex,
@@ -104,59 +150,53 @@ public class WordsController : BaseApiController
 	/// <response code="403">Not permitted.</response>
 	[HttpPost]
 	[Authorize(Roles="administrator, dataImporter")]
-	public async Task<ActionResult<AppUser>> CreateWord(CreateWord createWord)
+	public async Task<ActionResult<CreateWordResult>> CreateWord(CreateWord createWord)
 	{
 		// try to resolve the dictionary
 		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createWord.DictionaryId);
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
-		
-		// does the word for the language already exist? If so, reject - maybe a translation is required
-		IEnumerable<Word> existingWord = await _wordRepository.GetWordsAsync(createWord.Word, dictionary.Id);
-		if (existingWord.Any())
-			return BadRequest("Word already exists, perhaps a Translation from the existing Word is appropriate?");
-		
+
+		IEnumerable<Word> existingWords =
+			await _wordRepository.GetWordsAsync(createWord.Word, createWord.DictionaryId, null);
+		if (existingWords.Any()) return BadRequest("Word already exists in Dictionary");
+
 		Word newWord = new Word()
 		{
-			CreatedAt = DateTime.Now,
-			CreatedOn = GetRemoteHostAddress(),
-			CreatedByUserName = GetCurrentUserName(),
+			CreatedAt = createWord.CreatedAt ?? DateTime.Now,
+			CreatedOn = createWord.CreatedOn ?? GetRemoteHostAddress(),
+			CreatedByUserName = createWord.CreatedByUserName ?? GetCurrentUserName(),
 			TheWord = createWord.Word,
-			DictionaryId = dictionary.Id
+			DictionaryId = createWord.DictionaryId,
+			ExternalId = createWord.ExternalId ?? Guid.NewGuid().ToString(),
+			Phrases = new Collection<Phrase>()
 		};
 
 		_wordRepository.Create(newWord);
 		if (!await _wordRepository.SaveAllAsync()) return BadRequest();
-		
+
 		string url = $"{GetBaseApiPath()}/words/{newWord.Id}";
-		CreateWordResult createWordResult = new CreateWordResult()
+
+		return Created(url,new CreateWordResult()
 		{
-			Id = newWord.Id,
-			Links = new[]
+			ExternalId = newWord.ExternalId,
+			WordId = newWord.Id,
+			RequiresReindexing = true,
+			Links = new []
 			{
 				new Link()
 				{
 					Action = "get",
 					Rel = "self",
-					Types = new string[] { JSON_MIME_TYPE },
-					HRef = url
-				},
-				new Link()
-				{
-					Action = "get",
-					Rel = "dictionary",
-					Types = new [] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/dictionaries/{newWord.DictionaryId}"
+					HRef = url,
+					Types = new []{ JSON_MIME_TYPE }
 				}
 			}
-		};
-		
-		// TODO: Scan phrases/etc. for instances of Word within this language and link
-		
-		return Created(url,createWordResult);
-		
+		});
 		
 	}
+
     
+
 	/// <summary>
 	/// Update an existing Word with meta-data.
 	/// </summary>
@@ -165,11 +205,12 @@ public class WordsController : BaseApiController
 	/// <response code="200">Word was updated.</response>
 	/// <response code="400">One or more validation errors prevented successful updating.</response>
 	/// <response code="403">Not permitted.</response>
+	/// <response code="404">Word not found.</response>
 	[HttpPatch]
 	[Authorize(Roles="administrator, dataImporter")]
 	public async Task<ActionResult<AppUser>> UpdateWord(UpdateWord updateWord)
 	{
-		Word? word = await _wordRepository.GetById(updateWord.WordId);
+		Word? word= await _wordRepository.GetByIdAsync(updateWord.WordId);
 		if (word == null) return NotFound();
 		
 		// update word
@@ -177,16 +218,6 @@ public class WordsController : BaseApiController
 		{
 
 		};
-
-		if (updateWord.Word!=null &&
-		    !word.TheWord.Equals(updateWord.Word))
-		{
-			// changing the word is dangerous. Ensure the new word doesn't already exist
-			IEnumerable<Word>? newWord = await _wordRepository.GetWordsAsync(updateWord.Word,updateWord.DictionaryId);
-			if (newWord.Any()) return BadRequest("The word is being renamed to another Word that already exists within the Dictionary");
-
-			word.TheWord = updateWord.Word;
-		}
 
 		if (updateWord.MoveWordToDictionaryId.HasValue &&
 		    word.DictionaryId != updateWord.MoveWordToDictionaryId.Value)
@@ -233,8 +264,6 @@ public class WordsController : BaseApiController
 				HRef = $"{GetBaseApiPath()}/dictionaries/{word.DictionaryId}"
 			}
 		};
-		
-		// TODO: Scan phrases/etc. for instances of Word within this language and link
 		
 		return Ok(updateWordResult);
 		

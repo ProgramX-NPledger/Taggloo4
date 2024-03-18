@@ -48,6 +48,15 @@ public class Word
 	// this fails when building migrations
 //	public ICollection<WordTranslation> Translations { get; set; }
 
-	
+	/// <summary>
+	/// Phrases in which this Word appears.
+	/// </summary>
+	public ICollection<Phrase>? Phrases { get; set; }
+
+	/// <summary>
+	/// An external identifier that can be applied to the entity for ready identification.
+	/// </summary>
+	[MaxLength(32)]
+	public string? ExternalId { get; set; }
 	
 }

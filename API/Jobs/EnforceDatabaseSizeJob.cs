@@ -28,9 +28,20 @@ public class EnforceDatabaseSizeJob
             iterations++;
             
             // delete old logs
-            int recordsAffected=_databaseManagement.DeleteOldestLogsByDay();
 
-            if (recordsAffected < 100)
+            int recordsAffected = 0;
+            recordsAffected+=_databaseManagement.DeleteOldestLogsByDay();
+            recordsAffected += _databaseManagement.DeleteLogsByPropertiesText(new[]
+            {
+                "<property key='commandType'",
+                "<property key='EndpointName'",
+                "<property key='ObjectResultType'",
+                "<property key='EventId'><structure type=''><property key='Id'>1</property></structure></property>",
+                "<property key='RouteData'>"
+                
+            });
+            
+            if (iterations>10 || recordsAffected == 0)
             {
                 // gone too far, likely will not be able to reocver any more space
                 throw new InvalidOperationException(
