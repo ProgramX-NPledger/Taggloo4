@@ -37,8 +37,16 @@ public interface IDictionaryRepository
 	/// </summary>
 	/// <param name="id">If specified, matches by the ID of the Dictionary.</param>
 	/// <param name="ietfLanguageTag">If specified, limits by IETF Language Tag</param>
-	/// <returns>A collection of matching <seealso cref="Dixtionary"/> items.</returns>
+	/// <returns>A collection of matching <seealso cref="Dictionary"/> items.</returns>
 	Task<IEnumerable<Dictionary>> GetDictionariesAsync(int? id, string? ietfLanguageTag);
 
+	/// <summary>
+	/// Deletes the specified Dictionary, and all related content.
+	/// </summary>
+	/// <param name="dictionaryId">ID of Dictionary to delete.</param>
+	/// <returns></returns>
+	/// <exception cref="InvalidOperationException">Thrown if deletion fails.</exception>
+	Task Delete(int dictionaryId);
+	
 
 }
