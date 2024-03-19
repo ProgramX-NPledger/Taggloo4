@@ -80,7 +80,7 @@ jobs:
       run: echo ${{ github.run_number }}
     - name: Output Run Attempt
       run: echo ${{ github.run_attempt }}
-    - name: 1. Prepare work area
+    - name: 1. Prepare files
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
@@ -89,24 +89,5 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         connect_timeout: 10s
         script: |
-          ~/taggloo.im/scripts/01-prepare-workarea.sh ${{ github.sha }}
-    - name: 2. Expand deployment archive
-      uses: cross-the-world/ssh-pipeline@master
-      with:
-        host: ${{ secrets.TAGGLOOIM_HOST }}
-        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
-        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
-        port: ${{ secrets.TAGGLOOIM_PORT }}
-        connect_timeout: 10s
-        script: |
-          ~/taggloo.im/scripts/02-unzip.sh ${{ github.sha }}
-    - name: 3. Apply secrets
-      uses: cross-the-world/ssh-pipeline@master
-      with:
-        host: ${{ secrets.TAGGLOOIM_HOST }}
-        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
-        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
-        port: ${{ secrets.TAGGLOOIM_PORT }}
-        connect_timeout: 10s
-        script: |
-          ~/taggloo.im/scripts/03-apply-secrets.sh ${{ github.sha }} ${{ secrets.TAGGLOOIM_DB_USERNAME }} ${{ secrets.TAGGLOOIM_DB_PASSWORD }} ${{ secrets.JWT_KEY }}
+          ~/taggloo.im/scripts/01-prepare-files.sh ${{ github.sha }} ${{ secrets.TAGGLOOIM_DB_USERNAME }} ${{ secrets.TAGGLOOIM_DB_PASSWORD }} ${{ secrets.JWT_KEY }}
+  
