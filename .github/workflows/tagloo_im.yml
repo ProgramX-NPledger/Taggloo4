@@ -80,7 +80,7 @@ jobs:
       run: echo ${{ github.run_number }}
     - name: Output Run Attempt
       run: echo ${{ github.run_attempt }}
-    - name: Host step ONE Prepare work area
+    - name: 1. Prepare work area
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
@@ -89,8 +89,8 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         connect_timeout: 10s
         script: |
-          ~/taggloo.im/scripts/01-prepare-workarea.sh
-    - name: Host step TWO Expand deployment archive
+          ~/taggloo.im/scripts/01-prepare-workarea.sh ${{ github.sha }}
+    - name: 2. Expand deployment archive
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
@@ -99,8 +99,8 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         connect_timeout: 10s
         script: |
-          ~/taggloo.im/scripts/02-unzip.sh
-    - name: Host step THREE Apply secrets
+          ~/taggloo.im/scripts/02-unzip.sh ${{ github.sha }}
+    - name: 3. Apply secrets
       uses: cross-the-world/ssh-pipeline@master
       with:
         host: ${{ secrets.TAGGLOOIM_HOST }}
@@ -109,48 +109,4 @@ jobs:
         port: ${{ secrets.TAGGLOOIM_PORT }}
         connect_timeout: 10s
         script: |
-          echo ${{ secrets.TAGGLOOIM_DB_USERNAME }} > ~/taggloo.im/work/var-db-username.txt
-          echo ${{ secrets.TAGGLOOIM_DB_PASSWORD }} > ~/taggloo.im/work/var-db-password.txt
-          echo "${{ secrets.JWT_KEY }}" > ~/taggloo.im/work/var-jwt-key.txt
-          ~/taggloo.im/scripts/03-apply-secrets.sh
-    - name: Host step FOUR Remove debugging configuration
-      uses: cross-the-world/ssh-pipeline@master
-      with:
-        host: ${{ secrets.TAGGLOOIM_HOST }}
-        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
-        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
-        port: ${{ secrets.TAGGLOOIM_PORT }}
-        connect_timeout: 10s
-        script: |
-          ~/taggloo.im/scripts/04-remove-dev-config.sh
-    - name: Host step FIVE Copy deployment to web server file area
-      uses: cross-the-world/ssh-pipeline@master
-      with:
-        host: ${{ secrets.TAGGLOOIM_HOST }}
-        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
-        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
-        port: ${{ secrets.TAGGLOOIM_PORT }}
-        connect_timeout: 10s
-        script: |
-          ~/taggloo.im/scripts/05-copy-to-www.sh
-    - name: Host step SIX Configure and restart Nginx
-      uses: cross-the-world/ssh-pipeline@master
-      with:
-        host: ${{ secrets.TAGGLOOIM_HOST }}
-        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
-        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
-        port: ${{ secrets.TAGGLOOIM_PORT }}
-        connect_timeout: 10s
-        script: |
-          echo ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }} > ~/taggloo.im/work/var-password.txt
-          ~/taggloo.im/scripts/06-configure-nginx.sh
-    - name: Host step SEVEN Clean-up
-      uses: cross-the-world/ssh-pipeline@master
-      with:
-        host: ${{ secrets.TAGGLOOIM_HOST }}
-        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
-        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
-        port: ${{ secrets.TAGGLOOIM_PORT }}
-        connect_timeout: 10s
-        script: |
-          ~/taggloo.im/scripts/07-clean-up.sh
+          ~/taggloo.im/scripts/03-apply-secrets.sh ${{ github.sha }} ${{ secrets.TAGGLOOIM_DB_USERNAME }} ${{ secrets.TAGGLOOIM_DB_PASSWORD }} ${{ secrets.JWT_KEY }}
