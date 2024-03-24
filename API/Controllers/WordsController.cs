@@ -131,7 +131,7 @@ public class WordsController : BaseApiController
 		decimal numberOfPages = Math.Ceiling(words.Count()/(decimal)pageSize);
 		decimal offsetIndexOfLastPage = numberOfPages * pageSize;
 		
-		if (offsetIndexOfLastPage < words.Count())
+		if (offsetIndexOfLastPage <= words.Count())
 		{
 			links.Add(new Link()
 			{
