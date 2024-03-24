@@ -27,6 +27,6 @@ public class ImportOptions
 	public bool ResetAllDictionaries { get; set; } = false;
 	
 	[Option(HelpText = "List of import types (eg. \"Words\", \"Phrases\"",Separator = ',')]
-	public IEnumerable<string> ImportTypes { get; set; }
+	public IEnumerable<string>? ImportTypes { get; set; }
 
 }
