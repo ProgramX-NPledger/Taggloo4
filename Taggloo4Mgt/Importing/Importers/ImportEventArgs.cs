@@ -8,7 +8,7 @@ public class ImportEventArgs : EventArgs
     /// <summary>
     /// Message to include in logs.
     /// </summary>
-    public string LogMessage { get; set; }
+    public required string LogMessage { get; set; }
     
     /// <summary>
     /// Number of indentations for text.
