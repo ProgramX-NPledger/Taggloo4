@@ -40,6 +40,12 @@ public class WordsController : BaseApiController
 	}
 
 
+	/// <summary>
+	/// Retrieves the specified Word.
+	/// </summary>
+	/// <param name="id">ID of the Word.</param>
+	/// <response code="200">Word found.</response>
+	/// <response code="404">Word not found.</response>
 	[HttpGet("{id}")]
 	[Authorize(Roles = "administrator,dataExporter")]
 	public async Task<ActionResult<GetWordResultItem>> GetWordById(int id)
