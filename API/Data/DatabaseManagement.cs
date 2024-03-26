@@ -4,15 +4,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
+/// <summary>
+/// Implementation for database maintenance tasks.
+/// </summary>
 public class DatabaseManagement : IDatabaseManagement
 {
     private readonly DataContext _dataContext;
 
+    /// <summary>
+    /// COnstructor with injected parameters.
+    /// </summary>
+    /// <param name="dataContext">The Entity Framework <c>DataContext</c>.</param>
     public DatabaseManagement(DataContext dataContext)
     {
         _dataContext = dataContext;
     }
     
+    /// <summary>
+    /// Returns the database size in Megabytes.
+    /// </summary>
+    /// <returns>The database size in Megabytes.</returns>
     public decimal GetDatabaseSize()
     {
         using (SqlConnection sqlConnection = new SqlConnection(_dataContext.Database.GetConnectionString()))
@@ -42,6 +53,10 @@ public class DatabaseManagement : IDatabaseManagement
         throw new InvalidOperationException("Unable to get database size");
     }
     
+    /// <summary>
+    /// Deletes old logs.
+    /// </summary>
+    /// <returns>Number of records deleted.</returns>
     public int DeleteOldestLogsByDay()
     {
         using (SqlConnection sqlConnection = new SqlConnection(_dataContext.Database.GetConnectionString()))
@@ -58,6 +73,11 @@ public class DatabaseManagement : IDatabaseManagement
         }
     }
 
+    /// <summary>
+    /// Deletes logs by text strings.
+    /// </summary>
+    /// <param name="textStrings">A string-array containing text strings that may appear in log messages that should be deleted.</param>
+    /// <returns>Number of records deleted.</returns>
     public int DeleteLogsByPropertiesText(IEnumerable<string> textStrings)
     {
         using (SqlConnection sqlConnection = new SqlConnection(_dataContext.Database.GetConnectionString()))
@@ -82,6 +102,9 @@ public class DatabaseManagement : IDatabaseManagement
         }
     }
 
+    /// <summary>
+    /// Shrinks the database using known tooling of the DBMS.
+    /// </summary>
     public void ShrinkDatabase()
     {
         using (SqlConnection sqlConnection = new SqlConnection(_dataContext.Database.GetConnectionString()))

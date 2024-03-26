@@ -54,12 +54,62 @@ public class DictionariesController : BaseApiController
 	{
 		AssertApiConstraints(pageSize);
 		
-		IEnumerable<Dictionary> words = (await _dictionaryRepository.GetDictionariesAsync(id,ietfLanguageTag)).ToArray();
+		DateTime start = DateTime.Now;
+		
+		IEnumerable<Dictionary> dictionaries = (await _dictionaryRepository.GetDictionariesAsync(id,ietfLanguageTag)).ToArray();
 
-		string queryString = BuildQueryString(id,ietfLanguageTag);
+		List<Link> links = new List<Link>();
+		links.Add(new Link()
+		{
+			Action = "get",
+			Rel = "self",
+			Types = new[] { JSON_MIME_TYPE },
+			HRef = BuildPageNavigationUrl(id,ietfLanguageTag, offsetIndex, pageSize)
+		});
+		
+		if (offsetIndex > 0)
+		{
+			if (offsetIndex - pageSize < 0)
+			{
+				// previous page, but offset was incorrect
+				links.Add(new Link()
+				{
+					Action = "get",
+					Rel = "previouspage",
+					HRef = BuildPageNavigationUrl(id,ietfLanguageTag, 0, pageSize),
+					Types = new[] { JSON_MIME_TYPE }
+				});
+			}
+			else
+			{
+				links.Add(new Link()
+				{
+					Action = "get",
+					Rel = "previouspage",
+					HRef = BuildPageNavigationUrl(id,ietfLanguageTag, offsetIndex-pageSize, pageSize),
+					Types = new [] { JSON_MIME_TYPE }
+				});
+			}
+
+		}
+
+		decimal numberOfPages = Math.Ceiling(dictionaries.Count()/(decimal)pageSize);
+		decimal offsetIndexOfLastPage = numberOfPages * pageSize;
+		
+		if (offsetIndexOfLastPage <= dictionaries.Count())
+		{
+			links.Add(new Link()
+			{
+				Action = "get",
+				Rel = "nextpage",
+				HRef = BuildPageNavigationUrl(id,ietfLanguageTag, offsetIndex+pageSize, pageSize),
+				Types = new [] { JSON_MIME_TYPE }
+			});
+		}
+		
 		GetDictionariesResult getDictionariesResult = new GetDictionariesResult()
 		{
-			Results = words.Skip(offsetIndex).Take(pageSize).Select(d => new GetDictionaryResultItem()
+			Results = dictionaries.Skip(offsetIndex).Take(pageSize).Select(d => new GetDictionaryResultItem()
 			{
 				Id = d.Id,
 				Description = d.Description,
@@ -94,30 +144,22 @@ public class DictionariesController : BaseApiController
 					}
 				}
 			}),
-			Links = new[]
-			{
-				new Link()
-				{
-					Action = "get",
-					Rel = "self",
-					Types = new[] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/dictionaries?{queryString}offsetIndex={offsetIndex}&pageSize={pageSize}"
-				}
-			},
+			Links = links.ToArray(),
 			FromIndex = offsetIndex,
 			PageSize = pageSize,
-			TotalItemsCount = words.Count()
+			TotalItemsCount = dictionaries.Count(),
+			DeltaMs = (DateTime.Now-start).TotalMilliseconds
 		};
 		return getDictionariesResult;
 	}
 
-	private string BuildQueryString(int? id, string? ietfLanguageTag)
+	private string BuildPageNavigationUrl(int? id, string? ietfLanguageTag, int offsetIndex, int pageSize)
 	{
-		StringBuilder sb = new StringBuilder();
-		if (id.HasValue) sb.Append($"id={id.Value}");
-		if (sb.Length > 0) sb.Append("&");
-		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={ietfLanguageTag}");
-		if (sb.Length > 0) sb.Append("&");
+		StringBuilder sb = new StringBuilder(GetBaseApiPath()+"/dictionaries?");
+		if (id.HasValue) sb.Append($"id={id.Value}&");
+		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={ietfLanguageTag}&");
+		sb.Append($"offsetIndex={offsetIndex}");
+		if (pageSize != Defaults.MaxItems) sb.Append($"&pageSize={pageSize}");
 		return sb.ToString();
 		
 	}

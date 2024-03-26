@@ -35,23 +35,21 @@ public class LanguagesController : BaseApiController
 	/// Retrieve matching Languages.
 	/// </summary>
 	/// <param name="ietfLanguageTag">If specified, the IETF Tag used for the Language.</param>
-	/// <param name="offsetIndex">If specified, returns results starting at the specified offset position (starting index 0) Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
-	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
 	/// <returns>A <seealso cref="GetLanguagesResult"/> containing the results.</returns>
 	/// <response code="200">Results prepared..</response>
 	/// <response code="403">Not permitted.</response>
 	[HttpGet("{ietfLanguageTag?}")] //
 	[Authorize(Roles="administrator,dataExporter,translator")]
-	public async Task<ActionResult<GetLanguagesResult>> GetLanguage(string? ietfLanguageTag, int offsetIndex=Defaults.OffsetIndex, int pageSize=Defaults.MaxItems)
+	public async Task<ActionResult<GetLanguagesResult>> GetLanguage(string? ietfLanguageTag)
 	{
-		AssertApiConstraints(pageSize);
+		AssertApiConstraints(2);
 
 		IEnumerable<Language> languages = (await _languageRepository.GetLanguagesAsync(ietfLanguageTag)).ToArray();
 
 		string queryString = BuildQueryString(ietfLanguageTag);
 		GetLanguagesResult getLanguagesResult = new GetLanguagesResult()
 		{
-			Results = languages.Skip(offsetIndex).Take(pageSize).Select(l => new GetLanguageResultItem()
+			Results = languages.Select(l => new GetLanguageResultItem()
 			{
 				Name = l.Name,
 				IetfLanguageCode = l.IetfLanguageTag,
@@ -73,11 +71,11 @@ public class LanguagesController : BaseApiController
 					Action = "get",
 					Rel = "self",
 					Types = new [] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/languages?{queryString}offsetIndex={offsetIndex}&pageSize={pageSize}"
+					HRef = $"{GetBaseApiPath()}/languages?{queryString}"
 				}
 			},
-			FromIndex = offsetIndex,
-			PageSize = pageSize,
+			FromIndex = 0,
+			PageSize = languages.Count(),
 			TotalItemsCount = languages.Count()
 		};
 		return getLanguagesResult;

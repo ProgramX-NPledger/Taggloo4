@@ -40,6 +40,12 @@ public class WordsController : BaseApiController
 	}
 
 
+	/// <summary>
+	/// Retrieves the specified Word.
+	/// </summary>
+	/// <param name="id">ID of the Word.</param>
+	/// <response code="200">Word found.</response>
+	/// <response code="404">Word not found.</response>
 	[HttpGet("{id}")]
 	[Authorize(Roles = "administrator,dataExporter")]
 	public async Task<ActionResult<GetWordResultItem>> GetWordById(int id)
@@ -77,6 +83,7 @@ public class WordsController : BaseApiController
 	/// </summary>
 	/// <param name="word">The word to search for.</param>
 	/// <param name="dictionaryId">If specified, searches within the Dictionary represented by the ID.</param>
+	/// <param name="externalId">If specified, searches for the specified external ID to allow relationship with existing IDs in other systems.</param>
 	/// <param name="offsetIndex">If specified, returns results starting at the specified offset position (starting index 0) Default is defined by <see cref="Defaults.OffsetIndex"/>.</param>
 	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <see cref="Defaults.MaxItems" />.</param>
 	/// <response code="200">Results prepared.</response>
@@ -89,8 +96,58 @@ public class WordsController : BaseApiController
 		int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
 	{
 		AssertApiConstraints(pageSize);
+
+		DateTime start = DateTime.Now;
 		
 		IEnumerable<Word> words = (await _wordRepository.GetWordsAsync(word, dictionaryId, externalId)).ToArray();
+
+		List<Link> links = new List<Link>();
+		links.Add(new Link()
+		{
+			Action = "get",
+			Rel = "self",
+			Types = new[] { JSON_MIME_TYPE },
+			HRef = BuildPageNavigationUrl(word,dictionaryId, externalId, offsetIndex, pageSize)
+		});
+		if (offsetIndex > 0)
+		{
+			if (offsetIndex - pageSize < 0)
+			{
+				// previous page, but offset was incorrect
+				links.Add(new Link()
+				{
+					Action = "get",
+					Rel = "previouspage",
+					HRef = BuildPageNavigationUrl(word, dictionaryId, externalId, 0, pageSize),
+					Types = new[] { JSON_MIME_TYPE }
+				});
+			}
+			else
+			{
+				links.Add(new Link()
+				{
+					Action = "get",
+					Rel = "previouspage",
+					HRef = BuildPageNavigationUrl(word, dictionaryId, externalId, offsetIndex - pageSize, pageSize),
+					Types = new [] { JSON_MIME_TYPE }
+				});
+			}
+
+		}
+
+		decimal numberOfPages = Math.Ceiling(words.Count()/(decimal)pageSize);
+		decimal offsetIndexOfLastPage = numberOfPages * pageSize;
+		
+		if (offsetIndexOfLastPage <= words.Count())
+		{
+			links.Add(new Link()
+			{
+				Action = "get",
+				Rel = "nextpage",
+				HRef = BuildPageNavigationUrl(word, dictionaryId, externalId, offsetIndex + pageSize, pageSize),
+				Types = new [] { JSON_MIME_TYPE }
+			});
+		}
 
 		GetWordsResult getWordsResult = new GetWordsResult()
 		{
@@ -122,25 +179,28 @@ public class WordsController : BaseApiController
 					}
 				}
 			}),
-			Links = new[]
-			{
-				new Link()
-				{
-					Action = "get",
-					Rel = "self",
-					Types = new[] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/words?word={word}&offsetIndex={offsetIndex}&pageSize={pageSize}"
-				}
-			},
+			Links = links.ToArray(),
 			FromIndex = offsetIndex,
 			PageSize = pageSize,
-			TotalItemsCount = words.Count()
+			TotalItemsCount = words.Count(),
+			DeltaMs = (DateTime.Now-start).TotalMilliseconds
 		};
 		return getWordsResult;
 	}
-	
-	
-    /// <summary>
+
+	private string BuildPageNavigationUrl(string? word, int? dictionaryId, string? externalId, int offsetIndex, int pageSize)
+	{
+		StringBuilder sb = new StringBuilder(GetBaseApiPath()+"/words?");
+		if (!string.IsNullOrWhiteSpace(word)) sb.Append($"word={word}&");
+		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&)");
+		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId]{externalId}&");
+		sb.Append($"offsetIndex={offsetIndex}");
+		if (pageSize != Defaults.MaxItems) sb.Append($"&pageSize={pageSize}");
+		return sb.ToString();
+	}
+
+
+	/// <summary>
 	/// Creates a new Word.
 	/// </summary>
 	/// <param name="createWord">A <see cref="CreateWord"/> representing the Word to create.</param>
