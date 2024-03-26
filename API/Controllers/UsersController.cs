@@ -139,7 +139,10 @@ public class UsersController : BaseApiController
 
 		UpdateUserResult updateUserResult = new UpdateUserResult()
 		{
-			UserName = user.UserName!
+			UserName = user.UserName!,
+			AddedToRoles = Array.Empty<string>(),
+			RemovedFromRoles = Array.Empty<string>()
+			
 		};
 			
 		// role changes

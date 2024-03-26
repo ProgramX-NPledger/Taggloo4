@@ -11,7 +11,7 @@ public class MgtUtility
     {
         _httpClientFactory = httpClientFactory;
     }
-    public async Task<int> Run(string[] args)
+    public int Run(string[] args)
     {
         try
         {
