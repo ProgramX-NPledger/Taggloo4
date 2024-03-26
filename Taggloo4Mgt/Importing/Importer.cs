@@ -69,7 +69,7 @@ public class Importer : ApiClientBase
 			IEnumerable<IImporter> importers = ImporterFactory.GetImporters();
 
 			// if no import types specified, select all
-			if (!_importOptions.ImportTypes.Any())
+			if (_importOptions.ImportTypes==null || !_importOptions.ImportTypes.Any())
 				_importOptions.ImportTypes = importers.Select(q => q.Key);
 			Log($"\t\tImporting: {string.Join(", ", _importOptions.ImportTypes.ToArray())}");
 
@@ -118,7 +118,7 @@ public class Importer : ApiClientBase
 							Console.WriteLine("STOP");
 						}
 					
-						UpdateProgressBar(++totalImportedCount, toBeImportedCount, e.LanguageCode, e.CurrentItem, importer.Key);
+						UpdateProgressBar(++totalImportedCount, toBeImportedCount, e.LanguageCode!, e.CurrentItem!, importer.Key);
 					};
 					importSessions.Add(importSession);
 				}

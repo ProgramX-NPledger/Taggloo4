@@ -8,11 +8,11 @@ public class ChangePassword
     /// <summary>
     /// The User's current password.
     /// </summary>
-    public string CurrentPassword { get; set; }
+    public required string CurrentPassword { get; set; }
     
     /// <summary>
     /// The User's new password.
     /// </summary>
-    public string NewPassword { get; set; }
+    public required string NewPassword { get; set; }
     
 }

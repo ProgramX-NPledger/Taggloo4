@@ -36,11 +36,11 @@ using (var serviceScope = host.Services.CreateScope())
 	try
 	{
 		MgtUtility myService = services.GetRequiredService<MgtUtility>();
-		int result = await myService.Run(args);
+		int result = myService.Run(args);
 
 		return result;
 	}
-	catch (Exception ex)
+	catch (Exception)
 	{
 		Console.WriteLine("Error Occured");
 	}

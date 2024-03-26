@@ -66,8 +66,7 @@ public class PhraseTranslationImportSession : IImportSession
 					toPhraseId = createPhraseResult.PhraseId;
 				}
 
-				CreatePhraseTranslationResult createPhraseTranslationResult =
-					await PostTranslationBetweenPhrases(httpClient, fromPhraseId.Value, toPhraseId.Value, dictionaryId, translation.CreatedAt, translation.CreatedByUserName);
+				_ = await PostTranslationBetweenPhrases(httpClient, fromPhraseId.Value, toPhraseId.Value, dictionaryId, translation.CreatedAt, translation.CreatedByUserName);
 				Imported?.Invoke(this,new ImportedEventArgs()
 				{
 					LanguageCode = languageCode,
@@ -165,7 +164,6 @@ public class PhraseTranslationImportSession : IImportSession
 				return null;
 			case 1:
 				return getPhrasesResult.Results.Single().Id;
-				break;
 			default:
 				// ambiguous result. 
 				throw new ImportException(
@@ -202,7 +200,6 @@ public class PhraseTranslationImportSession : IImportSession
 				return null;
 			case 1:
 				return getPhrasesResult.Results.Single().Id;
-				break;
 			default:
 				// ambiguous result. 
 				return null;

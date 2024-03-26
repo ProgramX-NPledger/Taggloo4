@@ -29,5 +29,10 @@ public class GetWordsResult
 	/// Links associated with this request.
 	/// </summary>
 	public IEnumerable<Link>? Links { get; set; }
+
+	/// <summary>
+	/// Time for request in milliseconds.
+	/// </summary>
+	public double DeltaMs { get; set; }
 	
 }

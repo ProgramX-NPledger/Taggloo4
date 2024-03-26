@@ -137,7 +137,6 @@ public class WordTranslationImportSession : IImportSession
 				return null;
 			case 1:
 				return getWordsResult.Results.Single().Id;
-				break;
 			default:
 				// ambiguous result. 
 				throw new ImportException(
@@ -174,7 +173,6 @@ public class WordTranslationImportSession : IImportSession
 				return null;
 			case 1:
 				return getWordsResult.Results.Single().Id;
-				break;
 			default:
 				// ambiguous result. 
 				return null;
@@ -207,7 +205,7 @@ public class WordTranslationImportSession : IImportSession
 
 		CreateWordTranslationResult? createWordTranslationResult =
 			await response.Content.ReadFromJsonAsync<CreateWordTranslationResult>();
-		return createWordTranslationResult;
+		return createWordTranslationResult!;
 	}
 
 	private async Task<CreateWordResult> PostWordToTarget(HttpClient httpClient, string word, DateTime createdAt, string createdBy,

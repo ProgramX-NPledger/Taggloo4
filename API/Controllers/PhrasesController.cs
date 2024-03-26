@@ -38,7 +38,12 @@ public class PhrasesController : BaseApiController
 	}
 	
 	
-
+	/// <summary>
+	/// Return a phrase by ID.
+	/// </summary>
+	/// <param name="id">ID of thr Phrase to return.</param>
+	/// <response code="200">Phrase returned.</response>
+	/// <response code="404">Phrase not found.</response>
 	[HttpGet("{id}")]
 	[Authorize(Roles = "administrator,dataExporter")]
 	public async Task<ActionResult<GetWordResultItem>> GetPhraseById(int id)
@@ -68,13 +73,14 @@ public class PhrasesController : BaseApiController
 			}
 		});
 	}
-	
+
 
 	/// <summary>
 	/// Retrieve matching Phrases from an optional Dictionary.
 	/// </summary>
 	/// <param name="phrase">The Phrase to search for.</param>
 	/// <param name="dictionaryId">If specified, searches within the Dictionary represented by the ID.</param>
+	/// <param name="externalId">If specified, searches for the specified external ID to allow relationship with existing IDs in other systems.</param>
 	/// <param name="offsetIndex">If specified, returns results starting at the specified offset position (starting index 0) Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
 	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <seealso cref="Defaults.OffsetIndex"/>.</param>
 	/// <response code="200">Results prepared.</response>
