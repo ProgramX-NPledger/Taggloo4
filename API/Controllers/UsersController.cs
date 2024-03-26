@@ -89,7 +89,7 @@ public class UsersController : BaseApiController
 	/// <response code="403">Not permitted.</response>
 	[HttpPost]
 	[Authorize(Roles="administrator")]
-	public async Task<ActionResult<AppUser>> CreateUser(CreateUser createUser)
+	public async Task<ActionResult<CreateUserResult>> CreateUser(CreateUser createUser)
 	{
 		if (!PasswordStrength.IsPasswordStrongEnough(createUser.Password)) return BadRequest("Password does not meet minimum strength requirements");
 		
@@ -139,7 +139,10 @@ public class UsersController : BaseApiController
 
 		UpdateUserResult updateUserResult = new UpdateUserResult()
 		{
-			UserName = user.UserName!
+			UserName = user.UserName!,
+			AddedToRoles = Array.Empty<string>(),
+			RemovedFromRoles = Array.Empty<string>()
+			
 		};
 			
 		// role changes

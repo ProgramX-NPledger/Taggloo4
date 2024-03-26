@@ -12,17 +12,17 @@ public class UpdateUserResult
 	/// <summary>
 	/// The UserName of the User.
 	/// </summary>
-	public string UserName { get; set; }
+	public required string UserName { get; set; }
 
 	/// <summary>
 	/// List of Roles the User has been added to.
 	/// </summary>
-	public string[] AddedToRoles { get; set; }
+	public required string[] AddedToRoles { get; set; }
 	
 	/// <summary>
 	/// List of Roles the User has been removed from.
 	/// </summary>
-	public string[] RemovedFromRoles { get; set; }
+	public required string[] RemovedFromRoles { get; set; }
 
 	public bool PasswordChanged { get; set; }
 	
