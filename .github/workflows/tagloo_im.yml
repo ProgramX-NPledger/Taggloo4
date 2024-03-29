@@ -11,7 +11,7 @@ on:
   pull_request:
     branches:
       - release/taggloo_im
-  workflow_dispatch:
+#  workflow_dispatch:
   
 jobs:
   Build:
