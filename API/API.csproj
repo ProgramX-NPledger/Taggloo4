@@ -41,6 +41,7 @@
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
+    <Folder Include="wwwroot\css\img\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,11 +51,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\..\..\.nuget\packages\bootstrap\5.3.3\contentFiles\any\any\wwwroot\css\site.css">
-      <Link>wwwroot\css\site.css</Link>
-    </Content>
     <Content Include="..\.dockerignore">
       <Link>.dockerignore</Link>
+    </Content>
+    <Content Update="wwwroot\css\site.css">
+      <Link>wwwroot\css\site.css</Link>
     </Content>
   </ItemGroup>
 
