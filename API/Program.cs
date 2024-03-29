@@ -32,8 +32,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
 
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddApplicationService(builder.Configuration);
@@ -95,14 +94,17 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 #endif
 
-//app.UseAuthorization();
-
-//app.UseCors(builder => builder.AllowANyHeader().AllowAnyMethod()).WithOrigins("http://localhost:123"));
-
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+//app.UseCors(builder => builder.AllowANyHeader().AllowAnyMethod()).WithOrigins("http://localhost:123"));
+
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.UseHangfireDashboard("/admin/hangfire");
 

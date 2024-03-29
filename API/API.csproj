@@ -15,6 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="bootstrap" Version="5.3.3" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.9" />
     <PackageReference Include="Hangfire.Core" Version="1.8.9" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.8.9" />
@@ -49,6 +50,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\..\..\..\.nuget\packages\bootstrap\5.3.3\contentFiles\any\any\wwwroot\css\site.css">
+      <Link>wwwroot\css\site.css</Link>
+    </Content>
     <Content Include="..\.dockerignore">
       <Link>.dockerignore</Link>
     </Content>
