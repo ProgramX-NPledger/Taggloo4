@@ -1,0 +1,9 @@
+﻿header h1 { background-image: url(img/taggloo-logo-900bg.png); background-repeat: no-repeat; font-size: 120%; padding: 0 10px 4px 40px; margin: 0 0 0 0; }
+header ul { vertical-align: bottom; margin: 0 0 2px 0;}
+header form input { }
+header ul.login-links { list-style: none; display: inline-block; }
+header ul.login-links li a { color: #fff; text-decoration: none; }
+
+.taggloo-red { color: #900; }
+.taggloo-background-red { background-color: #900; }
+.color-white { color: #fff; }

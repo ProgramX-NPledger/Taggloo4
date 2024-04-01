@@ -27,14 +27,20 @@ public static class IdentityServiceExtensions
 			{
 				options.Password.RequireNonAlphanumeric = false;
 				//options.User.RequireUniqueEmail = true;
-			}).AddRoles<AppRole>()
+			})
+			.AddSignInManager<SignInManager<AppUser>>()
+			.AddRoles<AppRole>()
 			.AddRoleManager<RoleManager<AppRole>>()
 			.AddEntityFrameworkStores<DataContext>();
 		
 		string? jwtTokenKey = configuration[TokenService.JWT_TOKEN_KEY_CONFIG_KEY];
 		if (jwtTokenKey == null) throw new ArgumentNullException($"{TokenService.JWT_TOKEN_KEY_CONFIG_KEY} is invalid");
 		
-		services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+		services.AddAuthentication(options =>
+			{
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			})
 			.AddJwtBearer(options =>
 			{
 				options.TokenValidationParameters = new TokenValidationParameters()
@@ -44,8 +50,16 @@ public static class IdentityServiceExtensions
 					ValidateIssuer = false, // TODO
 					ValidateAudience = false
 				};
+			}).AddCookie("Identity.Application", options =>
+			{
+				options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+				options.LoginPath = "/account/login";
+				options.AccessDeniedPath = "/notpermitted";
+				options.SlidingExpiration = true;
+
 			});
 
+		
 		return services;
 	}
 }
