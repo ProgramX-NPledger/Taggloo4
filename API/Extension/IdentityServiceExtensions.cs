@@ -54,7 +54,7 @@ public static class IdentityServiceExtensions
 			{
 				options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
 				options.LoginPath = "/account/login";
-				options.AccessDeniedPath = "";
+				options.AccessDeniedPath = "/notpermitted";
 				options.SlidingExpiration = true;
 
 			});

@@ -12,7 +12,7 @@
   <div class="container">
     <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
       <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-        <svg class="bi me-2" width="40" height="32" role="img" aria-label="Taggloo"><use xlink:href="#taggloo"></use></svg>
+        <h1>Taggloo</h1>
       </a>
 
       <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
@@ -27,11 +27,11 @@
       </form>
 
       <div class="text-end">
-        @if (User.Identity != null)
+        @if (User.Identity is { IsAuthenticated: true })
         {
           <ul class="login-links logged-in">
             <li>@User.Identity.Name</li>
-            <li><a href="@Url.Action("Logout", "Account")">Logout</a></li>
+            <li><a href="@Url.Action("Logout", "Account", new { area="" })">Logout</a></li>
           </ul>
         }
         else
