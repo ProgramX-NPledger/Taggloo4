@@ -27,8 +27,22 @@
       </form>
 
       <div class="text-end">
-        <button type="button" class="btn btn-outline-light me-2">Login</button>
-        <button type="button" class="btn btn-warning">Sign-up</button>
+        @if (User.Identity != null)
+        {
+          <ul class="login-links logged-in">
+            <li>@User.Identity.Name</li>
+            <li><a href="@Url.Action("Logout", "Account")">Logout</a></li>
+          </ul>
+        }
+        else
+        {
+          <ul class="login-links logged-out">
+            <li><a href="@Url.Action("Login","Account")">Login</a></li>
+            <li><a href="@Url.Action("Register","Account")">Register</a></li>
+          </ul>
+          <button type="button" class="btn btn-outline-light me-2">Login</button>
+          <button type="button" class="btn btn-warning">Sign-up</button>
+        }
       </div>
     </div>
   </div>
@@ -47,7 +61,18 @@
     <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">GitHub</a></li>
     <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">About</a></li>
   </ul>
-  <p class="text-center text-body-secondary">© 2012-@(DateTime.Now.Year) Taggloo, Nathan Pledger, Build: xxxx</p>
+  <p class="text-center text-body-secondary">© 2012-@(DateTime.Now.Year) Taggloo, Nathan Pledger, Build: @{
+                                                                                                           if (Context.Response.Headers.ContainsKey("X-Build"))
+                                                                                                           {
+                                                                                                             <text>@Context.Response.Headers["X-Build"]</text>
+                                                                                                           }
+                                                                                                           else
+                                                                                                           {
+                                                                                                             <text>(unknown)</text>
+                                                                                                           }
+
+                                                                                                         
+                                                                                                         }</p>
 </footer>
 
 

@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4.Model", "Taggloo4.Model\Taggloo4.Model.csproj", "{A2F8AC54-ED1B-4DF6-8A60-3EB5278CCDD6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{5E8259EC-6B45-49AB-A598-E96A7A3528BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,5 +49,9 @@ Global
 		{A2F8AC54-ED1B-4DF6-8A60-3EB5278CCDD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2F8AC54-ED1B-4DF6-8A60-3EB5278CCDD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2F8AC54-ED1B-4DF6-8A60-3EB5278CCDD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E8259EC-6B45-49AB-A598-E96A7A3528BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E8259EC-6B45-49AB-A598-E96A7A3528BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E8259EC-6B45-49AB-A598-E96A7A3528BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E8259EC-6B45-49AB-A598-E96A7A3528BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

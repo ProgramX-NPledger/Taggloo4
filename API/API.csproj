@@ -59,5 +59,9 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="Views\Admin\Index.cshtml" />
+  </ItemGroup>
+
 
 </Project>
