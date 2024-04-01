@@ -66,5 +66,24 @@ jobs:
           ./deploy_net8_linux-x64.zip
           README.md
           CHANGELOG.md
-
+    - name: SCP using password
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        username: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        password: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        source: "deploy_net8_linux-x64.zip"
+        target: taggloo.im
+    - name: Deploy
+      uses: cross-the-world/ssh-pipeline@master
+      with:
+        host: ${{ secrets.TAGGLOOIM_HOST }}
+        user: ${{ secrets.TAGGLOOIM_DEPLOY_USERNAME }}
+        pass: ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+        port: ${{ secrets.TAGGLOOIM_PORT }}
+        connect_timeout: 10s
+        script: |
+          ~/taggloo.im/scripts/01-prepare-files.sh ${{ github.sha }} ${{ secrets.TAGGLOOIM_DB_USERNAME }} ${{ secrets.TAGGLOOIM_DB_PASSWORD }} ${{ secrets.JWT_KEY }} ${{ secrets.TAGGLOOIM_DEPLOY_PASSWORD }}
+          
   
