@@ -10,7 +10,7 @@ concurrency:
 on:
   pull_request:
     branches:
-      - release/taggloo_im
+      - main
 #  workflow_dispatch:
   
 jobs:
