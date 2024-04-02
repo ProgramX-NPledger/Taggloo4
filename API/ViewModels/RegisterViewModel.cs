@@ -2,19 +2,31 @@
 
 namespace API.ViewModels;
 
+/// <summary>
+/// View Model for user registration.
+/// </summary>
 public class RegisterViewModel
 {
+    /// <summary>
+    /// Email of registering user. This will be the user's username.
+    /// </summary>
     [Required]
     [EmailAddress]
-    public string Email { get; set; }
+    public required string Email { get; set; } 
     
+    /// <summary>
+    /// Desired password of registering user.
+    /// </summary>
     [Required]
     [DataType(DataType.Password)]
-    public string Password { get; set; }
+    public required string Password { get; set; } 
 
+    /// <summary>
+    /// Confirmation of desired password of registering user.
+    /// </summary>
     [DataType(DataType.Password)]
     [Display(Name ="Confirm Password")]
     [Compare("Password",ErrorMessage ="Password and confirmation password not match.")]
-    public string ConfirmPassword { get; set; }
+    public required string ConfirmPassword { get; set; }
     
 }
