@@ -9,5 +9,5 @@ public class PhraseTranslation
 	public int FromPhraseId { get; set; }
 	public int ToPhraseId { get; set; }
 	public int Id { get; set; }
-	
+	public string FromPhrase { get; set; }
 }

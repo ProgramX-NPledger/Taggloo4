@@ -3,9 +3,14 @@
 public interface IImportSession
 {
     int GetToBeImportedCount();
+    
 
-    Task Import(HttpClient httpClient, string languageCode, int dictionaryId, Dictionary<string, Dictionary<int, string>> originalIdsToImportIdsMap);
-
+    Task ImportAcrossDictionariesAsync(HttpClient httpClient,
+        string languageCode1,
+        int dictionary1Id,
+        string languageCode2,
+        int dictionary2Id);
+    
     event EventHandler<ImportEventArgs>? LogMessage;
     event EventHandler<ImportMetricsEventArgs>? UpdateMetrics;
     event EventHandler<ImportedEventArgs>? Imported;

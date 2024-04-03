@@ -15,19 +15,20 @@ public class WordImportSession : IImportSession
     public WordImportSession(IEnumerable<Word> words)
     {
         _words = words;
-        
     }
 
     public event EventHandler<ImportMetricsEventArgs>? UpdateMetrics;
     public event EventHandler<ImportedEventArgs>? Imported;
-    public event EventHandler<ImportEventArgs>? LogMessage;
-    
-    public int GetToBeImportedCount()
+
+    public async Task ImportAcrossDictionariesAsync(HttpClient httpClient, string languageCode1, int dictionary1Id, string languageCode2,
+	    int dictionary2Id)
     {
-        return _words.Count();
+	    // words are simple, we can work with languages individually
+	    await ImportWithinDictionaryAsync(httpClient, languageCode1, dictionary1Id);
+	    await ImportWithinDictionaryAsync(httpClient, languageCode2, dictionary2Id);
     }
 
-    public async Task Import(HttpClient httpClient, string languageCode, int dictionaryId, Dictionary<string, Dictionary<int, string>> originalIdsToImportIdsMap)
+    private async Task ImportWithinDictionaryAsync(HttpClient httpClient, string languageCode, int dictionaryId)
     {
 	    Word[] wordsInLanguage =
 		    _words.Where(q => q.LanguageCode.Equals(languageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
@@ -105,7 +106,16 @@ public class WordImportSession : IImportSession
 			});
 			
 		}
-	}
+    }
+
+    public event EventHandler<ImportEventArgs>? LogMessage;
+    
+    public int GetToBeImportedCount()
+    {
+        return _words.Count();
+    }
+
+    
 
     private async Task<bool> IsWordExtant(HttpClient httpClient, Word word, int dictionaryId)
     {

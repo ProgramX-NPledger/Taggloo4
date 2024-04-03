@@ -9,4 +9,6 @@ public class WordTranslation
 	public required string CreatedByUserName { get; set; }
 
 	public int FromWordId { get; set; }
+
+	public required string FromWord { get; set; }
 }
