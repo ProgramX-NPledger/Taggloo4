@@ -38,7 +38,7 @@ public class WordTranslationImportSession : IImportSession
 	{
 		
 		WordTranslation[] wordTranslationsInLanguage = _wordTranslations
-			.Where(q => q.LanguageCode.Equals(fromLanguageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
+			.Where(q => q.FromLanguageCode.Equals(fromLanguageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
 
 		LogMessage?.Invoke(this, new ImportEventArgs()
 		{
@@ -63,33 +63,49 @@ public class WordTranslationImportSession : IImportSession
 				int? fromWordId = await GetWordByOriginalId(httpClient, translation.FromWordId, fromLanguageCode);
 				if (!fromWordId.HasValue)
 				{
-					CreateWordResult postWordToTargetResult = await PostWordToTarget(httpClient, translation.FromWord,
-						translation.CreatedAt, translation.CreatedByUserName, fromDictionaryId, translation.Id);
-					fromWordId = postWordToTargetResult.WordId;
-					LogMessage?.Invoke(this,new ImportEventArgs()
+					// try and get ID of Word using alternative lookup method
+					fromWordId = await GetWordInDictionary(httpClient, translation.FromWord, fromLanguageCode,
+						fromDictionaryId);
+
+					if (!fromWordId.HasValue)
 					{
-						LogMessage = $"New Word ID {fromWordId} created for Dictionary ID {fromDictionaryId}",
-						Indentation = 6
-					});
+						CreateWordResult postWordToTargetResult = await PostWordToTarget(httpClient, translation.FromWord,
+							translation.CreatedAt, translation.CreatedByUserName, fromDictionaryId, translation.Id);
+						fromWordId = postWordToTargetResult.WordId;
+						LogMessage?.Invoke(this,new ImportEventArgs()
+						{
+							LogMessage = $"New Word ID {fromWordId} created for Dictionary ID {fromDictionaryId}",
+							Indentation = 6
+						});
+					}
 				}
 
-				if (!translation.LanguageCode.Equals(toLanguageCode, StringComparison.OrdinalIgnoreCase))
+				if (!translation.ToLanguageCode.Equals(toLanguageCode, StringComparison.OrdinalIgnoreCase))
 				{
 					throw new ImportException($"Translation language does not equal target Language");
 				}
 
-				int? toWordId = await GetWordInDictionary(httpClient,translation.TheTranslation, translation.LanguageCode, toDictionaryId);
+				int? toWordId = await GetWordInDictionary(httpClient,translation.TheTranslation, translation.ToLanguageCode, toDictionaryId);
 				if (!toWordId.HasValue)
 				{
-					// word not already imported, so create it
-					CreateWordResult createWordResult = await PostWordToTarget(httpClient, translation.TheTranslation, translation.CreatedAt, translation.CreatedByUserName, toDictionaryId,
-						translation.Id);
-					toWordId = createWordResult.WordId;
-					LogMessage?.Invoke(this,new ImportEventArgs()
+					// try and get ID of Word using alternative lookup method
+					toWordId = await GetWordInDictionary(httpClient, translation.TheTranslation, toLanguageCode,
+						toDictionaryId);
+
+					if (!toWordId.HasValue)
 					{
-						LogMessage = $"New Word ID {fromWordId} created for Dictionary ID {toDictionaryId}",
-						Indentation = 6
-					});
+						// word not already imported, so create it
+						CreateWordResult createWordResult = await PostWordToTarget(httpClient,
+							translation.TheTranslation, translation.CreatedAt, translation.CreatedByUserName,
+							toDictionaryId,
+							translation.Id);
+						toWordId = createWordResult.WordId;
+						LogMessage?.Invoke(this, new ImportEventArgs()
+						{
+							LogMessage = $"New Word ID {fromWordId} created for Dictionary ID {toDictionaryId}",
+							Indentation = 6
+						});
+					}
 				}
 
 				_ = await PostTranslationBetweenWords(httpClient, fromWordId.Value, toWordId.Value, fromDictionaryId, translation.CreatedAt, translation.CreatedByUserName);
@@ -238,7 +254,7 @@ public class WordTranslationImportSession : IImportSession
 		string url = "/api/v4/words";
 		CreateWord createWord = new CreateWord()
 		{
-			Word = word,
+			Word = word.Trim(),
 			CreatedAt = createdAt,
 			CreatedByUserName = createdBy,
 			DictionaryId = dictionaryId,
