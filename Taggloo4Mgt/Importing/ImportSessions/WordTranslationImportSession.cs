@@ -64,7 +64,7 @@ public class WordTranslationImportSession : IImportSession
 				if (!fromWordId.HasValue)
 				{
 					// try and get ID of Word using alternative lookup method
-					fromWordId = await GetWordInDictionary(httpClient, translation.FromWord, fromLanguageCode,
+					fromWordId = await GetWordInDictionary(httpClient, translation.FromWord.Trim(), fromLanguageCode,
 						fromDictionaryId);
 
 					if (!fromWordId.HasValue)
@@ -85,27 +85,20 @@ public class WordTranslationImportSession : IImportSession
 					throw new ImportException($"Translation language does not equal target Language");
 				}
 
-				int? toWordId = await GetWordInDictionary(httpClient,translation.TheTranslation, translation.ToLanguageCode, toDictionaryId);
+				int? toWordId = await GetWordInDictionary(httpClient,translation.TheTranslation.Trim(), translation.ToLanguageCode, toDictionaryId);
 				if (!toWordId.HasValue)
 				{
-					// try and get ID of Word using alternative lookup method
-					toWordId = await GetWordInDictionary(httpClient, translation.TheTranslation, toLanguageCode,
-						toDictionaryId);
-
-					if (!toWordId.HasValue)
+					// word not already imported, so create it
+					CreateWordResult createWordResult = await PostWordToTarget(httpClient,
+						translation.TheTranslation, translation.CreatedAt, translation.CreatedByUserName,
+						toDictionaryId,
+						translation.Id);
+					toWordId = createWordResult.WordId;
+					LogMessage?.Invoke(this, new ImportEventArgs()
 					{
-						// word not already imported, so create it
-						CreateWordResult createWordResult = await PostWordToTarget(httpClient,
-							translation.TheTranslation, translation.CreatedAt, translation.CreatedByUserName,
-							toDictionaryId,
-							translation.Id);
-						toWordId = createWordResult.WordId;
-						LogMessage?.Invoke(this, new ImportEventArgs()
-						{
-							LogMessage = $"New Word ID {fromWordId} created for Dictionary ID {toDictionaryId}",
-							Indentation = 6
-						});
-					}
+						LogMessage = $"New Word ID {fromWordId} created for Dictionary ID {toDictionaryId}",
+						Indentation = 6
+					});
 				}
 
 				_ = await PostTranslationBetweenWords(httpClient, fromWordId.Value, toWordId.Value, fromDictionaryId, translation.CreatedAt, translation.CreatedByUserName);
