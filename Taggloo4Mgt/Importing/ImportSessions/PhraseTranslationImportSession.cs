@@ -25,16 +25,22 @@ public class PhraseTranslationImportSession : IImportSession
 		return _phraseTranslations.Count();
 	}
 
-	public async Task Import(HttpClient httpClient, string languageCode, int dictionaryId,
-		Dictionary<string, Dictionary<int, string>> originalIdsToImportIdsMap)
+	public async Task ImportAcrossDictionariesAsync(HttpClient httpClient, string languageCode1, int dictionary1Id, string languageCode2,
+		int dictionary2Id)
+	{
+		await ImportWithinDictionaryAsync(httpClient, languageCode1, dictionary1Id, languageCode2, dictionary2Id);
+		await ImportWithinDictionaryAsync(httpClient, languageCode2, dictionary2Id, languageCode1, dictionary1Id);
+	}
+
+	private async Task ImportWithinDictionaryAsync(HttpClient httpClient, string fromLanguageCode, int fromDictionaryId, string toLanguageCode, int toDictionaryId)
 	{
 		PhraseTranslation[] phraseTranslationsInLanguage = _phraseTranslations
-			.Where(q => q.LanguageCode.Equals(languageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
+			.Where(q => q.LanguageCode.Equals(fromLanguageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
 
 		LogMessage?.Invoke(this, new ImportEventArgs()
 		{
 			LogMessage =
-				$"Importing {phraseTranslationsInLanguage.Count()} Phrase Translations for Language {languageCode}",
+				$"Importing {phraseTranslationsInLanguage.Count()} Phrase Translations for Language {fromLanguageCode}",
 			Indentation = 4
 		});
 
@@ -52,24 +58,42 @@ public class PhraseTranslationImportSession : IImportSession
 			try
 			{
 				// if phrase is already present, get the existing ID, otherwise, create new for language
-				int? fromPhraseId = await GetPhraseByOriginalId(httpClient, translation.FromPhraseId, translation.LanguageCode);
+				int? fromPhraseId = await GetPhraseByOriginalId(httpClient, translation.FromPhraseId, fromLanguageCode);
 				if (!fromPhraseId.HasValue)
-					throw new ImportException(
-						$"Original Phrase with ID {translation.FromPhraseId} not already in imported corpus, no translation can be made");
+				{
+					CreatePhraseResult postPhraseToTargetResult = await PostPhraseToTarget(httpClient, translation.FromPhrase,
+						translation.CreatedAt, translation.CreatedByUserName, fromDictionaryId, translation.Id);
+					fromPhraseId = postPhraseToTargetResult.PhraseId;
+					LogMessage?.Invoke(this,new ImportEventArgs()
+					{
+						LogMessage = $"New Phrase ID {fromPhraseId} created for Dictionary ID {fromDictionaryId}",
+						Indentation = 6
+					});
+				}
+					
+				if (!translation.LanguageCode.Equals(toLanguageCode, StringComparison.OrdinalIgnoreCase))
+				{
+					throw new ImportException($"Translation language does not equal target Language");
+				}
 				
-				int? toPhraseId = await GetPhraseInDictionary(httpClient,translation.Translation, languageCode, dictionaryId);
+				int? toPhraseId = await GetPhraseInDictionary(httpClient,translation.Translation, translation.LanguageCode, toDictionaryId);
 				if (!toPhraseId.HasValue)
 				{
 					// phrase not already imported, so create it
-					CreatePhraseResult createPhraseResult = await PostPhraseToTarget(httpClient, translation.Translation, translation.CreatedAt, translation.CreatedByUserName, dictionaryId,
+					CreatePhraseResult createPhraseResult = await PostPhraseToTarget(httpClient, translation.Translation, translation.CreatedAt, translation.CreatedByUserName, toDictionaryId,
 						translation.Id);
 					toPhraseId = createPhraseResult.PhraseId;
+					LogMessage?.Invoke(this,new ImportEventArgs()
+					{
+						LogMessage = $"New Phrase ID {fromPhraseId} created for Dictionary ID {toDictionaryId}",
+						Indentation = 6
+					});
 				}
 
-				_ = await PostTranslationBetweenPhrases(httpClient, fromPhraseId.Value, toPhraseId.Value, dictionaryId, translation.CreatedAt, translation.CreatedByUserName);
+				_ = await PostTranslationBetweenPhrases(httpClient, fromPhraseId.Value, toPhraseId.Value, fromDictionaryId, translation.CreatedAt, translation.CreatedByUserName);
 				Imported?.Invoke(this,new ImportedEventArgs()
 				{
-					LanguageCode = languageCode,
+					LanguageCode = fromLanguageCode,
 					CurrentItem = translation.Translation,
 					IsSuccess = true,
 					SourceId = translation.Id
@@ -92,7 +116,7 @@ public class PhraseTranslationImportSession : IImportSession
 				} while (exPtr!=null);
 				Imported?.Invoke(this,new ImportedEventArgs()
 				{
-					LanguageCode = languageCode,
+					LanguageCode = fromLanguageCode,
 					CurrentItem = translation.Translation,
 					IsSuccess = false
 				});

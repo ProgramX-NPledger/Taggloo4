@@ -59,13 +59,7 @@ public class Importer : ApiClientBase
 
 			IEnumerable<string> sourceLanguageCodes =
 				await GetLanguagesFromSourceAndEnforceAtTarget(sqlConnection, httpClient);
-
-			if (_importOptions.ResetAllDictionaries)
-			{
-				// reset all existing dictionaries for languages prior to import
-				await DeleteAllDictionariesForLanguage(httpClient, sourceLanguageCodes);
-			}
-
+			
 			IEnumerable<IImporter> importers = ImporterFactory.GetImporters();
 
 			// if no import types specified, select all
@@ -124,25 +118,21 @@ public class Importer : ApiClientBase
 				}
 			}
 
+			if (sourceLanguageCodes.Count() != 2)
+			{
+				throw new InvalidOperationException($"There must be exactly 2 languages defined");
+			}
+			
 			foreach (IImportSession importSession in importSessions)
 			{
-				int numberOfImportedItemsForType = 0;
-				foreach (string languageCode in sourceLanguageCodes)
-				{
-					// create a dictionary
-					CreateDictionaryResult createDictionaryResult =
-						await CreateDictionaryForLanguage(httpClient, languageCode, importSession.GetType().Name);
-					if (!_importOptions.MaxItemsPerType.HasValue || _importOptions.MaxItemsPerType >= numberOfImportedItemsForType)
-					{
-						numberOfImportedItemsForType++;
-						await importSession.Import(httpClient, languageCode, createDictionaryResult.Id, _originalIdsToImportIdsMap);
-					}
-				}
-
+				// create a Dictionary for each language code
+				CreateDictionaryResult dictionary1 = await CreateDictionaryForLanguage(httpClient,
+					sourceLanguageCodes.ElementAt(0), importSession.GetType().Name);
+				CreateDictionaryResult dictionary2 = await CreateDictionaryForLanguage(httpClient,
+					sourceLanguageCodes.ElementAt(1), importSession.GetType().Name);
+				await importSession.ImportAcrossDictionariesAsync(httpClient, sourceLanguageCodes.ElementAt(0), dictionary1.Id,
+					sourceLanguageCodes.ElementAt(1), dictionary2.Id);
 			}
-
-			
-
 		}
 
 		Console.WriteLine();
