@@ -12,4 +12,7 @@ public class WordTranslation
 	public int FromWordId { get; set; }
 
 	public required string FromWord { get; set; }
+	
+	
+	
 }

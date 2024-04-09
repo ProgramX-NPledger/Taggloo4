@@ -127,16 +127,13 @@ public class DataContext : IdentityDbContext<AppUser,
 			.HasMany(p => p.Words)
 			.WithMany(w => w.Phrases)
 			.UsingEntity("WordsInPhrase");
-
 		
-
-
-		// this results in migration failure
-		// builder.Entity<Word>()
-		// 	.HasMany(w => w.Translations)
-		// 	.WithOne(wt => wt.FromWord)
-		// 	.HasForeignKey(wt => wt.FromWordId)
-		// 	.OnDelete(DeleteBehavior.NoAction);
+		
+		builder.Entity<Word>()
+			.HasMany(w => w.Translations)
+			.WithOne(wt => wt.FromWord)
+			.HasForeignKey(wt => wt.FromWordId)
+			.OnDelete(DeleteBehavior.NoAction);
 		//
 		// builder.Entity<Word>()
 		// 	.HasMany(w => w.Translations)

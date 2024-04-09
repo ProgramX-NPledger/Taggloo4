@@ -56,7 +56,11 @@ public class WordRepository : IWordRepository
 	/// <returns>A collection of matching <seealso cref="Word"/>s within the <seealso cref="Dictionary"/>.</returns>
 	public async Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId, string? externalId)
 	{
-		IQueryable<Word> query = _dataContext.Words.AsQueryable();
+		IQueryable<Word> query = _dataContext.Words
+			.Include("Translations")
+			.Include("Dictionary")
+			.AsQueryable();
+		
 		if (!string.IsNullOrWhiteSpace(word))
 		{
 			query = query.Where(q => q.TheWord == word);
@@ -72,7 +76,7 @@ public class WordRepository : IWordRepository
 			query = query.Where(q => q.ExternalId == externalId);
 		}
 
-		return await query.Include("Dictionary").ToArrayAsync();
+		return await query.ToArrayAsync();
 	}
 
 	/// <summary>
@@ -82,7 +86,10 @@ public class WordRepository : IWordRepository
 	/// <returns>The requested <seealso cref="Word"/>, or <c>null</c> if no Word could be found./</returns>
 	public async Task<Word?> GetByIdAsync(int id)
 	{
-		return await _dataContext.Words.SingleOrDefaultAsync(q => q.Id == id);
+		return await _dataContext.Words
+			.Include("Dictionary")
+			.Include("Translations")
+			.SingleOrDefaultAsync(q => q.Id == id);
 	}
 
 
