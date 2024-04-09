@@ -177,7 +177,13 @@ public class WordsController : BaseApiController
 						Types = new[] { JSON_MIME_TYPE },
 						HRef = $"{GetBaseApiPath()}/dictionaries/{w.DictionaryId}"
 					}
-				}
+				}.Union(w.Translations.Select(t=>new Link()
+				{
+					Action = "get",
+					Rel = "translation",
+					HRef = $"{GetBaseApiPath()}/words/{t.ToWordId}",
+					Types = new []{ JSON_MIME_TYPE}
+				}))
 			}),
 			Links = links.ToArray(),
 			FromIndex = offsetIndex,
