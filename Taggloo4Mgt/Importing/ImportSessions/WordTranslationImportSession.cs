@@ -18,8 +18,6 @@ public class WordTranslationImportSession : IImportSession
 
 	public event EventHandler<ImportMetricsEventArgs>? UpdateMetrics;
 	public event EventHandler<ImportedEventArgs>? Imported;
-
-
 	public event EventHandler<ImportEventArgs>? LogMessage;
 
 	public int GetToBeImportedCount()
@@ -36,7 +34,6 @@ public class WordTranslationImportSession : IImportSession
 
 	private async Task ImportWithinDictionaryAsync(HttpClient httpClient, string fromLanguageCode, int fromDictionaryId, string toLanguageCode, int toDictionaryId)
 	{
-		
 		WordTranslation[] wordTranslationsInLanguage = _wordTranslations
 			.Where(q => q.FromLanguageCode.Equals(fromLanguageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
 

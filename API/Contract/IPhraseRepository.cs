@@ -33,7 +33,7 @@ public interface IPhraseRepository
 	/// <param name="containingText">Filters response for presence of text (collation as per database).</param>
 	/// <param name="externalId">An externally determined identifier.</param>
 	/// <returns>A collection of matching <seealso cref="Phrase"/>s within the <seealso cref="Dictionary"/>.</returns>
-	Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId, string? containingText, string? externalId);
+	Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId, string? containingText, string? externalId, string? languageCode);
 	
 	/// <summary>
 	/// Retrieves a <seealso cref="Phrase"/> by its ID.

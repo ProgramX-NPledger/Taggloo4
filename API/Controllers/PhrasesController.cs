@@ -90,16 +90,17 @@ public class PhrasesController : BaseApiController
 	public async Task<ActionResult<GetPhrasesResult>> GetPhrases(string? phrase, 
 		int? dictionaryId,
 		string? externalId,
+		string? ietfLanguageTag,
 		int offsetIndex=Defaults.OffsetIndex, 
 		int pageSize = Defaults.MaxItems)
 	{
 		AssertApiConstraints(pageSize);
 		
-		IEnumerable<Phrase> words = (await _phraseRepository.GetPhrasesAsync(phrase, dictionaryId,null, externalId)).ToArray();
+		IEnumerable<Phrase> phrases = (await _phraseRepository.GetPhrasesAsync(phrase, dictionaryId,null, externalId, ietfLanguageTag)).ToArray();
 
 		GetPhrasesResult getPhrasesResult = new GetPhrasesResult()
 		{
-			Results = words.Skip(offsetIndex).Take(pageSize).Select(p => new GetPhraseResultItem()
+			Results = phrases.Skip(offsetIndex).Take(pageSize).Select(p => new GetPhraseResultItem()
 			{
 				Id = p.Id,
 				Phrase = p.ThePhrase,
@@ -134,12 +135,12 @@ public class PhrasesController : BaseApiController
 					Action = "get",
 					Rel = "self",
 					Types = new[] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/words?phrase={phrase}&offsetIndex={offsetIndex}&pageSize={pageSize}"
+					HRef = $"{GetBaseApiPath()}/phrases?phrase={phrase}&offsetIndex={offsetIndex}&pageSize={pageSize}"
 				}
 			},
 			FromIndex = offsetIndex,
 			PageSize = pageSize,
-			TotalItemsCount = words.Count()
+			TotalItemsCount = phrases.Count()
 		};
 		return getPhrasesResult;
 	}
@@ -161,42 +162,67 @@ public class PhrasesController : BaseApiController
 		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createPhrase.DictionaryId);
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 		
-		IEnumerable<Phrase> existingPhrases = await _phraseRepository.GetPhrasesAsync(createPhrase.Phrase,createPhrase.DictionaryId,null,null);
-		if (existingPhrases.Any()) return BadRequest("Phrase already exists in Dictionary");
-
-		Phrase newPhrase = new Phrase()
+		IEnumerable<Phrase> existingPhrases = (await _phraseRepository.GetPhrasesAsync(createPhrase.Phrase,createPhrase.DictionaryId,null,null,createPhrase.IetfLanguageTag)).ToArray();
+		if (existingPhrases.Count() == 1)
 		{
-			CreatedAt = createPhrase.CreatedAt ?? DateTime.Now,
-			CreatedOn = createPhrase.CreatedOn ?? GetRemoteHostAddress(),
-			CreatedByUserName = createPhrase.CreatedByUserName ?? GetCurrentUserName(),
-			ThePhrase = createPhrase.Phrase,
-			DictionaryId = createPhrase.DictionaryId,
-			ExternalId = createPhrase.ExternalId,
-			Words = new Collection<Word>()
-		};
-
-		_phraseRepository.Create(newPhrase);
-		if (!await _phraseRepository.SaveAllAsync()) return BadRequest();
-
-		string url = $"{GetBaseApiPath()}/phrases/{newPhrase.Id}";
-		return Created(url,new CreatePhraseResult()
-		{
-			ExternalId = newPhrase.ExternalId,
-			PhraseId = newPhrase.Id,
-			RequiresReindexing = true,
-			Links = new []
+			// there is already a single phrase created, return the details of that
+			string url = $"{GetBaseApiPath()}/phrases/{existingPhrases.Single().Id}";
+			return Ok(new CreatePhraseResult()
 			{
-				new Link()
+				ExternalId = existingPhrases.Single().ExternalId,
+				PhraseId = existingPhrases.Single().Id,
+				RequiresReindexing = true,
+				Links = new []
 				{
-					Action = "get",
-					Rel = "self",
-					HRef = url,
-					Types = new []{ JSON_MIME_TYPE }
+					new Link()
+					{
+						Action = "get",
+						Rel = "self",
+						HRef = url,
+						Types = new []{ JSON_MIME_TYPE }
+					}
 				}
-			}
-		});
+			});
+		}
 		
-		
+		if (existingPhrases.Count()==0)
+		{
+			Phrase newPhrase = new Phrase()
+			{
+				CreatedAt = createPhrase.CreatedAt ?? DateTime.Now,
+				CreatedOn = createPhrase.CreatedOn ?? GetRemoteHostAddress(),
+				CreatedByUserName = createPhrase.CreatedByUserName ?? GetCurrentUserName(),
+				ThePhrase = createPhrase.Phrase,
+				DictionaryId = createPhrase.DictionaryId,
+				ExternalId = createPhrase.ExternalId,
+				Words = new Collection<Word>()
+			};
+
+			_phraseRepository.Create(newPhrase);
+			if (!await _phraseRepository.SaveAllAsync()) return BadRequest();
+
+			string url = $"{GetBaseApiPath()}/phrases/{newPhrase.Id}";
+			return Created(url,new CreatePhraseResult()
+			{
+				ExternalId = newPhrase.ExternalId,
+				PhraseId = newPhrase.Id,
+				RequiresReindexing = true,
+				Links = new []
+				{
+					new Link()
+					{
+						Action = "get",
+						Rel = "self",
+						HRef = url,
+						Types = new []{ JSON_MIME_TYPE }
+					}
+				}
+			});
+		}
+		else
+		{
+			return BadRequest("Phrase already exists in Dictionary");
+		}
 	}
     
 	/// <summary>
