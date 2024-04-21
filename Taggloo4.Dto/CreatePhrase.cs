@@ -37,7 +37,8 @@ public class CreatePhrase
 	/// <summary>
 	/// Assign an external identifier to the entity.
 	/// </summary>
-	/// <remarks>This should be externally conistent and unique. Taggloo cannot guarantee or assume uniqueness.</remarks>
+	/// <remarks>This should be externally consistent and unique. Taggloo cannot guarantee or assume uniqueness.</remarks>
 	public string? ExternalId { get; set; }
 	
+	public required string IetfLanguageTag { get; set; }
 }

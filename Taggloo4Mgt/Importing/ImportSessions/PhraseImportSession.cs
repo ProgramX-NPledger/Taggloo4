@@ -62,7 +62,7 @@ public class PhraseImportSession : IImportSession
 		        bool phraseAlreadyExists = await IsPhraseExtant(httpClient, translation, dictionaryId);
 		        if (!phraseAlreadyExists)
 		        {
-			        CreatePhraseResult createPhraseResult = await PostPhraseToTarget(httpClient, translation, dictionaryId);
+			        CreatePhraseResult createPhraseResult = await PostPhraseToTarget(httpClient, translation, dictionaryId, translation.LanguageCode);
 			        Imported?.Invoke(this,new ImportedEventArgs()
 			        {
 				        LanguageCode = languageCode,
@@ -128,7 +128,7 @@ public class PhraseImportSession : IImportSession
 
 
     private async Task<CreatePhraseResult> PostPhraseToTarget(HttpClient httpClient, Phrase phrase,
-	    int dictionaryId)
+	    int dictionaryId, string ietfLanguageTag)
     {
 	    string url = "/api/v4/phrases";
 	    CreatePhrase createPhrase = new CreatePhrase()
@@ -137,7 +137,8 @@ public class PhraseImportSession : IImportSession
 		    DictionaryId = dictionaryId,
 		    CreatedAt = phrase.CreatedTimeStamp,
 		    CreatedByUserName = phrase.CreatedByUserName,
-		    ExternalId = $"Taggloo2-Phrase-{phrase.ID}"
+		    ExternalId = $"Taggloo2-Phrase-{phrase.ID}",
+		    IetfLanguageTag = ietfLanguageTag
 	    };
 		
 	    HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createPhrase);
