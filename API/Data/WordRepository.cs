@@ -92,5 +92,17 @@ public class WordRepository : IWordRepository
 			.SingleOrDefaultAsync(q => q.Id == id);
 	}
 
+	public async Task<IEnumerable<WordInPhrase>> GetPhrasesForWordAsync(int id)
+	{
+		return await _dataContext.WordsInPhrases
+			.Include("Words")
+			.Include("InPhrase")
+			.Where(q => q.WordId == id)
+			.ToArrayAsync();
+	}
 
+	public void AddPhraseForWord(WordInPhrase wordInPhrase)
+	{
+		_dataContext.WordsInPhrases.Add(wordInPhrase);
+	}
 }

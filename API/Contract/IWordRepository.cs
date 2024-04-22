@@ -41,6 +41,7 @@ public interface IWordRepository
 	/// <returns>The requested <seealso cref="Word"/>, or <c>null</c> if no Word could be found./</returns>
 	Task<Word?> GetByIdAsync(int id);
 
+	Task<IEnumerable<WordInPhrase>> GetPhrasesForWordAsync(int id);
 
-
+	void AddPhraseForWord(WordInPhrase wordInPhrase);
 }

@@ -259,6 +259,8 @@ namespace API.Data.Migrations
 
                     b.HasIndex("DictionaryId");
 
+                    b.HasIndex("FromPhraseId");
+
                     b.ToTable("PhraseTranslations");
                 });
 
@@ -299,6 +301,43 @@ namespace API.Data.Migrations
                     b.ToTable("Words");
                 });
 
+            modelBuilder.Entity("API.Model.WordInPhrase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedByUserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedOn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("InPhraseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Ordinal")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WordId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InPhraseId");
+
+                    b.HasIndex("WordId");
+
+                    b.ToTable("WordsInPhrases");
+                });
+
             modelBuilder.Entity("API.Model.WordTranslation", b =>
                 {
                     b.Property<int>("Id")
@@ -328,6 +367,8 @@ namespace API.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DictionaryId");
+
+                    b.HasIndex("FromWordId");
 
                     b.ToTable("WordTranslations");
                 });
@@ -420,7 +461,7 @@ namespace API.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("WordsInPhrase", b =>
+            modelBuilder.Entity("PhraseWord", b =>
                 {
                     b.Property<int>("PhrasesId")
                         .HasColumnType("int");
@@ -432,7 +473,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("WordsId");
 
-                    b.ToTable("WordsInPhrase");
+                    b.ToTable("PhraseWord");
                 });
 
             modelBuilder.Entity("API.Model.AppUserRole", b =>
@@ -484,7 +525,15 @@ namespace API.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("API.Model.Phrase", "FromPhrase")
+                        .WithMany("Translations")
+                        .HasForeignKey("FromPhraseId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Dictionary");
+
+                    b.Navigation("FromPhrase");
                 });
 
             modelBuilder.Entity("API.Model.Word", b =>
@@ -498,6 +547,25 @@ namespace API.Data.Migrations
                     b.Navigation("Dictionary");
                 });
 
+            modelBuilder.Entity("API.Model.WordInPhrase", b =>
+                {
+                    b.HasOne("API.Model.Phrase", "InPhrase")
+                        .WithMany("HasWordsInPhrase")
+                        .HasForeignKey("InPhraseId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("API.Model.Word", "Word")
+                        .WithMany("AppearsInPhrases")
+                        .HasForeignKey("WordId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("InPhrase");
+
+                    b.Navigation("Word");
+                });
+
             modelBuilder.Entity("API.Model.WordTranslation", b =>
                 {
                     b.HasOne("API.Model.Dictionary", "Dictionary")
@@ -506,7 +574,15 @@ namespace API.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("API.Model.Word", "FromWord")
+                        .WithMany("Translations")
+                        .HasForeignKey("FromWordId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Dictionary");
+
+                    b.Navigation("FromWord");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -545,7 +621,7 @@ namespace API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WordsInPhrase", b =>
+            modelBuilder.Entity("PhraseWord", b =>
                 {
                     b.HasOne("API.Model.Phrase", null)
                         .WithMany()
@@ -584,6 +660,20 @@ namespace API.Data.Migrations
             modelBuilder.Entity("API.Model.Language", b =>
                 {
                     b.Navigation("Dictionaries");
+                });
+
+            modelBuilder.Entity("API.Model.Phrase", b =>
+                {
+                    b.Navigation("HasWordsInPhrase");
+
+                    b.Navigation("Translations");
+                });
+
+            modelBuilder.Entity("API.Model.Word", b =>
+                {
+                    b.Navigation("AppearsInPhrases");
+
+                    b.Navigation("Translations");
                 });
 #pragma warning restore 612, 618
         }

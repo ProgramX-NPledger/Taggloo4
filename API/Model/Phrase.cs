@@ -63,6 +63,7 @@ public class Phrase
 	/// </summary>
 	[MaxLength(32)]
 	public string? ExternalId { get; set; }
-	
-	
+
+	public ICollection<WordInPhrase> HasWordsInPhrase { get; set; } = new List<WordInPhrase>();
 }
+	
