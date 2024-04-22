@@ -1,14 +1,8 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using API.Contract;
-using API.Data;
-using API.Helper;
+﻿using API.Contract;
 using API.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Taggloo4.Dto;
 
 namespace API.Controllers;
