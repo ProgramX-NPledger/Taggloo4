@@ -234,7 +234,8 @@ public class WordsController : BaseApiController
 			TheWord = createWord.Word,
 			DictionaryId = createWord.DictionaryId,
 			ExternalId = createWord.ExternalId ?? Guid.NewGuid().ToString(),
-			Phrases = new Collection<Phrase>()
+			Phrases = new Collection<Phrase>(),
+			Translations = new Collection<WordTranslation>()
 		};
 
 		_wordRepository.Create(newWord);

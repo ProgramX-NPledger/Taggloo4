@@ -45,7 +45,10 @@ public class Word
 	/// </summary>
 	public int DictionaryId { get; set; }
 
-	public ICollection<WordTranslation> Translations { get; set; }
+	/// <summary>
+	/// Translations of the Word.
+	/// </summary>
+	public required ICollection<WordTranslation> Translations { get; set; } = new List<WordTranslation>();
 
 	/// <summary>
 	/// Phrases in which this Word appears.
