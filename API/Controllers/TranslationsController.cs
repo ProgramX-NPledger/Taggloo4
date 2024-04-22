@@ -27,9 +27,10 @@ public class TranslationsController : BaseApiController
 	/// <summary>
 	/// Constructor with injected parameters.
 	/// </summary>
-	/// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
-	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
-	/// <param name="translationRepository">Implementation of <seealso cref="ITranslationRepository"/>.</param>
+	/// <param name="wordRepository">Implementation of <see cref="IWordRepository"/>.</param>
+	/// <param name="phraseRepository">Implementation of <see cref="IPhraseRepository"/>.</param>
+	/// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
+	/// <param name="translationRepository">Implementation of <see cref="ITranslationRepository"/>.</param>
 	public TranslationsController(IWordRepository wordRepository, 
 		IPhraseRepository phraseRepository,
 		IDictionaryRepository dictionaryRepository,

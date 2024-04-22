@@ -48,14 +48,15 @@ public class PhraseRepository : IPhraseRepository
 	}
 
 	/// <summary>
-	/// Retrieves all matching <seealso cref="Phrase"/>s within a <seealso cref="Dictionary"/>.
+	/// Retrieves a all matching <seealso cref="Phrase"/>s within a <seealso cref="Dictionary"/>.
 	/// </summary>
-	/// <param name="phrase">Phrase to match within the <seealso cref="Dictionary"/>.</param>
+	/// <param name="phrase">Word to match within the <seealso cref="Dictionary"/>.</param>
 	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
 	/// <param name="containingText">Filters response for presence of text (collation as per database).</param>
-	/// <param name="externalId">An externally determined identifier.</param>
+	/// <param name="externalId">If specified, filters using an externally determined identifier.</param>
+	/// <param name="languageCode">If specified, filters within Dictionaries for the IETF Language Tag.</param>
 	/// <returns>A collection of matching <seealso cref="Phrase"/>s within the <seealso cref="Dictionary"/>.</returns>
-	public async Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId, string? containingText, string? externalId, string languageCode)
+	public async Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId, string? containingText, string? externalId, string? languageCode)
 	{
 		IQueryable<Phrase> query = _dataContext.Phrases.Include("Dictionary").AsQueryable();
 		if (!string.IsNullOrWhiteSpace(phrase))

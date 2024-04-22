@@ -17,7 +17,10 @@ public class WordTranslation
 	/// </summary>
 	public int FromWordId { get; set; }
 	
-	public Word FromWord { get; set; }
+	/// <summary>
+	/// Word being translated.
+	/// </summary>
+	public Word? FromWord { get; set; }
 	
 	/// <summary>
 	/// The identifier of the <seealso cref="Word"/> translation.
