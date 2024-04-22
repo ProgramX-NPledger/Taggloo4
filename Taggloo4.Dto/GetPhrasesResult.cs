@@ -30,4 +30,8 @@ public class GetPhrasesResult
 	/// </summary>
 	public IEnumerable<Link>? Links { get; set; }
 	
+	/// <summary>
+	/// Time for request in milliseconds.
+	/// </summary>
+	public double DeltaMs { get; set; }
 }
