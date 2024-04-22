@@ -93,7 +93,8 @@ public class WordsController : BaseApiController
 	public async Task<ActionResult<GetWordsResult>> GetWords(string? word, 
 		int? dictionaryId, 
 		string? externalId,
-		int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
+		int offsetIndex=Defaults.OffsetIndex, 
+		int pageSize = Defaults.MaxItems)
 	{
 		AssertApiConstraints(pageSize);
 
@@ -137,7 +138,9 @@ public class WordsController : BaseApiController
 
 		decimal numberOfPages = Math.Ceiling(words.Count()/(decimal)pageSize);
 		decimal offsetIndexOfLastPage = numberOfPages * pageSize;
-		
+		decimal remainder = numberOfPages % pageSize;
+		offsetIndexOfLastPage -= remainder;
+
 		if (offsetIndexOfLastPage <= words.Count())
 		{
 			links.Add(new Link()

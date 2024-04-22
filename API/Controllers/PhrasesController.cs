@@ -97,8 +97,60 @@ public class PhrasesController : BaseApiController
 	{
 		AssertApiConstraints(pageSize);
 		
+		DateTime start = DateTime.Now;
+		
 		IEnumerable<Phrase> phrases = (await _phraseRepository.GetPhrasesAsync(phrase, dictionaryId,null, externalId, ietfLanguageTag)).ToArray();
 
+		List<Link> links = new List<Link>();
+		links.Add(new Link()
+		{
+			Action = "get",
+			Rel = "self",
+			Types = new[] { JSON_MIME_TYPE },
+			HRef = BuildPageNavigationUrl(phrase,dictionaryId, externalId, ietfLanguageTag,offsetIndex, pageSize)
+		});
+		if (offsetIndex > 0)
+		{
+			if (offsetIndex - pageSize < 0)
+			{
+				// previous page, but offset was incorrect
+				links.Add(new Link()
+				{
+					Action = "get",
+					Rel = "previouspage",
+					HRef = BuildPageNavigationUrl(phrase, dictionaryId, externalId, ietfLanguageTag,0, pageSize),
+					Types = new[] { JSON_MIME_TYPE }
+				});
+			}
+			else
+			{
+				links.Add(new Link()
+				{
+					Action = "get",
+					Rel = "previouspage",
+					HRef = BuildPageNavigationUrl(phrase, dictionaryId, externalId, ietfLanguageTag,offsetIndex - pageSize, pageSize),
+					Types = new [] { JSON_MIME_TYPE }
+				});
+			}
+
+		}
+		
+		decimal numberOfPages = Math.Ceiling(phrases.Count()/(decimal)pageSize);
+		decimal offsetIndexOfLastPage = numberOfPages * pageSize;
+		decimal remainder = numberOfPages % pageSize;
+		offsetIndexOfLastPage -= remainder;
+
+		if (offsetIndexOfLastPage <= phrases.Count())
+		{
+			links.Add(new Link()
+			{
+				Action = "get",
+				Rel = "nextpage",
+				HRef = BuildPageNavigationUrl(phrase, dictionaryId, externalId, ietfLanguageTag, offsetIndex + pageSize, pageSize),
+				Types = new [] { JSON_MIME_TYPE }
+			});
+		}
+		
 		GetPhrasesResult getPhrasesResult = new GetPhrasesResult()
 		{
 			Results = phrases.Skip(offsetIndex).Take(pageSize).Select(p => new GetPhraseResultItem()
@@ -135,23 +187,26 @@ public class PhrasesController : BaseApiController
 					Types = new []{ JSON_MIME_TYPE}
 				}))
 			}),
-			Links = new[]
-			{
-				new Link()
-				{
-					Action = "get",
-					Rel = "self",
-					Types = new[] { JSON_MIME_TYPE },
-					HRef = $"{GetBaseApiPath()}/phrases?phrase={phrase}&offsetIndex={offsetIndex}&pageSize={pageSize}"
-				}
-			},
+			Links = links.ToArray(),
 			FromIndex = offsetIndex,
 			PageSize = pageSize,
-			TotalItemsCount = phrases.Count()
+			TotalItemsCount = phrases.Count(),
+			DeltaMs = (DateTime.Now-start).TotalMilliseconds
 		};
 		return getPhrasesResult;
 	}
 	
+	private string BuildPageNavigationUrl(string? phrase, int? dictionaryId, string? externalId, string? ietfLanguageTag,  int offsetIndex, int pageSize)
+	{
+		StringBuilder sb = new StringBuilder(GetBaseApiPath()+"/phrases?");
+		if (!string.IsNullOrWhiteSpace(phrase)) sb.Append($"phrase={phrase}&");
+		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&)");
+		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId]={externalId}&");
+		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={ietfLanguageTag}");
+		sb.Append($"offsetIndex={offsetIndex}");
+		if (pageSize != Defaults.MaxItems) sb.Append($"&pageSize={pageSize}");
+		return sb.ToString();
+	}
 	
     /// <summary>
 	/// Creates a new Phrase.
