@@ -7,6 +7,9 @@ using Taggloo4.Model.Exceptions;
 
 namespace API.Jobs;
 
+/// <summary>
+/// Job to allow reindexing of database items.
+/// </summary>
 public class ReindexJob
 {
 	private readonly ILanguageRepository _languageRepository;

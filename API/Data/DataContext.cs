@@ -47,6 +47,9 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// </summary>
 	public DbSet<PhraseTranslation> PhraseTranslations { get; set; }
 
+	/// <summary>
+	/// Words in Phrases.
+	/// </summary>
 	public DbSet<WordInPhrase> WordsInPhrases { get; set; }
 	
 	/// <summary>

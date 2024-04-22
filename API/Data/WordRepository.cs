@@ -92,6 +92,12 @@ public class WordRepository : IWordRepository
 			.SingleOrDefaultAsync(q => q.Id == id);
 	}
 
+	/// <summary>
+	/// Retrieves matching <see cref="WordInPhrase"/> items.
+	/// </summary>
+	/// <param name="wordId">The ID of the <see cref="Word"/>.</param>
+	/// <param name="phraseId">The ID of the <see cref="Phrase"/>.</param>
+	/// <returns>A collection of matching <see cref="WordInPhrase"/>s.</returns>
 	public async Task<IEnumerable<WordInPhrase>> GetPhrasesForWordAsync(int wordId, int phraseId)
 	{
 		return await _dataContext.WordsInPhrases
@@ -101,6 +107,10 @@ public class WordRepository : IWordRepository
 			.ToArrayAsync();
 	}
 
+	/// <summary>
+	/// Adds a <see cref="WordInPhrase"/>, representing the <see cref="Word"/> appearing in a <see cref="Phrase"/>.
+	/// </summary>
+	/// <param name="wordInPhrase">The created <see cref="WordInPhrase"/> item.</param>
 	public void AddPhraseForWord(WordInPhrase wordInPhrase)
 	{
 		_dataContext.WordsInPhrases.Add(wordInPhrase);
