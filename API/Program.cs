@@ -147,4 +147,9 @@ if (string.IsNullOrWhiteSpace(enforceDatabaseSizeCron))
     throw new NullReferenceException("Configuration Database:SizeManagement:CheckEvery must be specified");
 RecurringJob.AddOrUpdate<EnforceDatabaseSizeJob>("databaseSize",job => job.EnforceDatabaseSize(), enforceDatabaseSizeCron);
 
+string? reindexCron = app.Configuration["Index:ReIndex:Every"];
+if (string.IsNullOrWhiteSpace(reindexCron))
+    throw new NullReferenceException("Configuration Index:ReIndex.Every must be specified");
+RecurringJob.AddOrUpdate<ReindexJob>("reindexJob",job=>job.Reindex(),reindexCron);
+
 app.Run();

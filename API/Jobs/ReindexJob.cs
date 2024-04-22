@@ -15,53 +15,60 @@ public class ReindexJob
 	private readonly IDictionaryRepository _dictionaryRepository;
 	private readonly IWordInPhraseRepository _wordInPhraseRepository;
 
-	public ReindexJob()
-	{
-		
-	}
-	
-	public ReindexJob(ILanguageRepository _languageRepository,
+
+	/// <summary>
+	/// Reindexes the database for performant querying.
+	/// </summary>
+	/// <param name="languageRepository">Implementation of <see cref="ILanguageRepository"/>.</param>
+	/// <param name="wordRepository">Implementation of <see cref="IWordRepository"/>.</param>
+	/// <param name="phraseRepository">Implementation of <see cref="IPhraseRepository"/>.</param>
+	/// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
+	/// <param name="wordInPhraseRepository">Implementation of <see cref="IWordInPhraseRepository"/>.</param>
+	public ReindexJob(ILanguageRepository languageRepository,
 		IWordRepository wordRepository,
 	    IPhraseRepository phraseRepository,
 	    IDictionaryRepository dictionaryRepository,
 		IWordInPhraseRepository wordInPhraseRepository)
 	{
-		this._languageRepository = _languageRepository;
+		this._languageRepository = languageRepository;
 		_wordRepository = wordRepository;
 		_phraseRepository = phraseRepository;
 		_dictionaryRepository = dictionaryRepository;
 		_wordInPhraseRepository = wordInPhraseRepository;
 	}
 
-	
-    public async void ReindexAsync(string remoteHostAddress,
-	    string? currentUserName,
-	    string theWord,
-	    Guid importGuid,
-	    DateTime? timeStamp=null)
+	/// <summary>
+	/// Executes re-indexing of the database.
+	/// </summary>
+	/// <remarks>This method is not async because Hangfire does not support asynchronous tasks.</remarks>
+    public void Reindex()
     {
 	    // for each language
-	    IEnumerable<Language> allLanguages = await _languageRepository.GetAllLanguagesAsync();
+	    IEnumerable<Language> allLanguages = _languageRepository.GetAllLanguagesAsync().Result;
 
 	    foreach (Language language in allLanguages)
 	    {
-		    IEnumerable<Dictionary> allDictionariesInLanguage = await _dictionaryRepository.GetDictionariesAsync(null, language.IetfLanguageTag);
+		    IEnumerable<Dictionary> allDictionariesInLanguage = _dictionaryRepository.GetDictionariesAsync(null, language.IetfLanguageTag).Result;
 
 		    foreach (Dictionary dictionary in allDictionariesInLanguage)
 		    {
-			    IEnumerable<Phrase> allPhrasesInDictionary = await _phraseRepository.GetPhrasesAsync(null, dictionary.Id, null, null, null);
+			    IEnumerable<Phrase> allPhrasesInDictionary = _phraseRepository.GetPhrasesAsync(null, dictionary.Id, null, null, null).Result;
 
 			    foreach (Phrase phrase in allPhrasesInDictionary)
 			    {
 				    // break apart phrase into words
 				    string[] words = phrase.ThePhrase.Split(new char[] { ' ' }).Select(q => q.Trim()).ToArray();
 
+				    int ordinal = 0;
 				    foreach (string wordString in words)
 				    {
-					    IList<Word> matchingWords = (await _wordRepository.GetWordsAsync(wordString, dictionary.Id, null)).ToList();
+					    ordinal++;
+					    
+					    IList<Word> matchingWords = _wordRepository.GetWordsAsync(wordString, dictionary.Id, null).Result.ToList();
 					    if (!matchingWords.Any())
 					    {
 						    // no matching words, so create it and add it to the collection
+						    // BUG: This is attempting to create multiple Words within the same Dictionary
 						    Word newWord = new Word()
 						    {
 							    CreatedAt = DateTime.Now,
@@ -71,19 +78,16 @@ public class ReindexJob
 							    Dictionary = dictionary
 						    };
 						    _wordRepository.Create(newWord);
-						    await _wordRepository.SaveAllAsync();
+						    _wordRepository.SaveAllAsync().Wait();
 						    matchingWords.Add(newWord);
 					    }
-
-					    int ordinal = 0;
+					    
 					    foreach (Word word in matchingWords)
 					    {
-						    ordinal++;
-						    
 						    // there should only be one word in the collection, but if there are >1, they are all relevant
 										
 						    // is there already a WordInPhrase entry?
-						    IEnumerable<WordInPhrase> wordInPhrases = await _wordRepository.GetPhrasesForWordAsync(word.Id);
+						    IEnumerable<WordInPhrase> wordInPhrases = _wordRepository.GetPhrasesForWordAsync(word.Id,phrase.Id).Result;
 
 						    if (!wordInPhrases.Any())
 						    {
@@ -98,7 +102,7 @@ public class ReindexJob
 								    InPhrase = phrase
 							    };
 							    _wordRepository.AddPhraseForWord(newWordInPhrase);
-							    await _wordRepository.SaveAllAsync();
+							    _wordRepository.SaveAllAsync().Wait();
 						    }
 					    } // foreach Word
 				    } // foreach wordString
@@ -106,19 +110,19 @@ public class ReindexJob
 		    }// foreach Dictionary
 	    }// foreach Language
 
-	    IEnumerable<WordInPhrase> wordsInPhrases = await _wordInPhraseRepository.GetWordsInPhrasesAsync();
+	    IEnumerable<WordInPhrase> wordsInPhrases = _wordInPhraseRepository.GetWordsInPhrasesAsync().Result;
 	    foreach (WordInPhrase wordInPhrase in wordsInPhrases)
 	    {
 		    int recordsAffected = 0;
 		    
-		    Word? word = await _wordRepository.GetByIdAsync(wordInPhrase.WordId);
+		    Word? word = _wordRepository.GetByIdAsync(wordInPhrase.WordId).Result;
 		    if (word == null)
 		    {
 			    _wordInPhraseRepository.Remove(wordInPhrase);
 			    recordsAffected++;
 		    }
 
-		    Phrase? phrase = await _phraseRepository.GetByIdAsync(wordInPhrase.InPhraseId);
+		    Phrase? phrase = _phraseRepository.GetByIdAsync(wordInPhrase.InPhraseId).Result;
 		    if (phrase == null)
 		    {
 			    _wordInPhraseRepository.Remove(wordInPhrase);
@@ -138,7 +142,7 @@ public class ReindexJob
 			
 		    if (recordsAffected > 0)
 		    {
-			    await _wordInPhraseRepository.SaveChangesAsync();
+			    _wordInPhraseRepository.SaveAllAsync().Wait();
 		    }
 	    }
 	    

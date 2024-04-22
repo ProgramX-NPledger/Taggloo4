@@ -26,7 +26,7 @@ public class WordInPhraseRepository : IWordInPhraseRepository
         _dataContext.WordsInPhrases.Remove(wordInPhrase);
     }
 
-    public async Task<bool> SaveChangesAsync()
+    public async Task<bool> SaveAllAsync()
     {
         return await _dataContext.SaveChangesAsync() > 0;
     }

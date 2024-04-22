@@ -9,7 +9,7 @@ public interface IWordInPhraseRepository
 {
 	Task<IEnumerable<WordInPhrase>> GetWordsInPhrasesAsync();
 	void Remove(WordInPhrase wordInPhrase);
-	Task<bool> SaveChangesAsync();
+	Task<bool> SaveAllAsync();
 	
 
 }

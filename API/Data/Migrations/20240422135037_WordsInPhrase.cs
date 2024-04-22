@@ -15,30 +15,6 @@ namespace API.Data.Migrations
                 name: "WordsInPhrase");
 
             migrationBuilder.CreateTable(
-                name: "PhraseWord",
-                columns: table => new
-                {
-                    PhrasesId = table.Column<int>(type: "int", nullable: false),
-                    WordsId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PhraseWord", x => new { x.PhrasesId, x.WordsId });
-                    table.ForeignKey(
-                        name: "FK_PhraseWord_Phrases_PhrasesId",
-                        column: x => x.PhrasesId,
-                        principalTable: "Phrases",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PhraseWord_Words_WordsId",
-                        column: x => x.WordsId,
-                        principalTable: "Words",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "WordsInPhrases",
                 columns: table => new
                 {
@@ -75,11 +51,6 @@ namespace API.Data.Migrations
                 name: "IX_PhraseTranslations_FromPhraseId",
                 table: "PhraseTranslations",
                 column: "FromPhraseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PhraseWord_WordsId",
-                table: "PhraseWord",
-                column: "WordsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WordsInPhrases_InPhraseId",
