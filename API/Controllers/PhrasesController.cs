@@ -127,7 +127,13 @@ public class PhrasesController : BaseApiController
 						Types = new[] { JSON_MIME_TYPE },
 						HRef = $"{GetBaseApiPath()}/dictionaries/{p.DictionaryId}"
 					}
-				}
+				}.Union(p.Translations.Select(t=>new Link()
+				{
+					Action = "get",
+					Rel = "translation",
+					HRef = $"{GetBaseApiPath()}/phrases/{t.ToPhraseId}",
+					Types = new []{ JSON_MIME_TYPE}
+				}))
 			}),
 			Links = new[]
 			{

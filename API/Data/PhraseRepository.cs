@@ -58,7 +58,11 @@ public class PhraseRepository : IPhraseRepository
 	/// <returns>A collection of matching <seealso cref="Phrase"/>s within the <seealso cref="Dictionary"/>.</returns>
 	public async Task<IEnumerable<Phrase>> GetPhrasesAsync(string? phrase, int? dictionaryId, string? containingText, string? externalId, string? languageCode)
 	{
-		IQueryable<Phrase> query = _dataContext.Phrases.Include("Dictionary").AsQueryable();
+		IQueryable<Phrase> query = _dataContext.Phrases
+			.Include("Translations")
+			.Include("Dictionary")
+			.AsQueryable();
+		
 		if (!string.IsNullOrWhiteSpace(phrase))
 		{
 			query = query.Where(q => q.ThePhrase == phrase);
