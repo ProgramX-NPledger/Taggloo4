@@ -1,20 +1,11 @@
 ﻿using System.Collections.ObjectModel;
-using System.Security.Cryptography;
 using System.Text;
 using API.Contract;
-using API.Data;
-using API.Helper;
-using API.Jobs;
 using API.Model;
-using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Taggloo4.Dto;
-using Taggloo4.Model.Exceptions;
 
 namespace API.Controllers;
 

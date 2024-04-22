@@ -1,9 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using System.Transactions;
-using API.Contract;
-using API.Data;
-using API.Helper;
+﻿using System.Transactions;
 using API.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -91,8 +86,6 @@ public class UsersController : BaseApiController
 	[Authorize(Roles="administrator")]
 	public async Task<ActionResult<CreateUserResult>> CreateUser(CreateUser createUser)
 	{
-		if (!PasswordStrength.IsPasswordStrongEnough(createUser.Password)) return BadRequest("Password does not meet minimum strength requirements");
-		
 		if (await IsUserExisting(createUser.UserName)) return BadRequest("UserName already in use");
 		
 		AppUser newUser = new AppUser()
