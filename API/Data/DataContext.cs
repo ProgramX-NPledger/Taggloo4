@@ -51,6 +51,12 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// Words in Phrases.
 	/// </summary>
 	public DbSet<WordInPhrase> WordsInPhrases { get; set; }
+
+	/// <summary>
+	/// Reindexing Jobs
+	/// </summary>
+	public DbSet<ReindexingJob> ReindexingJobs { get; set; }
+	
 	
 	/// <summary>
 	/// Constructor with options parameter.

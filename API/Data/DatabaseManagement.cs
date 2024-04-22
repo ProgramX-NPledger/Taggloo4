@@ -1,4 +1,5 @@
 ﻿using API.Contract;
+using API.Model;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -100,6 +101,86 @@ public class DatabaseManagement : IDatabaseManagement
 
             return recordsAffected;
         }
+    }
+
+    /// <summary>
+    /// Retrieves Reindexing Jobs.
+    /// </summary>
+    /// <param name="isActive">When specified, filters by status of execution status.</param>
+    /// <returns>A collection of <see cref="ReindexingJob"/> items.</returns>
+    public async Task<IEnumerable<ReindexingJob>> GetReindexingJobsAsync(bool? isActive)
+    {
+        IQueryable<ReindexingJob> query = _dataContext.ReindexingJobs;
+
+        if (isActive.HasValue)
+        {
+            query = query.Where(q => !q.FinishedAt.HasValue);
+        }
+
+        query = query.OrderBy(q => q.StartedAt);
+        return await query.ToArrayAsync();
+    }
+
+    /// <summary>
+    /// Marks a re-indexing job as being started.
+    /// </summary>
+    /// <param name="userName">Username of starting user.</param>
+    /// <param name="hostName">Name of machine on which job was started.</param>
+    /// <returns>The identifier of the reindexing job.</returns>
+    public async Task<int> StartReindexingJobAsync(string userName, string hostName)
+    {
+        ReindexingJob newReindexingJob = new ReindexingJob()
+        {
+            StartedOn = hostName,
+            StartedByUserName = userName,
+            StartedAt = DateTime.Now
+        };
+        _dataContext.ReindexingJobs.Add(newReindexingJob);
+        int recordsAffected=await _dataContext.SaveChangesAsync();
+        if (recordsAffected > 0)
+        {
+            return newReindexingJob.Id;
+        }
+
+        throw new InvalidOperationException(
+            $"Expected 1 record to be updated when marking Reindexing Job as being started but none were");
+    }
+
+    /// <summary>
+    /// Marks a re-indexing job as being completed.
+    /// </summary>
+    /// <param name="reindexingJobId">The identifier of the job to complete. This is provided by the <see cref="StartReindexingJob"/> function.</param>
+    /// <param name="numberOfLanguagesProcessed">Number of <see cref="Language"/>s processed.</param>
+    /// <param name="numberOfDictionariesProcessed">Number of <see cref="Dictionary"/> items processed.</param>
+    /// <param name="numberOfPhrasesProcessed">Number of <see cref="Phrase"/>s processed.</param>
+    /// <param name="numberOfWordsProcessed">Number of <see cref="Word"/>s processed.</param>
+    /// <param name="numberOfWordsCreated">Number of <see cref="Word"/>s that were created.</param>
+    /// <param name="numberOfWordsInPhrasesCreated">Number of <see cref="WordInPhrase"/> items created.</param>
+    /// <param name="numberOfWordsInPhrasesRemoved">Number of <see cref="WordInPhrase"/> items removed due to removal of links.</param>
+    /// <returns><c>True</c> if successful.</returns>
+    public async Task<bool> CompleteReindexingJobAsync(int reindexingJobId, int numberOfLanguagesProcessed, int numberOfDictionariesProcessed,
+        int numberOfPhrasesProcessed, int numberOfWordsProcessed, int numberOfWordsCreated,
+        int numberOfWordsInPhrasesCreated, int numberOfWordsInPhrasesRemoved)
+    {
+        ReindexingJob? reindexingJob =
+            await _dataContext.ReindexingJobs.SingleOrDefaultAsync(q => q.Id == reindexingJobId);
+        if (reindexingJob == null)
+        {
+            throw new InvalidOperationException(
+                $"Cannot mark non-existent Reindexing Job (ID: {reindexingJobId}) as Complete");
+        }
+        
+        reindexingJob.FinishedAt=DateTime.Now;
+        reindexingJob.NumberOfLanguagesProcessed = numberOfLanguagesProcessed;
+        reindexingJob.NumberOfDictionariesProcessed = numberOfDictionariesProcessed;
+        reindexingJob.NumberOfPhrasesProcessed = numberOfPhrasesProcessed;
+        reindexingJob.NumberOfWordProcessed = numberOfWordsProcessed;
+        reindexingJob.NumberOfWordsCreated = numberOfWordsCreated;
+        reindexingJob.NumberOfWordsInPhrasesCreated = numberOfWordsInPhrasesCreated;
+        reindexingJob.NumberOfWordsInPhrasesRemoved = numberOfWordsInPhrasesRemoved;
+        _dataContext.ReindexingJobs.Update(reindexingJob);
+        int recordsAffected = await _dataContext.SaveChangesAsync();
+        return recordsAffected > 0;
     }
 
     /// <summary>

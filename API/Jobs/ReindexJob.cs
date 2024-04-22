@@ -17,6 +17,7 @@ public class ReindexJob
 	private readonly IPhraseRepository _phraseRepository;
 	private readonly IDictionaryRepository _dictionaryRepository;
 	private readonly IWordInPhraseRepository _wordInPhraseRepository;
+	private readonly IDatabaseManagement _databaseManagement;
 
 
 	/// <summary>
@@ -27,17 +28,20 @@ public class ReindexJob
 	/// <param name="phraseRepository">Implementation of <see cref="IPhraseRepository"/>.</param>
 	/// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
 	/// <param name="wordInPhraseRepository">Implementation of <see cref="IWordInPhraseRepository"/>.</param>
+	/// <param name="databaseManagement">Implementation of <see cref="IDatabaseManagement"/>.</param>
 	public ReindexJob(ILanguageRepository languageRepository,
 		IWordRepository wordRepository,
 	    IPhraseRepository phraseRepository,
 	    IDictionaryRepository dictionaryRepository,
-		IWordInPhraseRepository wordInPhraseRepository)
+		IWordInPhraseRepository wordInPhraseRepository,
+		IDatabaseManagement databaseManagement)
 	{
 		this._languageRepository = languageRepository;
 		_wordRepository = wordRepository;
 		_phraseRepository = phraseRepository;
 		_dictionaryRepository = dictionaryRepository;
 		_wordInPhraseRepository = wordInPhraseRepository;
+		_databaseManagement = databaseManagement;
 	}
 
 	/// <summary>
@@ -46,6 +50,26 @@ public class ReindexJob
 	/// <remarks>This method is not async because Hangfire does not support asynchronous tasks.</remarks>
     public void Reindex()
     {
+	    // make sure there is not an indexing job currently running
+	    IEnumerable<ReindexingJob> activeReindexingJobs = _databaseManagement.GetReindexingJobsAsync(true).Result;
+	    if (activeReindexingJobs.Any())
+	    {
+		    throw new InvalidOperationException(
+			    $"Cannot execute multiple reindexing jobs concurrently. Currently executing IDs: {string.Join(", ", activeReindexingJobs.Select(q => q.Id).ToArray())}");
+	    }
+
+	    int reindexingJobId =
+		    _databaseManagement.StartReindexingJobAsync($"{Environment.UserDomainName}\\{Environment.UserName}",
+			    Environment.MachineName).Result;
+
+	    int numberOfLanguagesProcessed = 0;
+	    int numberOfDictionariesProcessed = 0;
+	    int numberOfPhrasesProcessed = 0;
+	    int numberOfWordsProcessed = 0;
+	    int numberOfWordsCreated = 0;
+	    int numberOfWordInPhrasesCreated = 0;
+	    int numberOfWordInPhrasesRemoved = 0;
+	    
 	    // for each language
 	    IEnumerable<Language> allLanguages = _languageRepository.GetAllLanguagesAsync().Result;
 
@@ -72,6 +96,8 @@ public class ReindexJob
 					    {
 						    // no matching words, so create it and add it to the collection
 						    // BUG: This is attempting to create multiple Words within the same Dictionary
+						    // also: https://learn.microsoft.com/en-gb/ef/core/dbcontext-configuration/#avoiding-dbcontext-threading-issues
+						    // use separate DbContext instances
 						    Word newWord = new Word()
 						    {
 							    CreatedAt = DateTime.Now,
@@ -83,6 +109,8 @@ public class ReindexJob
 						    _wordRepository.Create(newWord);
 						    _wordRepository.SaveAllAsync().Wait();
 						    matchingWords.Add(newWord);
+
+						    numberOfWordsCreated++;
 					    }
 					    
 					    foreach (Word word in matchingWords)
@@ -106,11 +134,21 @@ public class ReindexJob
 							    };
 							    _wordRepository.AddPhraseForWord(newWordInPhrase);
 							    _wordRepository.SaveAllAsync().Wait();
+
+							    numberOfWordInPhrasesCreated++;
 						    }
+
+						    numberOfWordsProcessed++;
 					    } // foreach Word
 				    } // foreach wordString
+
+				    numberOfPhrasesProcessed++;
 			    }// foreach Phrase
+
+			    numberOfDictionariesProcessed++;
 		    }// foreach Dictionary
+
+		    numberOfLanguagesProcessed++;
 	    }// foreach Language
 
 	    IEnumerable<WordInPhrase> wordsInPhrases = _wordInPhraseRepository.GetWordsInPhrasesAsync().Result;
@@ -146,9 +184,21 @@ public class ReindexJob
 		    if (recordsAffected > 0)
 		    {
 			    _wordInPhraseRepository.SaveAllAsync().Wait();
+
+			    numberOfWordInPhrasesRemoved += recordsAffected;
 		    }
 	    }
-	    
+
+	    _databaseManagement.CompleteReindexingJobAsync(reindexingJobId,
+		    numberOfLanguagesProcessed,
+		    numberOfDictionariesProcessed,
+		    numberOfPhrasesProcessed,
+		    numberOfWordsProcessed,
+		    numberOfWordsCreated,
+		    numberOfDictionariesProcessed,
+		    numberOfWordInPhrasesRemoved
+		    );
+
     }
 
 
