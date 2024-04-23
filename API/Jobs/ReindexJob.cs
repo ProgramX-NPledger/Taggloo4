@@ -129,7 +129,11 @@ public class ReindexJob
 				foreach (Phrase phrase in allPhrasesInDictionary)
 			    {
 				    // break apart phrase into words
-				    string[] words = phrase.ThePhrase.Split(new char[] { ' ' }).Select(q => q.Trim()).Where(q=>!string.IsNullOrWhiteSpace(q)).ToArray();
+				    string[] words = phrase.ThePhrase
+					    .Split(new char[] { ' ' })
+					    .Select(q => q.Trim())
+					    .Where(q=>!string.IsNullOrWhiteSpace(q))
+					    .ToArray();
 
 				    int ordinal = 0;
 				    foreach (string wordString in words)
