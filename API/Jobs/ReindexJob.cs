@@ -171,12 +171,12 @@ public class ReindexJob
 						    // there should only be one word in the collection, but if there are >1, they are all relevant
 										
 						    // is there already a WordInPhrase entry?
-						    IEnumerable<WordInPhrase> wordInPhrases = _wordRepository.GetPhrasesForWordAsync(word.Id,phrase.Id).Result;
+						    IEnumerable<WordInPhrase> wordInPhrases = _wordRepository.GetPhrasesForWordAsync(word.Id,phrase.Id,ordinal).Result;
 
 						    if (!wordInPhrases.Any())
 						    {
-							    _logger.LogInformation("Creating a new WordInPhrase index because Word ID {wordId}/Phrase ID {phraseId} has not yet been indexed (Correlation ID: {reindexingJobId})",
-								    word.Id,phrase.Id,reindexingJobId);
+							    _logger.LogInformation("Creating a new WordInPhrase index because Word ID {wordId}/Phrase ID {phraseId} at ordinal {ordinal} has not yet been indexed (Correlation ID: {reindexingJobId})",
+								    word.Id,phrase.Id,ordinal,reindexingJobId);
 							    
 							    // if not, create
 							    WordInPhrase newWordInPhrase = new WordInPhrase()

@@ -97,13 +97,14 @@ public class WordRepository : IWordRepository
 	/// </summary>
 	/// <param name="wordId">The ID of the <see cref="Word"/>.</param>
 	/// <param name="phraseId">The ID of the <see cref="Phrase"/>.</param>
+	/// <param name="ordinal">The ordinal of the Word.</param>
 	/// <returns>A collection of matching <see cref="WordInPhrase"/>s.</returns>
-	public async Task<IEnumerable<WordInPhrase>> GetPhrasesForWordAsync(int wordId, int phraseId)
+	public async Task<IEnumerable<WordInPhrase>> GetPhrasesForWordAsync(int wordId, int phraseId, int ordinal)
 	{
 		return await _dataContext.WordsInPhrases
 			.Include("Word")
 			.Include("InPhrase")
-			.Where(q => q.WordId == wordId && q.InPhraseId==phraseId)
+			.Where(q => q.WordId == wordId && q.InPhraseId==phraseId && q.Ordinal==ordinal)
 			.ToArrayAsync();
 	}
 
