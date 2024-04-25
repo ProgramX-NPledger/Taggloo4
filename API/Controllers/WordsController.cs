@@ -207,7 +207,7 @@ public class WordsController : BaseApiController
 	{
 		StringBuilder sb = new StringBuilder(GetBaseApiPath()+"/words?");
 		if (!string.IsNullOrWhiteSpace(word)) sb.Append($"word={word}&");
-		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&)");
+		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&");
 		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId={externalId}&");
 		sb.Append($"offsetIndex={offsetIndex}&");
 		if (pageSize != Defaults.MaxItems) sb.Append($"pageSize={pageSize}");

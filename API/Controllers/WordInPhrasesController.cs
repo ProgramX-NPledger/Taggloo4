@@ -202,8 +202,8 @@ public class WordInPhrasesController : BaseApiController
 	private string BuildPageNavigationUrl(int? wordId, int? phraseId,  int offsetIndex, int pageSize)
 	{
 		StringBuilder sb = new StringBuilder(GetBaseApiPath() + "/wordInPhrases?");
-		if (wordId.HasValue) sb.Append($"wordId={wordId}&)");
-		if (phraseId.HasValue) sb.Append($"phraseId={phraseId}&)");
+		if (wordId.HasValue) sb.Append($"wordId={wordId}&");
+		if (phraseId.HasValue) sb.Append($"phraseId={phraseId}&");
 		sb.Append($"offsetIndex={offsetIndex}&");
 		if (pageSize != Defaults.MaxItems) sb.Append($"pageSize={pageSize}");
 		return sb.ToString();

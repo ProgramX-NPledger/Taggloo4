@@ -207,7 +207,7 @@ public class PhrasesController : BaseApiController
 	{
 		StringBuilder sb = new StringBuilder(GetBaseApiPath()+"/phrases?");
 		if (!string.IsNullOrWhiteSpace(phrase)) sb.Append($"phrase={phrase}&");
-		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&)");
+		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&");
 		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId={externalId}&");
 		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={ietfLanguageTag}&");
 		sb.Append($"offsetIndex={offsetIndex}&");
