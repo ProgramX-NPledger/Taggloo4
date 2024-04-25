@@ -104,7 +104,7 @@ public class DataContext : IdentityDbContext<AppUser,
 			.WithOne(wt => wt.Dictionary)
 			.HasForeignKey(wt => wt.DictionaryId)
 			.IsRequired();
-
+		
 		builder.Entity<Word>()
 			.HasIndex(a =>
 				new

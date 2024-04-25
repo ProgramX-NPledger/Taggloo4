@@ -209,7 +209,7 @@ public class ReindexJob
 
 	    _logger.LogInformation("Completed building index (Correlation ID {reindexingJobId})", reindexingJobId);
 	    
-	    IEnumerable<WordInPhrase> wordsInPhrases = _wordInPhraseRepository.GetWordsInPhrasesAsync().Result;
+	    IEnumerable<WordInPhrase> wordsInPhrases = _wordInPhraseRepository.GetWordsInPhrasesAsync(null,null).Result;
 	    foreach (WordInPhrase wordInPhrase in wordsInPhrases)
 	    {
 		    int recordsAffected = 0;

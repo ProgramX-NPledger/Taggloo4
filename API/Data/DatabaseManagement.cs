@@ -149,7 +149,7 @@ public class DatabaseManagement : IDatabaseManagement
     /// <summary>
     /// Marks a re-indexing job as being completed.
     /// </summary>
-    /// <param name="reindexingJobId">The identifier of the job to complete. This is provided by the <see cref="StartReindexingJob"/> function.</param>
+    /// <param name="reindexingJobId">The identifier of the job to complete. This is provided by the <see cref="StartReindexingJobAsync"/> function.</param>
     /// <param name="numberOfLanguagesProcessed">Number of <see cref="Language"/>s processed.</param>
     /// <param name="numberOfDictionariesProcessed">Number of <see cref="Dictionary"/> items processed.</param>
     /// <param name="numberOfPhrasesProcessed">Number of <see cref="Phrase"/>s processed.</param>

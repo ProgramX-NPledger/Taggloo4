@@ -58,6 +58,7 @@ public class WordRepository : IWordRepository
 	{
 		IQueryable<Word> query = _dataContext.Words
 			.Include("Translations")
+			.Include("AppearsInPhrases")
 			.Include("Dictionary")
 			.AsQueryable();
 		
@@ -89,6 +90,7 @@ public class WordRepository : IWordRepository
 		return await _dataContext.Words
 			.Include("Dictionary")
 			.Include("Translations")
+			.Include("AppearsInPhrases")
 			.SingleOrDefaultAsync(q => q.Id == id);
 	}
 
