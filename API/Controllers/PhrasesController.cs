@@ -34,7 +34,7 @@ public class PhrasesController : BaseApiController
 	/// <summary>
 	/// Return a phrase by ID.
 	/// </summary>
-	/// <param name="id">ID of thr Phrase to return.</param>
+	/// <param name="id">ID of the Phrase to return.</param>
 	/// <response code="200">Phrase returned.</response>
 	/// <response code="404">Phrase not found.</response>
 	[HttpGet("{id}")]
@@ -61,6 +61,13 @@ public class PhrasesController : BaseApiController
 					Action = "get",
 					Rel = "self",
 					HRef = $"{GetBaseApiPath()}/phrases/{phrase.Id}",
+					Types = new[] { JSON_MIME_TYPE }
+				},
+				new Link()
+				{
+					Action = "get",
+					Rel = "wordinphrases",
+					HRef = $"{GetBaseApiPath()}/wordinphrases?phraseid={phrase.Id}",
 					Types = new[] { JSON_MIME_TYPE }
 				}
 			}
@@ -171,6 +178,13 @@ public class PhrasesController : BaseApiController
 						Rel = "dictionary",
 						Types = new[] { JSON_MIME_TYPE },
 						HRef = $"{GetBaseApiPath()}/dictionaries/{p.DictionaryId}"
+					},
+					new Link()
+					{
+						Action = "get",
+						Rel = "wordinphrases",
+						Types = new[] { JSON_MIME_TYPE },
+						HRef = $"{GetBaseApiPath()}/wordinphrases?phraseid={p.Id}"
 					}
 				}.Union(p.Translations.Select(t=>new Link()
 				{
@@ -193,7 +207,7 @@ public class PhrasesController : BaseApiController
 	{
 		StringBuilder sb = new StringBuilder(GetBaseApiPath()+"/phrases?");
 		if (!string.IsNullOrWhiteSpace(phrase)) sb.Append($"phrase={phrase}&");
-		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&)");
+		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&");
 		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId={externalId}&");
 		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={ietfLanguageTag}&");
 		sb.Append($"offsetIndex={offsetIndex}&");

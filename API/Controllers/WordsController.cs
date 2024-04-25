@@ -63,6 +63,13 @@ public class WordsController : BaseApiController
 					Rel = "self",
 					HRef = $"{GetBaseApiPath()}/words/{word.Id}",
 					Types = new[] { JSON_MIME_TYPE }
+				},
+				new Link()
+				{
+					Action = "get",
+					Rel = "wordinphrases",
+					HRef = $"{GetBaseApiPath()}/wordinphrases?wordid={word.Id}",
+					Types = new[] { JSON_MIME_TYPE }
 				}
 			}
 		});
@@ -101,6 +108,7 @@ public class WordsController : BaseApiController
 			Types = new[] { JSON_MIME_TYPE },
 			HRef = BuildPageNavigationUrl(word,dictionaryId, externalId, offsetIndex, pageSize)
 		});
+		
 		if (offsetIndex > 0)
 		{
 			if (offsetIndex - pageSize < 0)
@@ -170,6 +178,13 @@ public class WordsController : BaseApiController
 						Rel = "dictionary",
 						Types = new[] { JSON_MIME_TYPE },
 						HRef = $"{GetBaseApiPath()}/dictionaries/{w.DictionaryId}"
+					},
+					new Link()
+					{
+						Action = "get",
+						Rel = "wordinphrases",
+						HRef = $"{GetBaseApiPath()}/wordinphrases?wordid={w.Id}",
+						Types = new[] { JSON_MIME_TYPE }
 					}
 				}.Union(w.Translations.Select(t=>new Link()
 				{
@@ -192,7 +207,7 @@ public class WordsController : BaseApiController
 	{
 		StringBuilder sb = new StringBuilder(GetBaseApiPath()+"/words?");
 		if (!string.IsNullOrWhiteSpace(word)) sb.Append($"word={word}&");
-		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&)");
+		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&");
 		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId={externalId}&");
 		sb.Append($"offsetIndex={offsetIndex}&");
 		if (pageSize != Defaults.MaxItems) sb.Append($"pageSize={pageSize}");

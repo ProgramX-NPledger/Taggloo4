@@ -46,6 +46,17 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// Phrase Translations
 	/// </summary>
 	public DbSet<PhraseTranslation> PhraseTranslations { get; set; }
+
+	/// <summary>
+	/// Words in Phrases.
+	/// </summary>
+	public DbSet<WordInPhrase> WordsInPhrases { get; set; }
+
+	/// <summary>
+	/// Reindexing Jobs
+	/// </summary>
+	public DbSet<ReindexingJob> ReindexingJobs { get; set; }
+	
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -93,7 +104,7 @@ public class DataContext : IdentityDbContext<AppUser,
 			.WithOne(wt => wt.Dictionary)
 			.HasForeignKey(wt => wt.DictionaryId)
 			.IsRequired();
-
+		
 		builder.Entity<Word>()
 			.HasIndex(a =>
 				new
@@ -123,11 +134,12 @@ public class DataContext : IdentityDbContext<AppUser,
 			.HasForeignKey(wt => wt.DictionaryId)
 			.IsRequired();
 
-		builder.Entity<Phrase>()
-			.HasMany(p => p.Words)
-			.WithMany(w => w.Phrases)
-			.UsingEntity("WordsInPhrase");
+		// builder.Entity<Phrase>()
+		// 	.HasMany(p => p.Words)
+		// 	.WithMany(w => w.Phrases)
+		// 	.UsingEntity("WordsInPhrase");
 		
+		// translations
 		
 		builder.Entity<Word>()
 			.HasMany(w => w.Translations)
@@ -140,13 +152,21 @@ public class DataContext : IdentityDbContext<AppUser,
 			.WithOne(pt => pt.FromPhrase)
 			.HasForeignKey(pt => pt.FromPhraseId)
 			.OnDelete(DeleteBehavior.NoAction);
-		//
-		// builder.Entity<Word>()
-		// 	.HasMany(w => w.Translations)
-		// 	.WithOne(wt => wt.ToWord)
-		// 	.HasForeignKey(wt => wt.ToWordId)
-		// 	.OnDelete(DeleteBehavior.NoAction);
 
+		// words in phrase
+
+		builder.Entity<Phrase>()
+			.HasMany(p => p.HasWordsInPhrase)
+			.WithOne(wip => wip.InPhrase)
+			.HasForeignKey(wip => wip.InPhraseId)
+			.OnDelete(DeleteBehavior.NoAction);
+
+		builder.Entity<Word>()
+			.HasMany(w => w.AppearsInPhrases)
+			.WithOne(wip => wip.Word)
+			.HasForeignKey(wip => wip.WordId)
+			.OnDelete(DeleteBehavior.NoAction);
+		
 
 	}
 }

@@ -60,5 +60,10 @@ public class Word
 	/// </summary>
 	[MaxLength(32)]
 	public string? ExternalId { get; set; }
-	
+
+	/// <summary>
+	/// Appearances of this Word in <see cref="Phrase"/>s.
+	/// </summary>
+	public ICollection<WordInPhrase> AppearsInPhrases { get; set; } = new List<WordInPhrase>();
+
 }
