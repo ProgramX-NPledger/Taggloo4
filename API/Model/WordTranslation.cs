@@ -16,8 +16,11 @@ public class WordTranslation
 	/// The identifier of the <seealso cref="Word"/> being translated.
 	/// </summary>
 	public int FromWordId { get; set; }
-	// this breaks migrations
-	//public Word FromWord { get; set; }
+	
+	/// <summary>
+	/// Word being translated.
+	/// </summary>
+	public Word? FromWord { get; set; }
 	
 	/// <summary>
 	/// The identifier of the <seealso cref="Word"/> translation.

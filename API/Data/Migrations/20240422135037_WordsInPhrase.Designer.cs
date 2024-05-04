@@ -4,6 +4,7 @@ using API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240422135037_WordsInPhrase")]
+    partial class WordsInPhrase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -262,54 +265,6 @@ namespace API.Data.Migrations
                     b.HasIndex("FromPhraseId");
 
                     b.ToTable("PhraseTranslations");
-                });
-
-            modelBuilder.Entity("API.Model.ReindexingJob", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("FinishedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("NumberOfDictionariesProcessed")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("NumberOfLanguagesProcessed")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("NumberOfPhrasesProcessed")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("NumberOfWordProcessed")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("NumberOfWordsCreated")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("NumberOfWordsInPhrasesCreated")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("NumberOfWordsInPhrasesRemoved")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("StartedByUserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StartedOn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ReindexingJobs");
                 });
 
             modelBuilder.Entity("API.Model.Word", b =>

@@ -52,6 +52,10 @@ public class PhraseTranslation
 	/// </summary>
 	public Dictionary? Dictionary { get; set; }
 	
+	/// <summary>
+	/// Phrase being translated.
+	/// </summary>
+	public Phrase? FromPhrase { get; set; }
 	
 	
 }

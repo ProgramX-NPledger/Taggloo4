@@ -52,15 +52,21 @@ public class Phrase
 	/// Words used in this Phrase.
 	/// </summary>
 	public ICollection<Word>? Words { get; set; }
-	
-	// this fails when building migrations
-//	public ICollection<WordTranslation> Translations { get; set; }
+
+	/// <summary>
+	/// Translations of the Phrase
+	/// </summary>
+	public ICollection<PhraseTranslation> Translations { get; set; } = new List<PhraseTranslation>();
 
 	/// <summary>
 	/// An external identifier that can be applied to the entity for ready identification.
 	/// </summary>
 	[MaxLength(32)]
 	public string? ExternalId { get; set; }
-	
-	
+
+	/// <summary>
+	/// Appearances of <see cref="Word"/>s in this Phrase.
+	/// </summary>
+	public ICollection<WordInPhrase> HasWordsInPhrase { get; set; } = new List<WordInPhrase>();
 }
+	

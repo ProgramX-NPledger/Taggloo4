@@ -1,14 +1,14 @@
 ﻿namespace Taggloo4.Dto;
 
 /// <summary>
-/// Result of a request for many Phrases.
+/// Result of a request for many Words in Phrases.
 /// </summary>
-public class GetPhrasesResult
+public class GetWordInPhrasesResult
 {
 	/// <summary>
 	/// Results of the query.
 	/// </summary>
-	public IEnumerable<GetPhraseResultItem> Results { get; set; } = Enumerable.Empty<GetPhraseResultItem>();
+	public IEnumerable<GetWordInPhraseResultItem> Results { get; set; } = Enumerable.Empty<GetWordInPhraseResultItem>();
 	
 	/// <summary>
 	/// The index from which results have been returned. This is 0-based.

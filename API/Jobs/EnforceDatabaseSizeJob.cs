@@ -59,7 +59,7 @@ public class EnforceDatabaseSizeJob
                 
             });
             
-            if (iterations>10 || recordsAffected == 0)
+            if (iterations>10 && recordsAffected == 0)
             {
                 // gone too far, likely will not be able to recover any more space
                 throw new InvalidOperationException(

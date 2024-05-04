@@ -41,6 +41,18 @@ public interface IWordRepository
 	/// <returns>The requested <seealso cref="Word"/>, or <c>null</c> if no Word could be found./</returns>
 	Task<Word?> GetByIdAsync(int id);
 
+	/// <summary>
+	/// Retrieves matching <see cref="WordInPhrase"/> items.
+	/// </summary>
+	/// <param name="wordId">The ID of the <see cref="Word"/>.</param>
+	/// <param name="phraseId">The ID of the <see cref="Phrase"/>.</param>
+	/// <param name="ordinal">The ordinal of the Word.</param>
+	/// <returns>A collection of matching <see cref="WordInPhrase"/>s.</returns>
+	Task<IEnumerable<WordInPhrase>> GetPhrasesForWordAsync(int wordId, int phraseId, int ordinal);
 
-
+	/// <summary>
+	/// Adds a <see cref="WordInPhrase"/>, representing the <see cref="Word"/> appearing in a <see cref="Phrase"/>.
+	/// </summary>
+	/// <param name="wordInPhrase">The created <see cref="WordInPhrase"/> item.</param>
+	void AddPhraseForWord(WordInPhrase wordInPhrase);
 }

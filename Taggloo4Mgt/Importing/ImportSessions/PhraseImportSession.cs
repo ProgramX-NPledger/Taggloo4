@@ -10,6 +10,7 @@ public class PhraseImportSession : IImportSession
 {
     private readonly IEnumerable<Phrase> _phrases;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public PhraseImportSession(IEnumerable<Phrase> phrases)
     {
         _phrases = phrases;
@@ -25,9 +26,18 @@ public class PhraseImportSession : IImportSession
     public event EventHandler<ImportMetricsEventArgs>? UpdateMetrics;
     public event EventHandler<ImportedEventArgs>? Imported;
     
-    public async Task Import(HttpClient httpClient, string languageCode, int dictionaryId, Dictionary<string, Dictionary<int, string>> originalIdsToImportIdsMap)
+    public async Task ImportAcrossDictionariesAsync(HttpClient httpClient, string languageCode1, int dictionary1Id, string languageCode2,
+	    int dictionary2Id)
     {
-        Phrase[] phrasesInLanguage =
+	    // words are simple, we can work with languages individually
+	    await ImportWithinDictionaryAsync(httpClient, languageCode1, dictionary1Id);
+	    await ImportWithinDictionaryAsync(httpClient, languageCode2, dictionary2Id);
+    }
+    
+    
+    private async Task ImportWithinDictionaryAsync(HttpClient httpClient, string languageCode, int dictionaryId)
+    {
+	    Phrase[] phrasesInLanguage =
         		    _phrases.Where(q => q.LanguageCode.Equals(languageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
         
         LogMessage?.Invoke(this,new ImportEventArgs()
@@ -36,43 +46,41 @@ public class PhraseImportSession : IImportSession
         	Indentation = 4
         });
         
-        
-        // for each Phrase in source
-        foreach (Phrase phraseInLanguage in phrasesInLanguage)
+        foreach (Phrase translation in phrasesInLanguage)
         {
         	DateTime startTimeStamp = DateTime.Now;
         	
         	LogMessage?.Invoke(this,new ImportEventArgs()
         	{
-        		LogMessage = $"{phraseInLanguage.ThePhrase}",
+        		LogMessage = $"{translation.ThePhrase}",
         		Indentation = 5
         	});
 
         	try
         	{
-		        // verify that word doesn't already exist
-		        bool phraseAlreadyExists = await IsPhraseExtant(httpClient, phraseInLanguage, dictionaryId);
+		       // verify that phrase doesn't already exist
+		        bool phraseAlreadyExists = await IsPhraseExtant(httpClient, translation, dictionaryId);
 		        if (!phraseAlreadyExists)
 		        {
-			        CreatePhraseResult createPhraseResult = await PostPhraseToTarget(httpClient, phraseInLanguage, dictionaryId);
+			        CreatePhraseResult createPhraseResult = await PostPhraseToTarget(httpClient, translation, dictionaryId, translation.LanguageCode);
 			        Imported?.Invoke(this,new ImportedEventArgs()
 			        {
 				        LanguageCode = languageCode,
-				        CurrentItem = phraseInLanguage.ThePhrase,
+				        CurrentItem = translation.ThePhrase,
 				        IsSuccess = true,
-				        SourceId = phraseInLanguage.ID
+				        SourceId = translation.ID
 			        });
 		        }
 		        else
 		        {
 			        throw new ImportException(
-				        $"Phrase '{phraseInLanguage}' already exists in Dictionary ID {dictionaryId}");
+				        $"Phrase '{translation}' already exists in Dictionary ID {dictionaryId}");
 		        }
         	}
         	catch (Exception ex)
         	{
         		await Console.Error.WriteLineAsync();
-        		await Console.Error.WriteLineAsync($"Failed to import Word '{phraseInLanguage.ThePhrase}'");
+        		await Console.Error.WriteLineAsync($"Failed to import Word '{translation.ThePhrase}'");
         		Exception? exPtr = ex;
         		do
         		{
@@ -87,7 +95,7 @@ public class PhraseImportSession : IImportSession
         		Imported?.Invoke(this,new ImportedEventArgs()
         		{
         			LanguageCode = languageCode,
-        			CurrentItem = phraseInLanguage.ThePhrase,
+        			CurrentItem = translation.ThePhrase,
         			IsSuccess = false
         		});
         	}
@@ -120,7 +128,7 @@ public class PhraseImportSession : IImportSession
 
 
     private async Task<CreatePhraseResult> PostPhraseToTarget(HttpClient httpClient, Phrase phrase,
-	    int dictionaryId)
+	    int dictionaryId, string ietfLanguageTag)
     {
 	    string url = "/api/v4/phrases";
 	    CreatePhrase createPhrase = new CreatePhrase()
@@ -129,7 +137,8 @@ public class PhraseImportSession : IImportSession
 		    DictionaryId = dictionaryId,
 		    CreatedAt = phrase.CreatedTimeStamp,
 		    CreatedByUserName = phrase.CreatedByUserName,
-		    ExternalId = $"Taggloo2-Phrase-{phrase.ID}"
+		    ExternalId = $"Taggloo2-Phrase-{phrase.ID}",
+		    IetfLanguageTag = ietfLanguageTag
 	    };
 		
 	    HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createPhrase);

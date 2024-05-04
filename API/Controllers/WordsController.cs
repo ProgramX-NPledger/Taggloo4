@@ -1,20 +1,11 @@
 ﻿using System.Collections.ObjectModel;
-using System.Security.Cryptography;
 using System.Text;
 using API.Contract;
-using API.Data;
-using API.Helper;
-using API.Jobs;
 using API.Model;
-using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Taggloo4.Dto;
-using Taggloo4.Model.Exceptions;
 
 namespace API.Controllers;
 
@@ -72,6 +63,13 @@ public class WordsController : BaseApiController
 					Rel = "self",
 					HRef = $"{GetBaseApiPath()}/words/{word.Id}",
 					Types = new[] { JSON_MIME_TYPE }
+				},
+				new Link()
+				{
+					Action = "get",
+					Rel = "wordinphrases",
+					HRef = $"{GetBaseApiPath()}/wordinphrases?wordid={word.Id}",
+					Types = new[] { JSON_MIME_TYPE }
 				}
 			}
 		});
@@ -93,7 +91,8 @@ public class WordsController : BaseApiController
 	public async Task<ActionResult<GetWordsResult>> GetWords(string? word, 
 		int? dictionaryId, 
 		string? externalId,
-		int offsetIndex=Defaults.OffsetIndex, int pageSize = Defaults.MaxItems)
+		int offsetIndex=Defaults.OffsetIndex, 
+		int pageSize = Defaults.MaxItems)
 	{
 		AssertApiConstraints(pageSize);
 
@@ -109,6 +108,7 @@ public class WordsController : BaseApiController
 			Types = new[] { JSON_MIME_TYPE },
 			HRef = BuildPageNavigationUrl(word,dictionaryId, externalId, offsetIndex, pageSize)
 		});
+		
 		if (offsetIndex > 0)
 		{
 			if (offsetIndex - pageSize < 0)
@@ -137,7 +137,9 @@ public class WordsController : BaseApiController
 
 		decimal numberOfPages = Math.Ceiling(words.Count()/(decimal)pageSize);
 		decimal offsetIndexOfLastPage = numberOfPages * pageSize;
-		
+		decimal remainder = numberOfPages % pageSize;
+		offsetIndexOfLastPage -= remainder;
+
 		if (offsetIndexOfLastPage <= words.Count())
 		{
 			links.Add(new Link()
@@ -176,8 +178,21 @@ public class WordsController : BaseApiController
 						Rel = "dictionary",
 						Types = new[] { JSON_MIME_TYPE },
 						HRef = $"{GetBaseApiPath()}/dictionaries/{w.DictionaryId}"
+					},
+					new Link()
+					{
+						Action = "get",
+						Rel = "wordinphrases",
+						HRef = $"{GetBaseApiPath()}/wordinphrases?wordid={w.Id}",
+						Types = new[] { JSON_MIME_TYPE }
 					}
-				}
+				}.Union(w.Translations.Select(t=>new Link()
+				{
+					Action = "get",
+					Rel = "translation",
+					HRef = $"{GetBaseApiPath()}/words/{t.ToWordId}",
+					Types = new []{ JSON_MIME_TYPE}
+				}))
 			}),
 			Links = links.ToArray(),
 			FromIndex = offsetIndex,
@@ -192,10 +207,10 @@ public class WordsController : BaseApiController
 	{
 		StringBuilder sb = new StringBuilder(GetBaseApiPath()+"/words?");
 		if (!string.IsNullOrWhiteSpace(word)) sb.Append($"word={word}&");
-		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&)");
-		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId]{externalId}&");
-		sb.Append($"offsetIndex={offsetIndex}");
-		if (pageSize != Defaults.MaxItems) sb.Append($"&pageSize={pageSize}");
+		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&");
+		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId={externalId}&");
+		sb.Append($"offsetIndex={offsetIndex}&");
+		if (pageSize != Defaults.MaxItems) sb.Append($"pageSize={pageSize}");
 		return sb.ToString();
 	}
 
@@ -228,7 +243,8 @@ public class WordsController : BaseApiController
 			TheWord = createWord.Word,
 			DictionaryId = createWord.DictionaryId,
 			ExternalId = createWord.ExternalId ?? Guid.NewGuid().ToString(),
-			Phrases = new Collection<Phrase>()
+			Phrases = new Collection<Phrase>(),
+			Translations = new Collection<WordTranslation>()
 		};
 
 		_wordRepository.Create(newWord);

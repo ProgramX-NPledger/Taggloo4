@@ -45,8 +45,10 @@ public class Word
 	/// </summary>
 	public int DictionaryId { get; set; }
 
-	// this fails when building migrations
-//	public ICollection<WordTranslation> Translations { get; set; }
+	/// <summary>
+	/// Translations of the Word.
+	/// </summary>
+	public ICollection<WordTranslation> Translations { get; set; } = new List<WordTranslation>();
 
 	/// <summary>
 	/// Phrases in which this Word appears.
@@ -58,5 +60,10 @@ public class Word
 	/// </summary>
 	[MaxLength(32)]
 	public string? ExternalId { get; set; }
-	
+
+	/// <summary>
+	/// Appearances of this Word in <see cref="Phrase"/>s.
+	/// </summary>
+	public ICollection<WordInPhrase> AppearsInPhrases { get; set; } = new List<WordInPhrase>();
+
 }

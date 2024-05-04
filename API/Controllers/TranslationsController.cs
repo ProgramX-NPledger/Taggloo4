@@ -1,14 +1,8 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using API.Contract;
-using API.Data;
-using API.Helper;
+﻿using API.Contract;
 using API.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Taggloo4.Dto;
 
 namespace API.Controllers;
@@ -27,9 +21,10 @@ public class TranslationsController : BaseApiController
 	/// <summary>
 	/// Constructor with injected parameters.
 	/// </summary>
-	/// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
-	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
-	/// <param name="translationRepository">Implementation of <seealso cref="ITranslationRepository"/>.</param>
+	/// <param name="wordRepository">Implementation of <see cref="IWordRepository"/>.</param>
+	/// <param name="phraseRepository">Implementation of <see cref="IPhraseRepository"/>.</param>
+	/// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
+	/// <param name="translationRepository">Implementation of <see cref="ITranslationRepository"/>.</param>
 	public TranslationsController(IWordRepository wordRepository, 
 		IPhraseRepository phraseRepository,
 		IDictionaryRepository dictionaryRepository,

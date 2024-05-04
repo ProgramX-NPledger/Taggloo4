@@ -25,7 +25,7 @@ public class WordTranslationImporter : IImporter
 	
     private async Task<IEnumerable<WordTranslation>> GetTranslations(SqlConnection sqlConnection)
     {
-        string sqlCmd = @"select toT.ID,fromWord.ID as FromWordId, toT.Translation as TheTranslation, toT.LanguageCode,fromWt.CreatedByUserName,fromWt.CreatedTimeStamp 
+        string sqlCmd = @"select toT.ID,fromWord.ID as FromWordId, toT.Translation as TheTranslation, toT.LanguageCode as ToLanguageCode,fromWt.CreatedByUserName,fromWt.CreatedTimeStamp,fromWord.Word as FromWord, fromWord.LanguageCode as FromLanguageCode 
 							from Taggloo_Word fromWord 
 							inner join Taggloo_WordTranslation fromWt on fromWt.WordID=fromWord.ID
 							inner join Taggloo_Translation toT on fromWt.TranslationID=toT.ID";
