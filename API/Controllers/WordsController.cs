@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text;
+using System.Text.Encodings.Web;
 using API.Contract;
 using API.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -206,9 +207,9 @@ public class WordsController : BaseApiController
 	private string BuildPageNavigationUrl(string? word, int? dictionaryId, string? externalId, int offsetIndex, int pageSize)
 	{
 		StringBuilder sb = new StringBuilder(GetBaseApiPath()+"/words?");
-		if (!string.IsNullOrWhiteSpace(word)) sb.Append($"word={word}&");
+		if (!string.IsNullOrWhiteSpace(word)) sb.Append($"word={UrlEncoder.Default.Encode(word)}&");
 		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&");
-		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId={externalId}&");
+		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId={UrlEncoder.Default.Encode(externalId)}&");
 		sb.Append($"offsetIndex={offsetIndex}&");
 		if (pageSize != Defaults.MaxItems) sb.Append($"pageSize={pageSize}");
 		return sb.ToString();
