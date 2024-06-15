@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Encodings.Web;
 using API.Jobs;
 using Hangfire;
 using Taggloo4.Dto;
@@ -157,7 +158,7 @@ public class DictionariesController : BaseApiController
 	{
 		StringBuilder sb = new StringBuilder(GetBaseApiPath()+"/dictionaries?");
 		if (id.HasValue) sb.Append($"id={id.Value}&");
-		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={ietfLanguageTag}&");
+		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={UrlEncoder.Default.Encode(ietfLanguageTag)}&");
 		sb.Append($"offsetIndex={offsetIndex}");
 		if (pageSize != Defaults.MaxItems) sb.Append($"&pageSize={pageSize}");
 		return sb.ToString();
