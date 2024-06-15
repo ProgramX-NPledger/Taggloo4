@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text;
+using System.Text.Encodings.Web;
 using API.Contract;
 using API.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -206,10 +207,10 @@ public class PhrasesController : BaseApiController
 	private string BuildPageNavigationUrl(string? phrase, int? dictionaryId, string? externalId, string? ietfLanguageTag,  int offsetIndex, int pageSize)
 	{
 		StringBuilder sb = new StringBuilder(GetBaseApiPath()+"/phrases?");
-		if (!string.IsNullOrWhiteSpace(phrase)) sb.Append($"phrase={phrase}&");
+		if (!string.IsNullOrWhiteSpace(phrase)) sb.Append($"phrase={UrlEncoder.Default.Encode(phrase)}&");
 		if (dictionaryId.HasValue) sb.Append($"dictionaryId={dictionaryId}&");
-		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId={externalId}&");
-		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={ietfLanguageTag}&");
+		if (!string.IsNullOrWhiteSpace(externalId)) sb.Append($"externalId={UrlEncoder.Default.Encode(externalId)}&");
+		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={UrlEncoder.Default.Encode(ietfLanguageTag)}&");
 		sb.Append($"offsetIndex={offsetIndex}&");
 		if (pageSize != Defaults.MaxItems) sb.Append($"pageSize={pageSize}");
 		return sb.ToString();

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Encodings.Web;
 using API.Contract;
 using API.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -79,7 +80,7 @@ public class LanguagesController : BaseApiController
 	private string BuildQueryString(string? ietfLanguageTag)
 	{
 		StringBuilder sb = new StringBuilder();
-		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={ietfLanguageTag}");
+		if (!string.IsNullOrWhiteSpace(ietfLanguageTag)) sb.Append($"ietfLanguageTag={UrlEncoder.Default.Encode(ietfLanguageTag)}");
 		if (sb.Length > 0) sb.Append("&");
 		return sb.ToString();
 	}
