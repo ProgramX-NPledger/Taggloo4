@@ -50,4 +50,19 @@ public class GetDictionaryResultItem
 	/// </summary>
 	public IEnumerable<Link>? Links { get; set; }
 	
+	/// <summary>
+	/// The URL name of the Controller to use to retrieve content.
+	/// </summary>
+	public string? Controller { get; set; }
+
+	/// <summary>
+	/// Disambiguated identifier for type of content to allow automatic processing.
+	/// </summary>
+	public string? ContentTypeKey { get; set; }
+
+	/// <summary>
+	/// Human-suitable name of Content Type.
+	/// </summary>
+	public string? ContentTypeFriendlyName { get; set; }
+	
 }
