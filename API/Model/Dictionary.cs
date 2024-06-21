@@ -11,11 +11,12 @@ public class Dictionary
 	/// Identifier of Dictionary.
 	/// </summary>
 	public int Id { get; set; }
-	
+
 	/// <summary>
 	/// Name of Dictionary.
 	/// </summary>
-	[Required] 
+	[Required]
+	[MaxLength(128)]
 	public required string Name { get; set; }
 
 	/// <summary>
@@ -27,16 +28,18 @@ public class Dictionary
 	/// <summary>
 	/// URL of source of Dictionary.
 	/// </summary>
+	[MaxLength(1024)]
 	public required string SourceUrl { get; set; }
 
 	/// <summary>
 	/// IETF Language-tag of the Dictionary. This must be a valid Language.
 	/// </summary>
 	public required string IetfLanguageTag { get; set; }
-	
+
 	/// <summary>
 	/// UserName of creator.
 	/// </summary>
+	[MaxLength(128)]
 	public required string? CreatedByUserName { get; set; }
 
 	/// <summary>
@@ -47,6 +50,7 @@ public class Dictionary
 	/// <summary>
 	/// Host from which the Dictionary was created.
 	/// </summary>
+	[MaxLength(256)]
 	public required string CreatedOn { get; set; }
 
 	/// <summary>
@@ -68,29 +72,29 @@ public class Dictionary
 	/// <seealso cref="Phrase"/>s in Dictionary
 	/// </summary>
 	public ICollection<Phrase>? Phrases { get; set; }
-	
+
 	/// <summary>
 	/// <seealso cref="PhraseTranslation"/>s in Dictionary.
 	/// </summary>
 	public ICollection<PhraseTranslation>? PhraseTranslations { get; set; }
-	
+
 	/// <summary>
 	/// The URL name of the Controller to use to retrieve content.
 	/// </summary>
 	[MaxLength(32)]
-	public string? Controller { get; set; }
+	public required string Controller { get; set; }
 
 	/// <summary>
 	/// Disambiguated identifier for type of content to allow automatic processing.
 	/// </summary>
 	[MaxLength(32)]
-	public string? ContentTypeKey { get; set; }
+	public required string ContentTypeKey { get; set; }
 
 	/// <summary>
 	/// Human-suitable name of Content Type.
 	/// </summary>
 	[MaxLength(128)]
-	public string? ContentTypeFriendlyName { get; set; }
+	public required string ContentTypeFriendlyName { get; set; }
 }
 	
 	
