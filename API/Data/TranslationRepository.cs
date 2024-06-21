@@ -73,7 +73,9 @@ public class TranslationRepository : ITranslationRepository
 	/// <returns>The requested <seealso cref="PhraseTranslation"/>, or <c>null</c> if no Phrase Translation could be found./</returns>
 	public async Task<PhraseTranslation?> GetPhraseTranslationByIdAsync(int id)
 	{
-		return await _dataContext.PhraseTranslations.SingleOrDefaultAsync(q => q.Id == id);
+		return await _dataContext.PhraseTranslations
+			.Include("FromPhrase")
+			.SingleOrDefaultAsync(q => q.Id == id);
 	}
 	
 	/// <summary>

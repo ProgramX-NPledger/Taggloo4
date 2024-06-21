@@ -2,33 +2,33 @@
 namespace Taggloo4.Dto;
 
 /// <summary>
-/// Represents a result within <seealso cref="GetWordTranslationsResult"/>.
+/// Represents a result within <seealso cref="GetPhraseTranslationsResult"/>.
 /// </summary>
-public class GetWordTranslationResultItem
+public class GetPhraseTranslationResultItem
 {
 	/// <summary>
-	/// Identifier of Word Translation.
+	/// Identifier of Phrase Translation.
 	/// </summary>
 	public int Id { get; set; }
 	
 	
 	/// <summary>
-	/// Links associated with the Word Translation.
+	/// Links associated with the Phrase Translation.
 	/// </summary>
 	public IEnumerable<Link>? Links { get; set; }
 	
 	/// <summary>
-	/// UserName of creator of the Word Translation.
+	/// UserName of creator of the Phrase Translation.
 	/// </summary>
 	public required string? CreatedByUserName { get; set; }
 
 	/// <summary>
-	/// Timestamp of creation of the Word Translation.
+	/// Timestamp of creation of the Phrase Translation.
 	/// </summary>
 	public required DateTime CreatedAt { get; set; }
 
 	/// <summary>
-	/// Host from which the Word Translation was created.
+	/// Host from which the Phrase Translation was created.
 	/// </summary>
 	public required string CreatedOn { get; set; }
 	
@@ -38,24 +38,24 @@ public class GetWordTranslationResultItem
 	public int DictionaryId { get; set; }
 	
 	/// <summary>
-	/// The IETF Language Tag for the Language this Word Translation is in
+	/// The IETF Language Tag for the Language this Phrase Translation is in
 	/// </summary>
 	public string? FromIetfLanguageTag { get; set; }
 	
 	/// <summary>
-	/// The Word being translated.
+	/// The Phrase being translated.
 	/// </summary>
-	public string? FromWord { get; set; }
+	public string? FromPhrase { get; set; }
 	
 	/// <summary>
-	/// Identifier of Word being translated.
+	/// Identifier of Phrase being translated.
 	/// </summary>
-	public int FromWordId { get; set; }
+	public int FromPhraseId { get; set; }
 	
 	/// <summary>
-	/// Identifier of the translation of the Word being translated.
+	/// Identifier of the translation of the Phrase being translated.
 	/// </summary>
-	public int ToWordId { get; set; }
+	public int ToPhraseId { get; set; }
 	
 	
 }
