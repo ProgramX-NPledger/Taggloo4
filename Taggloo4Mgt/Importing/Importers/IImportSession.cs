@@ -3,7 +3,12 @@
 public interface IImportSession
 {
     int GetToBeImportedCount();
+
+    string ContentTypeKey { get; }
     
+    string ContentTypeFriendlyName { get; }
+    
+    string ContentTypeController { get; }
 
     Task ImportAcrossDictionariesAsync(HttpClient httpClient,
         string languageCode1,

@@ -16,6 +16,10 @@ public class PhraseTranslationImportSession : IImportSession
 		_phraseTranslations = phraseTranslations;
 	}
 
+	public string ContentTypeKey { get; } = "PhraseTranslation";
+	public string ContentTypeFriendlyName { get; } = "Phrase Translation";
+	public string ContentTypeController { get; } = "phraseTranslations";
+
 	public event EventHandler<ImportMetricsEventArgs>? UpdateMetrics;
 	public event EventHandler<ImportedEventArgs>? Imported;
 	public event EventHandler<ImportEventArgs>? LogMessage;
