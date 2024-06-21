@@ -120,6 +120,9 @@ public class DictionariesController : BaseApiController
 				SourceUrl = d.SourceUrl,
 				IetfLanguageTag = d.IetfLanguageTag,
 				CreatedByUserName = d.CreatedByUserName,
+				Controller = d.Controller,
+				ContentTypeKey = d.ContentTypeKey,
+				ContentTypeFriendlyName = d.ContentTypeFriendlyName,
 				Links = new[]
 				{
 					new Link()
@@ -139,9 +142,9 @@ public class DictionariesController : BaseApiController
 					new Link()
 					{
 						Action = "get",
-						Rel = "firstwords",
+						Rel = "firstcontent",
 						Types = new[] { JSON_MIME_TYPE },
-						HRef = $"{GetBaseApiPath()}/words?dictionaryId={d.Id}"
+						HRef = $"{GetBaseApiPath()}/{d.Controller ?? "null"}?dictionaryId={d.Id}"
 					}
 				}
 			}),
@@ -189,7 +192,10 @@ public class DictionariesController : BaseApiController
 			Name = createDictionary.Name,
 			IetfLanguageTag = language.IetfLanguageTag,
 			Description = createDictionary.Description,
-			SourceUrl = createDictionary.SourceUrl
+			SourceUrl = createDictionary.SourceUrl,
+			Controller = createDictionary.Controller,
+			ContentTypeKey = createDictionary.ContentTypeKey,
+			ContentTypeFriendlyName = createDictionary.ContentTypeFriendlyName
 		};
 
 		_dictionaryRepository.Create(newDictionary);
