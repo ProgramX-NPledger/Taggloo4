@@ -7,28 +7,28 @@ namespace Taggloo4.Dto;
 public class GetWordTranslationResultItem
 {
 	/// <summary>
-	/// Identifier of Word.
+	/// Identifier of Word Translation.
 	/// </summary>
 	public int Id { get; set; }
 	
 	
 	/// <summary>
-	/// Links associated with the Word.
+	/// Links associated with the Word Translation.
 	/// </summary>
 	public IEnumerable<Link>? Links { get; set; }
 	
 	/// <summary>
-	/// UserName of creator of the Word.
+	/// UserName of creator of the Word Translation.
 	/// </summary>
 	public required string? CreatedByUserName { get; set; }
 
 	/// <summary>
-	/// Timestamp of creation of the Word.
+	/// Timestamp of creation of the Word Translation.
 	/// </summary>
 	public required DateTime CreatedAt { get; set; }
 
 	/// <summary>
-	/// Host from which the Word was created.
+	/// Host from which the Word Translation was created.
 	/// </summary>
 	public required string CreatedOn { get; set; }
 	
@@ -38,7 +38,7 @@ public class GetWordTranslationResultItem
 	public int DictionaryId { get; set; }
 	
 	/// <summary>
-	/// The IETF Language Tag for the Language this Word is in
+	/// The IETF Language Tag for the Language this Word Translation is in
 	/// </summary>
 	public string? FromIetfLanguageTag { get; set; }
 	
