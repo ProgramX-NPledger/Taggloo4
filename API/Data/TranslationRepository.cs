@@ -83,7 +83,9 @@ public class TranslationRepository : ITranslationRepository
 	/// <returns>The requested <seealso cref="WordTranslation"/>, or <c>null</c> if no Word Translation could be found./</returns>
 	public async Task<WordTranslation?> GetWordTranslationByIdAsync(int id)
 	{
-		return await _dataContext.WordTranslations.SingleOrDefaultAsync(q => q.Id == id);
+		return await _dataContext.WordTranslations
+			.Include("FromWord")
+			.SingleOrDefaultAsync(q => q.Id == id);
 	}
 
 }
