@@ -34,8 +34,8 @@ public class LanguagesController : BaseApiController
 	/// <returns>A <seealso cref="GetLanguagesResult"/> containing the results.</returns>
 	/// <response code="200">Results prepared..</response>
 	/// <response code="403">Not permitted.</response>
-	[HttpGet("{ietfLanguageTag?}")] //
-	[Authorize(Roles="administrator,dataExporter,translator")]
+	[AllowAnonymous]
+	[HttpGet("{ietfLanguageTag?}")] 
 	public async Task<ActionResult<GetLanguagesResult>> GetLanguage(string? ietfLanguageTag)
 	{
 		AssertApiConstraints(2);

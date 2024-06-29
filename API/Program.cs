@@ -65,6 +65,8 @@ builder.Services.AddHangfire(configuration=>
     }));
 builder.Services.AddHangfireServer();
 
+builder.Services.AddCors();
+
 // builder.Services.AddHttpLogging(o => { });
 // builder.Services.AddHttpLoggingInterceptor<HttpLoggingInterceptor>();
 
@@ -93,6 +95,8 @@ if (app.Environment.IsDevelopment())
 #if !DEBUG
 app.UseHttpsRedirection();
 #endif
+
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("*"));
 
 app.UseStaticFiles();
 app.UseAuthentication();
