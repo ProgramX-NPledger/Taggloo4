@@ -1,3 +1,4 @@
 /* PrimeNG theme */
-@import "primeng/resources/themes/lara-light-blue/theme.css";
+/*@import "primeng/resources/themes/arya-green/theme.css";*/
+@import "assets/themes/taggloo/theme.scss";
 @import "primeng/resources/primeng.css";

@@ -28,6 +28,7 @@
               "node_modules/bootstrap/scss/bootstrap.scss",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "node_modules/font-awesome/css/font-awesome.min.css",
+              "src/assets/themes/taggloo/theme.scss",
               "src/styles.css"
             ],
             "scripts": [
