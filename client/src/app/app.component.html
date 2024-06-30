@@ -1,17 +1,21 @@
-<h1>{{languages}}</h1>
-<ul>
-  @for (language of languages.results; track language.ietfLanguageCode) {
-    <li>{{ language.name }}</li>
-  }
+<app-nav></app-nav>
+<div class="container" style="margin-top: 50px">
+  <h1>{{languages}}</h1>
+  <ul>
+    @for (language of languages.results; track language.ietfLanguageCode) {
+      <li>{{ language.name }}</li>
+    }
 
-</ul>
-<div class="row">
-  <div class="col-md-6">
-    <p-button label="Button"></p-button>
+  </ul>
+  <div class="row">
+    <div class="col-md-6">
+      <p-button label="Button"></p-button>
+    </div>
+    <div class="col-md-6">
+      <p-button label="Button"></p-button>
+    </div>
+
   </div>
-  <div class="col-md-6">
-    <p-button label="Button"></p-button>
-  </div>
+
 
 </div>
-
