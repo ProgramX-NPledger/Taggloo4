@@ -20,10 +20,10 @@
         </li>
       </ul>
       <form class="d-flex" #loginForm="ngForm" (ngSubmit)="login()" autocomplete="off">
-        @if (currentUser) {
+        @if (accountService.currentUser()) {
           <p-menu #loggedInMenu [model]="loggedInMenuItems" [popup]="true" />
           <p-avatar
-          image="https://www.gravatar.com/avatar/{{ currentUser.EmailSha256 }}?d=monsterid"
+          image="https://www.gravatar.com/avatar/{{ accountService.currentUser()!.EmailSha256 }}?d=monsterid"
           styleClass="flex align-items-center justify-content-center mr-2"
           size="large" (click)="loggedInMenu.toggle($event)" />
         } @else {

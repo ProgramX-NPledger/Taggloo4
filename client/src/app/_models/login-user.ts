@@ -1,4 +1,4 @@
-﻿// export LoginUser {
-//   Username: string;
-//   Password: string;
-// }
+﻿export interface LoginUser {
+  UserName: string;
+  Password: string;
+}

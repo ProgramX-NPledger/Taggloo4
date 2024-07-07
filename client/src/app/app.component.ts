@@ -5,6 +5,8 @@ import { RouterOutlet } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ButtonModule } from 'primeng/button';
 import { NavComponent } from './nav/nav.component';
+import { AccountService } from './_services/account.service';
+import { LoggedInUser } from './_models/logged-in-user';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +17,7 @@ import { NavComponent } from './nav/nav.component';
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit{
+  private accountService: AccountService = inject(AccountService);
 
   http = inject(HttpClient)
 
@@ -22,6 +25,8 @@ export class AppComponent implements OnInit{
   languages: any;
 
   ngOnInit(): void {
+    this.setCurrentUser();
+
     this.http.get('http://localhost:5067/api/v4/languages').subscribe({
       next: response => {
         this.languages = response;
@@ -31,6 +36,16 @@ export class AppComponent implements OnInit{
       },
       complete: () => {}
     })
+  }
+
+  setCurrentUser() {
+    const userString = localStorage.getItem('user');
+    if (!userString) {
+      // not logged in
+    } else {
+      const user: LoggedInUser = JSON.parse(userString);
+      this.accountService.currentUser.set(user);
+    }
   }
 
 }

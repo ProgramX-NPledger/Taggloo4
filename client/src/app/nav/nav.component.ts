@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../_services/account.service';
 import { ToastModule } from 'primeng/toast';
 import {MenuItem, MessageService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuModule } from 'primeng/menu';
+import { LoggedInUser } from '../_models/logged-in-user';
 
 @Component({
   selector: 'app-nav',
@@ -16,11 +17,11 @@ import { MenuModule } from 'primeng/menu';
 })
 
 export class NavComponent {
-  private accountService:AccountService=inject(AccountService);
+  accountService:AccountService=inject(AccountService);
   private messageService:MessageService=inject(MessageService);
 
   credentialsModel:any = {}
-  currentUser: any|null = null;
+
   loggedInMenuItems:MenuItem[] = [
     {
       label: 'Profile',
@@ -34,7 +35,6 @@ export class NavComponent {
     this.accountService.login(this.credentialsModel.userName, this.credentialsModel.password).subscribe({
       next: response => {
         console.log(response);
-        this.currentUser=response;
         this.messageService.add({
           summary: 'Login successful',
           detail: 'Welcome, '+this.credentialsModel.userName,
@@ -62,6 +62,6 @@ export class NavComponent {
   }
 
   logout() {
-    this.credentialsModel=null;
+    this.accountService.logout();
   }
 }
