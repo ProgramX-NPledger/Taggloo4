@@ -7,11 +7,12 @@ import { ButtonModule } from 'primeng/button';
 import { NavComponent } from './nav/nav.component';
 import { AccountService } from './_services/account.service';
 import { LoggedInUser } from './_models/logged-in-user';
+import { HomeComponent } from './home/home.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet,ButtonModule, NavComponent],
+  imports: [RouterOutlet,ButtonModule, NavComponent, HomeComponent],
   providers: [],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
