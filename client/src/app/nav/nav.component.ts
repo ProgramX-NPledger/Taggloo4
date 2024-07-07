@@ -2,13 +2,14 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../_services/account.service';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MenuItem, MessageService } from 'primeng/api';
+import { AvatarModule } from 'primeng/avatar';
+import { MenuModule } from 'primeng/menu';
 
 @Component({
   selector: 'app-nav',
   standalone: true,
-  imports: [FormsModule,ToastModule],
+  imports: [FormsModule,ToastModule,AvatarModule,MenuModule],
   providers: [MessageService],
   templateUrl: './nav.component.html',
   styleUrl: './nav.component.css'
@@ -20,6 +21,14 @@ export class NavComponent {
 
   credentialsModel:any = {}
   currentUser: any|null = null;
+  loggedInMenuItems:MenuItem[] = [
+    {
+      label: 'Profile',
+    },
+    {
+      label: 'Logout',
+    }
+  ];
 
   login() {
     this.accountService.login(this.credentialsModel.userName, this.credentialsModel.password).subscribe({
@@ -50,5 +59,9 @@ export class NavComponent {
         console.error(error);
       }
     })
+  }
+
+  logout() {
+    this.credentialsModel=null;
   }
 }

@@ -20,18 +20,17 @@
         </li>
       </ul>
       <form class="d-flex" #loginForm="ngForm" (ngSubmit)="login()" autocomplete="off">
-        <input name="userName" [(ngModel)]="credentialsModel.userName" class="form-control me-2" placeholder="User name" />
-        <input name="password" [(ngModel)]="credentialsModel.password" class="form-control me-2" type="password" />
-        <button class="btn btn-outline-success" type="submit">Login</button>
-        <ul class="navbar-nav me-auto mb-2 mb-md-0">
-         <!-- TODO: Display in anonymous mode, otherwise display profile and options -->
-          <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Register</a>
-          </li>
-        </ul>
+        @if (currentUser) {
+          <p-menu #loggedInMenu [model]="loggedInMenuItems" [popup]="true" />
+          <p-avatar
+          image="https://www.gravatar.com/avatar/{{ currentUser.EmailSha256 }}?d=monsterid"
+          styleClass="flex align-items-center justify-content-center mr-2"
+          size="large" (click)="loggedInMenu.toggle($event)" />
+        } @else {
+          <input name="userName" [(ngModel)]="credentialsModel.userName" class="form-control me-2" placeholder="User name" />
+          <input name="password" [(ngModel)]="credentialsModel.password" class="form-control me-2" type="password" />
+          <button class="btn btn-outline-success" type="submit">Login</button>
+        }
       </form>
     </div>
   </div>

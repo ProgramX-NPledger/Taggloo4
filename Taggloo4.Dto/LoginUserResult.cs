@@ -15,4 +15,15 @@ public class LoginUserResult
 	/// JWT Token representing the secure log-in.
 	/// </summary>
 	public required string Token { get; set; }
+
+	/// <summary>
+	/// Email address of user.
+	/// </summary>
+	public string? Email { get; set; }
+
+	/// <summary>
+	/// SHA-256 hashed form of email address (for use by Gravatar).
+	/// </summary>
+	public string? EmailSha256 { get; set; }
+	
 }

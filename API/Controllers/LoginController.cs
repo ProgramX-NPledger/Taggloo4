@@ -56,7 +56,22 @@ public class LoginController : BaseApiController
 		return new LoginUserResult()
 		{
 			UserName = appUser.UserName,
-			Token = await _tokenService.CreateToken(appUser)
+			Token = await _tokenService.CreateToken(appUser),
+            Email = appUser.Email?.ToLower(),
+            EmailSha256 = GenerateSha256Hash(appUser.Email ?? string.Empty)
 		};
+	}
+	
+	private static string GenerateSha256Hash(string text)
+	{
+		byte[] bytes = Encoding.UTF8.GetBytes(text);
+		SHA256Managed sha256Managed = new SHA256Managed();
+		byte[] hash = sha256Managed.ComputeHash(bytes);
+		string hashString = string.Empty;
+		foreach (byte x in hash)
+		{
+			hashString += String.Format("{0:x2}", x);
+		}
+		return hashString;
 	}
 }
