@@ -1,0 +1,9 @@
+div#translate { margin: 20px 0 20px 0;  }
+div#query-container { margin-top: 20px; }
+input#query { width: 100%; font-size: 110%; padding: 10px; margin: 0; }
+div#languages-container { margin: 20px 0 0 0;}
+div.language-column label { vertical-align: bottom; margin-top: 8px; }
+
+/*
+#pn_id_3
+ */

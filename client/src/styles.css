@@ -3,7 +3,7 @@
 @import "assets/themes/taggloo/theme.scss";
 @import "primeng/resources/primeng.css";
 
-div.below-nav { margin-top: 70px;}
+div.below-nav { margin-top: 70px; }
 
 @media (min-width: 1201px)  {
   div.within-container {
