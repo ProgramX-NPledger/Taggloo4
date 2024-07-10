@@ -5,15 +5,21 @@
 
 div.below-nav { margin-top: 70px;}
 
-@media (min-width: 992px) {
+@media (min-width: 1201px)  {
   div.within-container {
-    max-width: 960px;
+    max-width: 1177px;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1200px)  {
+  div.within-container {
+    max-width: 968px;
   }
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
   div.within-container {
-    max-width: 720px;
+    max-width: 726px;
   }
 }
 
