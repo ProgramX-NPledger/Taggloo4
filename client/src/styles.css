@@ -2,3 +2,32 @@
 /*@import "primeng/resources/themes/arya-green/theme.css";*/
 @import "assets/themes/taggloo/theme.scss";
 @import "primeng/resources/primeng.css";
+
+div.below-nav { margin-top: 70px;}
+
+@media (min-width: 992px) {
+  div.within-container {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.within-container {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 400px) and (max-width: 767px) {
+  div.within-container {
+    max-width: 544px;
+  }
+}
+
+div.within-container {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
