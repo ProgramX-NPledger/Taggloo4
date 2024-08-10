@@ -1,4 +1,5 @@
 ﻿using API.Contract;
+using API.Model;
 using API.Model.Home;
 
 namespace API.ViewModels.Home.Factory;
@@ -9,13 +10,13 @@ namespace API.ViewModels.Home.Factory;
 public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
 {
     private readonly LargeTranslateFormViewModelFactory _largeTranslateFormViewModelFactory;
-    
+
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public IndexViewModelFactory()
+    public IndexViewModelFactory(IEnumerable<Language> allLanguages)
     {
-        _largeTranslateFormViewModelFactory = new LargeTranslateFormViewModelFactory();
+        _largeTranslateFormViewModelFactory = new LargeTranslateFormViewModelFactory(allLanguages);
     }
     
     /// <inheritdoc cref="IViewModelFactory{TViewModelType}"/>
@@ -23,6 +24,9 @@ public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
     {
         IndexViewModel viewModel = new IndexViewModel();
         Configure(ref viewModel);
+        
+        ILargeTranslateFormViewModel iLargeTranslateFormViewModel = (ILargeTranslateFormViewModel)viewModel;
+        _largeTranslateFormViewModelFactory.TransposeLanguageSelections(ref iLargeTranslateFormViewModel);
         return viewModel;
     }
 
