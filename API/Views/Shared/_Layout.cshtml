@@ -22,10 +22,6 @@
         <li><a href="#" class="nav-link px-2 text-white">Library</a></li>
       </ul>
 
-      <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-        <input type="search" class="form-control form-control-dark text-bg-dark" placeholder="Search..." aria-label="Search">
-      </form>
-
       <div class="text-end">
         @if (User.Identity is { IsAuthenticated: true })
         {
@@ -40,8 +36,6 @@
             <li><a href="@Url.Action("Login","Account")">Login</a></li>
             <li><a href="@Url.Action("Register","Account")">Register</a></li>
           </ul>
-          <button type="button" class="btn btn-outline-light me-2">Login</button>
-          <button type="button" class="btn btn-warning">Sign-up</button>
         }
       </div>
     </div>
@@ -66,9 +60,16 @@
                                                                                                            {
                                                                                                              <text>@Context.Response.Headers["X-Version"]</text>
                                                                                                            }
-                                                                                                           else
+
+                                                                                                           if (Context.Response.Headers.ContainsKey("X-BuildDate"))
                                                                                                            {
-                                                                                                             <text>(unknown) @string.Join(", ",Context.Response.Headers.Select(q=>q.Key))</text>
+                                                                                                             <text>@Context.Response.Headers["X-BuildDate"]</text>
+                                                                                                           }
+                                                                                                           
+                                                                                                           if (!Context.Response.Headers.ContainsKey("X-Version") &&
+                                                                                                               !Context.Response.Headers.ContainsKey("X-BuildDate"))
+                                                                                                           {
+                                                                                                             <text>(unknown)</text>
                                                                                                            }
 
                                                                                                          

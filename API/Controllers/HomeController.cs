@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using API.Model.Home;
+using API.ViewModels.Home.Factory;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -14,7 +16,9 @@ public class HomeController : Controller
     /// <returns>View <c>Index</c>.</returns>
     public IActionResult Index()
     {
-        return View();
+        IndexViewModelFactory viewModelFactory = new IndexViewModelFactory();
+        IndexViewModel viewModel = viewModelFactory.Create();
+        return View(viewModel);
     }
 
     /// <summary>
