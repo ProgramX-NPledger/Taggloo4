@@ -1,7 +1,7 @@
 ﻿@model API.ViewModels.Home.ILargeTranslateFormViewModel
 
 <div id="translate">
-  @using (Html.BeginForm("Translate", "Translate", null, FormMethod.Post, true, null))
+  @using (Html.BeginForm("Translate", "Translate", null, FormMethod.Get, false, null))
   {
     <input type="hidden" id="LastFromLanguage" value="en-GB">
     <input type="hidden" id="LastToLanguage" value="gv-GV">
