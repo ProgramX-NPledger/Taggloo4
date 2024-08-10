@@ -43,7 +43,6 @@
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Models\" />
-    <Folder Include="Areas\Api\" />
     <Folder Include="Data\Migrations\" />
     <Folder Include="Model\Home\" />
     <Folder Include="wwwroot\css\img\" />
