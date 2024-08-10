@@ -13,7 +13,7 @@ div#translate div#languages-container { padding: 10px 0 10px 0; font-size: 110%;
 div#translate div#languages-container div.language-column label { padding-top: 5px;}
 div#translate div#languages-container div.language-column select { width: 100%; padding: 5px; }
 div#translate div.language-submit-column input[type=submit] { background-color: #900; color: #fff; padding: 5px 10px 5px 10px; border: outset 1px #900; width: 100%; }
-div#translate div.language-submit-column a { color: #900; font-size: 80%; text-decoration: none; }
+div#translate div.language-submit-column a { color: #900; font-size: 80%; text-decoration: none; text-align: right; }
 div#translate div.language-submit-column a:hover { text-decoration: underline; }
 
 .taggloo-red { color: #900; }
