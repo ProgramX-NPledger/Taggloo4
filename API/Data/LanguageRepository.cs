@@ -53,7 +53,10 @@ public class LanguageRepository : ILanguageRepository
 	/// <returns>A collection of Languages.</returns>
 	public async Task<IEnumerable<Language>> GetAllLanguagesAsync()
 	{
-		return await _dataContext.Languages.ToListAsync();
+		return await _dataContext.Languages
+			.Include(q=>q.Dictionaries)
+			.AsNoTracking()
+			.ToListAsync();
 	}
 
 	/// <summary>

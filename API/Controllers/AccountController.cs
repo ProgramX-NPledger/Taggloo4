@@ -53,7 +53,7 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-            string upperedUserName = loginViewModel.Email.ToUpper();
+            string upperedUserName = loginViewModel.EmailOrUserName.ToUpper();
             AppUser? appUser = await _userManager.Users.SingleOrDefaultAsync(q => q.NormalizedUserName == upperedUserName);
             if (appUser == null)
             {

@@ -35,6 +35,5 @@ public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
     {
         ILargeTranslateFormViewModel iLargeTranslateFormViewModel = (ILargeTranslateFormViewModel)viewModel;
         _largeTranslateFormViewModelFactory.Configure(ref iLargeTranslateFormViewModel);
-        
     }
 }

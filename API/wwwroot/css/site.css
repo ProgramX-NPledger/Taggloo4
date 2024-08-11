@@ -6,6 +6,7 @@ header form input { }
 header ul.login-links { list-style: none; display: inline-block; }
 header ul.login-links li a { color: #fff; text-decoration: none; }
 
+/* translation */
 div#translate { margin: 10px 0 10px 0; }
 div#translate div#query-container label { font-size: 110%; padding: 0 0 10px 0; }
 div#translate div#query-container input { width: 100%; padding: 7px 7px 7px 35px; font-size: 120%; background-image: url(img/search-glyph.png); background-repeat: no-repeat; background-position: left center; }
@@ -15,6 +16,17 @@ div#translate div#languages-container div.language-column select { width: 100%; 
 div#translate div.language-submit-column input[type=submit] { background-color: #900; color: #fff; padding: 5px 10px 5px 10px; border: outset 1px #900; width: 100%; }
 div#translate div.language-submit-column a { color: #900; font-size: 80%; text-decoration: none; text-align: right; float: right; }
 div#translate div.language-submit-column a:hover { text-decoration: underline; }
+
+/* admin area */
+div#adminTiles { margin-left: -10px; margin-right: 10px; }
+div#adminTiles div.admin-tile { background-color: #efefef; border: solid 1px #dedede; margin: 2px; border-radius: 5px; padding: 10px; width: 24.692%; height: 200px; }
+div#adminTiles div.admin-tile:hover { background-color: #dedede; border: solid 1px #cdcdcd;  }
+div#adminTiles div.admin-tile h3 { font-size: 120%; border-bottom: solid 1px #dedede; padding-bottom: 5px; }
+div#adminTiles div.admin-tile:hover h3 { border-bottom: solid 1px #cdcdcd; }
+div#adminTiles div.admin-tile p { font-size: 95%; }
+div#adminTiles div.admin-tile p.admin-tile-bottom { text-align: right; vertical-align: bottom; }
+div#adminTiles div.admin-tile p.admin-tile-bottom a { color: #900; text-decoration: none;}
+div#adminTiles div.admin-tile p.admin-tile-bottom a:hover { text-decoration: underline; }
 
 .taggloo-red { color: #900; }
 .taggloo-background-red { background-color: #900; }

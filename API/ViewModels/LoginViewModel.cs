@@ -11,8 +11,7 @@ public class LoginViewModel
     /// Users email address (which is their username).
     /// </summary>
     [Required]
-    [EmailAddress]
-    public required string Email { get; set; }
+    public required string EmailOrUserName { get; set; }
     
     /// <summary>
     /// Password required to authenticate.
