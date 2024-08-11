@@ -1,0 +1,54 @@
+﻿@model API.ViewModels.Home.ILargeTranslateFormViewModel
+
+<div id="translate">
+  @using (Html.BeginForm("Translate", "Translate", null, FormMethod.Get, false, null))
+  {
+    <input type="hidden" id="LastFromLanguage" />
+    <input type="hidden" id="LastToLanguage"  />
+    <div class="row">
+      <div class="col-lg-12">
+        <h1>Translate</h1>
+      </div>
+    </div>
+    <div id="query-container" class="row">
+      <div class="col-lg-12">
+        <label for="query" class="taggloo-dark-grey">Find a word or phrase</label>
+        @Html.TextBoxFor(m => m.Query, new
+        {
+          autocomplete = "off",
+          placeholder = ""
+        })
+      </div>
+    </div>
+    <div id="languages-container" class="row padding-top-10px">
+      <div class="col-lg-1 language-column">
+        <label>From:</label>
+      </div>
+      <div class="col-lg-4 language-column">
+        @Html.DropDownListFor(m => m.FromLanguageCode, Model.AllLanguages, null, new
+        {
+          onfocus="captureLanguageCodes()",
+          onchange="flipLanguageCodes()"
+        })
+      </div>
+      <div class="col-lg-1 language-column">
+        <label>To:</label>
+      </div>
+      <div class="col-lg-4 language-column margin-bottom-10px">
+        @Html.DropDownListFor(m => m.ToLanguageCode, Model.AllLanguages, null, new
+        {
+            onfocus="captureLanguageCodes()",
+            onchange="flipLanguageCodes()"
+        })
+      </div>
+      <div class="col-lg-2 language-submit-column">
+        <input type="submit"/>
+        <br/>
+        <a href="@Url.Action("Index", "Translate")">Advanced search &gt;</a>
+      </div>
+    </div>
+  }
+</div>
+
+<script type="text/javascript" src="~/js/home/large-translate-form.js">
+</script>

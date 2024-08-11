@@ -1,13 +1,14 @@
 ﻿using System.Text;
 using System.Text.Encodings.Web;
 using API.Contract;
+using API.Controllers;
 using API.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Taggloo4.Dto;
 
-namespace API.Controllers;
+namespace API.Areas.Api.Controllers;
 
 /// <summary>
 /// Language operations. All methods require authorisation.

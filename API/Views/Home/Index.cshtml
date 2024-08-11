@@ -1,9 +1,8 @@
-﻿@model API.Model.Home.Index
+﻿@model API.Model.Home.IndexViewModel
 
 @{
     ViewBag.Title = "Home";
     Layout = "_Layout";
 }
+@await Html.PartialAsync("_LargeTranslateForm",Model)
 
-<h2>Home</h2>
-<p>This site is under active development.</p>
