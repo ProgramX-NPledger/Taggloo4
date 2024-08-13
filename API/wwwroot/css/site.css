@@ -28,6 +28,9 @@ div#adminTiles div.admin-tile p.admin-tile-bottom { text-align: right; vertical-
 div#adminTiles div.admin-tile p.admin-tile-bottom a { color: #900; text-decoration: none;}
 div#adminTiles div.admin-tile p.admin-tile-bottom a:hover { text-decoration: underline; }
 
+div.validation-summary-errors { color: #900; border: solid 1px #900; border-radius: 4px; padding: 5px; }
+div.validation-summary-errors ul { margin: 0; padding: 5px 5px 5px 25px; }
+
 .taggloo-red { color: #900; }
 .taggloo-background-red { background-color: #900; }
 .taggloo-dark-grey { color: #212529; }
