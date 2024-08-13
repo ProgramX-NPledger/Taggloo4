@@ -11,14 +11,15 @@ public class LoginViewModel
     /// Users email address (which is their username).
     /// </summary>
     [Required]
+    [Display(Name="Email address or User name")]
     public required string EmailOrUserName { get; set; }
     
     /// <summary>
     /// Password required to authenticate.
     /// </summary>
     [Required]
-    [DataType(DataType.Password)]
-    public required string Password { get; set; }
+    [Display(Name="Password")]
+    [DataType(DataType.Password)] public required string Password { get; set; }
 
     /// <summary>
     /// When set will drop a persistent cookie.

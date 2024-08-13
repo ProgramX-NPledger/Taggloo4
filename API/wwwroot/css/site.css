@@ -32,3 +32,10 @@ div#adminTiles div.admin-tile p.admin-tile-bottom a:hover { text-decoration: und
 .taggloo-background-red { background-color: #900; }
 .taggloo-dark-grey { color: #212529; }
 .color-white { color: #fff; }
+
+/* Bootstrap overrides */
+input.btn-primary,
+button.btn-primary { background-color: #900; color: #fff; border: solid 1px #fff; }
+
+input.btn-primary:hover,
+button.btn-primary:hover { background-color: #900; color: #fff; border: solid 1px #900; }
