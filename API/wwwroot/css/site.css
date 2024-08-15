@@ -4,6 +4,7 @@ header h1 { background-image: url(img/taggloo-logo-900bg.png); background-repeat
 header ul { vertical-align: bottom; margin: 0 0 2px 0;}
 header form input { }
 header ul.login-links { list-style: none; display: inline-block; }
+header ul.login-links li { display: inline-block; padding: 0 3px 0 3px; }
 header ul.login-links li a { color: #fff; text-decoration: none; }
 
 /* translation */
