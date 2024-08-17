@@ -3,6 +3,7 @@ using API.Contract;
 using API.Data;
 using API.Data.SiteInitialisation;
 using API.Extension;
+using API.Hubs;
 using API.Jobs;
 using API.Model;
 using Microsoft.AspNetCore.Identity;
@@ -65,6 +66,8 @@ builder.Services.AddHangfire(configuration=>
     }));
 builder.Services.AddHangfireServer();
 
+builder.Services.AddSignalR();
+
 // builder.Services.AddHttpLogging(o => { });
 // builder.Services.AddHttpLoggingInterceptor<HttpLoggingInterceptor>();
 
@@ -101,6 +104,8 @@ app.MapControllers();
 
 //app.UseCors(builder => builder.AllowANyHeader().AllowAnyMethod()).WithOrigins("http://localhost:123"));
 
+app.UseCors("any");
+app.MapHub<TranslateHub>("/translate");
 
 app.MapControllerRoute(
     name: "areas",

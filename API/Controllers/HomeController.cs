@@ -11,6 +11,7 @@ namespace API.Controllers;
 /// Default controller for core routes and messages.
 /// </summary>
 [Authorize(AuthenticationSchemes = "Identity.Application")]
+[AllowAnonymous]
 public class HomeController : Controller
 {
     private readonly ILanguageRepository _languageRepository;
