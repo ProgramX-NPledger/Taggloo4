@@ -5,32 +5,58 @@
     Layout = "_Layout";
 }
 
-<div class="row">
-    <div class="col-md-12">
+<div class="row mt-5">
+    <div class="col-md-3">
+        
+    </div>
+    <div class="col-md-6">
+        @Html.ValidationSummary()
+        
         <form method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Email"></label>
-                @Html.TextBoxFor(q=>q.Email)
+                @Html.LabelFor(m => m.EmailOrUserName, new
+                {
+                    @class = "col-form-label-lg"
+                })
+                @Html.TextBoxFor(q => q.EmailOrUserName, new
+                {
+                    @class = "form-control form-control-lg",
+                    required = "required"
+                })
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Password"></label>
-                @Html.PasswordFor(m=>m.Password)
-                <input asp-for="Password" class="form-control" />
+                @Html.LabelFor(m => m.Password, new
+                {
+                    @class = "col-form-label-lg"
+                })
+                @Html.PasswordFor(m => m.Password, new
+                {
+                    @class = "form-control form-control-lg",
+                    required = "required"
+                })
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <div class="custom-control custom-checkbox">
-                    <input asp-for="RememberMe" type="checkbox" class="custom-control-input">
-                    <label class="custom-control-label" asp-for="RememberMe">@Html.DisplayNameFor(m => m.RememberMe)</label>
-                </div>
+            <div class="form-check mt-3">
+                @Html.CheckBoxFor(m => m.RememberMe, new
+                {
+                    id = "RememberMe",
+                    @class = "form-check-input"
+                })
+                @Html.LabelFor(m => m.RememberMe)
 
             </div>
-            <button type="submit" class="btn-primary">Login</button>
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
         </form>
 
     </div>
+    <div class="col-md-3">
+        
+    </div>
+
 </div>
