@@ -6,29 +6,39 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace API.Hubs;
 
+/// <summary>
+/// SignalR Hub for purposes of handling communication to/from clients.
+/// </summary>
 public class TranslateHub : Hub
 {
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly IHubContext<TranslateHub> _hubContext;
 
+    /// <summary>
+    /// Constructor for injection of required services.
+    /// </summary>
+    /// <param name="backgroundJobClient">Implementation of Hangfire <seealso cref="IBackgroundJobClient"/>.</param>
+    /// <param name="hubContext">Implementation of SignalR <seealso cref="IHubContext"/>.</param>
     public TranslateHub(IBackgroundJobClient backgroundJobClient,
         IHubContext<TranslateHub> hubContext)
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
     }
-    
-    public async Task InvokeTranslation(object[] args)
+
+    /// <summary>
+    /// Invoked from the client, this will create a Translation Request, including the client's unique identifier
+    /// to allow for updating on the job progress as it completes.
+    /// </summary>
+    /// <param name="args">Arguments from the client. The only element must be serializable into a <seealso cref="TranslateViewModel"/>.</param>
+    /// <exception cref="InvalidOperationException">Thrown if the client request was invalid.</exception>
+    public void InvokeTranslation(object[] args)
     {
-        // this needs to create the translation request, logging the connection id within it
-        // to allow the callback to use it to publish the results
-        
         // the first element in the arguments must be an instance of the ITranslationRequestViewModel
         if (args.Length < 1) throw new InvalidOperationException($"Invalid arguments count");
         if (!(args[0] is JsonElement)) throw new InvalidOperationException("IInvalid argument");
         JsonElement jsonElement = (JsonElement)args[0];
-        TranslateViewModel? translateViewModel =
-            (TranslateViewModel)JsonSerializer.Deserialize<TranslateViewModel>(jsonElement.ToString());
+        TranslateViewModel? translateViewModel = JsonSerializer.Deserialize<TranslateViewModel>(jsonElement.ToString());
         if (translateViewModel == null)
             throw new InvalidOperationException($"Failed to deserialize {nameof(TranslateViewModel)}");
         
@@ -36,7 +46,7 @@ public class TranslateHub : Hub
         
         // start the translation by using the Translator object, which schedules on the Hangfire background job client
         // having a single Translator class allows for multiple entrypoints/clients to implement translation
-        Translator translator = new Translator(_backgroundJobClient, _hubContext);
+        AsynchronousTranslatorSession translator = new AsynchronousTranslatorSession(_backgroundJobClient, _hubContext);
         translator.Translate(translationRequest);
     }
     

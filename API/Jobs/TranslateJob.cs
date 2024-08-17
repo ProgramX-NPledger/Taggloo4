@@ -5,17 +5,29 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace API.Jobs;
 
+/// <summary>
+/// A Hangfire Job instantiated per translationr request, providing asynchronous user-experience.
+/// </summary>
 public class TranslateJob 
 {
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly IHubContext<TranslateHub> _hubContext;
     
+    /// <summary>
+    /// Constructor for purposes of injecting required services.
+    /// </summary>
+    /// <param name="backgroundJobClient">Implementation of Hangfire <seealso cref="IBackgroundJobClient"/>.</param>
+    /// <param name="hubContext">Implementation of SignalR <seealso cref="IHubContext"/>.</param>
     public TranslateJob(IBackgroundJobClient backgroundJobClient, IHubContext<TranslateHub> hubContext)
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
     }
 
+    /// <summary>
+    /// Add a Translation Job to the queue for processing. 
+    /// </summary>
+    /// <param name="translationRequest"></param>
     public void AddTranslationJob(TranslationRequest translationRequest) 
     {
         string? jobId = _backgroundJobClient.Enqueue<TranslateJob>(x => x.ProcessTranslationJob(translationRequest));
@@ -24,7 +36,7 @@ public class TranslateJob
         _backgroundJobClient.ContinueJobWith<TranslateJob>(jobId, x => x.PublishTranslationResultsAsync(translationRequest, jobId));
     }
 
-    public async Task ProcessTranslationJob(TranslationRequest translationRequest)
+    public void ProcessTranslationJob(TranslationRequest translationRequest)
     {
         // basic meta data for translation
     }
@@ -36,9 +48,13 @@ public class TranslateJob
         // no results yet, return
         
         // have results
-        await _hubContext.Clients.Client(translationRequest.ClientId).SendCoreAsync("UpdateTranslationResults", new[] 
+        if (!string.IsNullOrWhiteSpace(translationRequest.ClientId))
         {
-            translationRequest.Query
-        });
+            await _hubContext.Clients.Client(translationRequest.ClientId).SendCoreAsync("UpdateTranslationResults", new[] 
+            {
+                translationRequest.Query
+            });
+            
+        }
     }
 }

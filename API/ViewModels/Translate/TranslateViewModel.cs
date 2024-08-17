@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace API.ViewModels.Translate;
 
+/// <summary>
+/// Implementation of fields for Translation requests.
+/// </summary>
 public class TranslateViewModel : ITranslationRequestViewModel
 {
-    public string TranslationId { get; set; }
-    
     /// <inheritdoc cref="ILargeTranslateFormViewModel"/>
     [JsonPropertyName("query")]
     public string? Query { get; set; }

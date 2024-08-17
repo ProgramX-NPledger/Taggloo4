@@ -21,21 +21,12 @@ namespace API.Controllers;
 
 public class TranslateController : Controller
 {
-    private readonly ILanguageRepository _languageRepository;
-    private readonly IBackgroundJobClient _backgroundJobClient;
-    private readonly IHubContext<TranslateHub> _hubContext;
 
     /// <summary>
     /// Default constructor with injected properties.
     /// </summary>
-    /// <param name="languageRepository">Implementation of <seealso cref="ILanguageRepository"/>.</param>
-    public TranslateController(ILanguageRepository languageRepository,
-        IBackgroundJobClient backgroundJobClient,
-        IHubContext<TranslateHub> hubContext)
+    public TranslateController()
     {
-        _languageRepository = languageRepository;
-        _backgroundJobClient = backgroundJobClient;
-        _hubContext = hubContext;
     }
     
     /// <summary>
@@ -51,13 +42,9 @@ public class TranslateController : Controller
     [HttpPost]
     public async Task<IActionResult> Translate(TranslateViewModel viewModel)
     {
-        // TranslationRequest translationRequest = CreateTranslationRequestFromITranslationRequestViewModel(viewModel);
-        // Translator translator = new Translator(_backgroundJobClient, _hubContext);
-        // string id = translator.Translate(translationRequest);
-
         return View("Translate", new TranslateViewModel()
         {
-            TranslationId = ""
+     
         });
     }
 
