@@ -2,12 +2,23 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/translate").build();
 
-connection.on("UpdateTranslationResults", function (translateGuid) {
-        alert(translateGuid);
+// this is from the server
+connection.on("UpdateTranslationResults", function (result) {
+       alert('updating translation results: '+result);
+        console.log(connection);
+
+        // connection id: connection.connectionId
     });
     
+// this is to the server
     connection.start().then(function () {
-    
+        connection.invoke("InvokeTranslation",[{
+            query: 'query',
+            fromLanguageCode: '',
+            toLanguageCode: ''
+        }]).then(v => {
+            // noop
+        });
     }).catch(function (err) {
         return console.error(err.toString());
     });

@@ -16,14 +16,12 @@ public class TranslateJob
         _hubContext = hubContext;
     }
 
-    public string? AddTranslationJob(TranslationRequest translationRequest) 
+    public void AddTranslationJob(TranslationRequest translationRequest) 
     {
         string? jobId = _backgroundJobClient.Enqueue<TranslateJob>(x => x.ProcessTranslationJob(translationRequest));
         
         // each translator gets a continueWith
-        _backgroundJobClient.ContinueJobWith<TranslateJob>(jobId, x => x.PublishTranslationResultsAsync(translationRequest));
-
-        return jobId;
+        _backgroundJobClient.ContinueJobWith<TranslateJob>(jobId, x => x.PublishTranslationResultsAsync(translationRequest, jobId));
     }
 
     public async Task ProcessTranslationJob(TranslationRequest translationRequest)
@@ -31,14 +29,14 @@ public class TranslateJob
         // basic meta data for translation
     }
 
-    public async Task PublishTranslationResultsAsync(TranslationRequest translationRequest)
+    public async Task PublishTranslationResultsAsync(TranslationRequest translationRequest, string hangfireJobId)
     {
         // this will be called per translator
         
         // no results yet, return
         
         // have results
-        await _hubContext.Clients.All.SendCoreAsync("UpdateTranslationResults", new[]
+        await _hubContext.Clients.Client(translationRequest.ClientId).SendCoreAsync("UpdateTranslationResults", new[] 
         {
             translationRequest.Query
         });

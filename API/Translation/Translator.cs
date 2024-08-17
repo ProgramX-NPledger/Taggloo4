@@ -22,17 +22,13 @@ public class Translator
         _options = options;
     }
 
-    public string Translate(TranslationRequest translationRequest)
+    public void Translate(TranslationRequest translationRequest)
     {
         if (_backgroundJobClient == null)
             throw new InvalidOperationException("BackgroundJobClient implementation cannot be null");
         
-        Guid translationGuid = Guid.NewGuid();
-
         // create the hangfire job and submit
         TranslateJob translateJob = new TranslateJob(_backgroundJobClient, _hubContext);
-        string? jobId=translateJob.AddTranslationJob(translationRequest);
-        
-        return $"{translationGuid}:{jobId ?? "null"}";
+        translateJob.AddTranslationJob(translationRequest);
     }
 }

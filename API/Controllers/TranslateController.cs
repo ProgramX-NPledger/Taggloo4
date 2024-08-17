@@ -51,13 +51,13 @@ public class TranslateController : Controller
     [HttpPost]
     public async Task<IActionResult> Translate(TranslateViewModel viewModel)
     {
-        TranslationRequest translationRequest = CreateTranslationRequestFromITranslationRequestViewModel(viewModel);
-        Translator translator = new Translator(_backgroundJobClient, _hubContext);
-        string id = translator.Translate(translationRequest);
+        // TranslationRequest translationRequest = CreateTranslationRequestFromITranslationRequestViewModel(viewModel);
+        // Translator translator = new Translator(_backgroundJobClient, _hubContext);
+        // string id = translator.Translate(translationRequest);
 
         return View("Translate", new TranslateViewModel()
         {
-            TranslationId = id
+            TranslationId = ""
         });
     }
 
@@ -72,4 +72,6 @@ public class TranslateController : Controller
         };
         return translationRequest;
     }
+
+
 }
