@@ -437,6 +437,8 @@ namespace API.Data.Migrations
 
                     b.HasIndex("FromWordId");
 
+                    b.HasIndex("ToWordId");
+
                     b.ToTable("WordTranslations");
                 });
 
@@ -642,14 +644,22 @@ namespace API.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("API.Model.Word", "FromWord")
-                        .WithMany("Translations")
+                        .WithMany("FromTranslations")
                         .HasForeignKey("FromWordId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("API.Model.Word", "ToWord")
+                        .WithMany("ToTranslations")
+                        .HasForeignKey("ToWordId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Dictionary");
 
                     b.Navigation("FromWord");
+
+                    b.Navigation("ToWord");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -740,7 +750,9 @@ namespace API.Data.Migrations
                 {
                     b.Navigation("AppearsInPhrases");
 
-                    b.Navigation("Translations");
+                    b.Navigation("FromTranslations");
+
+                    b.Navigation("ToTranslations");
                 });
 #pragma warning restore 612, 618
         }
