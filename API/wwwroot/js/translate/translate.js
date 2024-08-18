@@ -4,30 +4,25 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/translate").build(
 
 // this is from the server
 connection.on("UpdateTranslationResults", function (result) {
-       alert('updating translation results: '+result);
-        console.log(connection);
-
-        // connection id: connection.connectionId
+    console.log('UpdateTrabslationResults',result);
     });
     
-// this is to the server
-    connection.start().then(function () {
-        connection.invoke("InvokeTranslation",[{
-            query: 'query',
-            fromLanguageCode: '',
-            toLanguageCode: ''
-        }]).then(v => {
-            // noop
-        });
-    }).catch(function (err) {
-        return console.error(err.toString());
+// build the translation request from the query string and submit to server, which will respond as and when ready 
+// though UpdateTranslationResults callbacj
+connection.start().then(function () {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
     });
+    let translationRequest = {
+      fromLanguageCode: params.FromLanguageCode,
+      toLanguageCode: params.ToLanguageCode,
+      query: params.Query
+    };
+    console.log(translationRequest);
+    connection.invoke("InvokeTranslation",[translationRequest]).then(v => {
+        // noop
+    });
+}).catch(function (err) {
+    return console.error(err.toString());
+});
 
-// document.getElementById("sendButton").addEventListener("click", function (event) {
-//     var user = document.getElementById("userInput").value;
-//     var message = document.getElementById("messageInput").value;
-//     connection.invoke("SendMessage", user, message).catch(function (err) {
-//         return console.error(err.toString());
-//     });
-//     event.preventDefault();
-// });

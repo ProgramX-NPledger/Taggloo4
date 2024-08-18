@@ -14,4 +14,14 @@ public class TranslationRequest
     /// A unique identifier for the client, if available, for purposes of communicating back to the original client.
     /// </summary>
     public string? ClientId { get; set; }
+
+    /// <summary>
+    /// IETF Language Tag to translate from.
+    /// </summary>
+    public required string FromLanguageCode { get; set; }
+
+    /// <summary>
+    /// IETF Language Tag to translate to.
+    /// </summary>
+    public required  string ToLanguageCode { get; set; }
 }

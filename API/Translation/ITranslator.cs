@@ -5,5 +5,5 @@
 /// </summary>
 public interface ITranslator
 {
-    
+    TranslationResults Translate(TranslationRequest translationRequest);
 }

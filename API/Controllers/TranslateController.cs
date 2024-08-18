@@ -49,16 +49,5 @@ public class TranslateController : Controller
     }
 
 
-    private TranslationRequest CreateTranslationRequestFromITranslationRequestViewModel(ITranslationRequestViewModel viewModel)
-    {
-        if (string.IsNullOrWhiteSpace(viewModel.Query)) throw new InvalidOperationException("Query cannot be null");
-        
-        TranslationRequest translationRequest = new TranslationRequest()
-        {
-            Query = viewModel.Query
-        };
-        return translationRequest;
-    }
-
 
 }

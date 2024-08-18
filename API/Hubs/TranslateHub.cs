@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using API.Data;
 using API.Translation;
 using API.ViewModels.Translate;
 using Hangfire;
@@ -13,6 +14,7 @@ public class TranslateHub : Hub
 {
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly IHubContext<TranslateHub> _hubContext;
+    private readonly DataContext _entityFrameworkCoreDataContext;
 
     /// <summary>
     /// Constructor for injection of required services.
@@ -20,10 +22,12 @@ public class TranslateHub : Hub
     /// <param name="backgroundJobClient">Implementation of Hangfire <seealso cref="IBackgroundJobClient"/>.</param>
     /// <param name="hubContext">Implementation of SignalR <seealso cref="IHubContext"/>.</param>
     public TranslateHub(IBackgroundJobClient backgroundJobClient,
-        IHubContext<TranslateHub> hubContext)
+        IHubContext<TranslateHub> hubContext,
+        DataContext entityFrameworkCoreDataContext)
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
+        _entityFrameworkCoreDataContext = entityFrameworkCoreDataContext;
     }
 
     /// <summary>
@@ -46,19 +50,24 @@ public class TranslateHub : Hub
         
         // start the translation by using the Translator object, which schedules on the Hangfire background job client
         // having a single Translator class allows for multiple entrypoints/clients to implement translation
-        AsynchronousTranslatorSession translator = new AsynchronousTranslatorSession(_backgroundJobClient, _hubContext);
+        AsynchronousTranslatorSession translator = new AsynchronousTranslatorSession(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext);
         translator.Translate(translationRequest);
     }
     
     private static TranslationRequest CreateTranslationRequestFromTranslateViewModel(TranslateViewModel viewModel, string signalRConnectionId)
     {
         if (string.IsNullOrWhiteSpace(viewModel.Query)) throw new InvalidOperationException("Query cannot be null");
+        if (string.IsNullOrWhiteSpace(viewModel.FromLanguageCode))
+            throw new InvalidOperationException("FromLanguageCode cannot be null");
+        if (string.IsNullOrWhiteSpace(viewModel.ToLanguageCode))
+            throw new InvalidOperationException("ToLanguageCode cannot be null");
         
         TranslationRequest translationRequest = new TranslationRequest()
         {
             Query = viewModel.Query,
-            ClientId = signalRConnectionId
-            
+            ClientId = signalRConnectionId,
+            FromLanguageCode = viewModel.FromLanguageCode,
+            ToLanguageCode = viewModel.ToLanguageCode
         };
         return translationRequest;
     }

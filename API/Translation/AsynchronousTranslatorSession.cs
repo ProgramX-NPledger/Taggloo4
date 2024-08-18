@@ -1,4 +1,5 @@
-﻿using API.Hubs;
+﻿using API.Data;
+using API.Hubs;
 using API.Jobs;
 using Hangfire;
 using Microsoft.AspNetCore.SignalR;
@@ -13,16 +14,18 @@ public class AsynchronousTranslatorSession : ITranslatorSession
     private readonly TranslatorOptions _options;
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly IHubContext<TranslateHub> _hubContext;
+    private readonly DataContext _entityFrameworkCoreDataContext;
 
     /// <summary>
     /// Constructor using injected objects for Hangfire and SignalR services.
     /// </summary>
     /// <param name="backgroundJobClient">Implementation of the Hangfire <seealso cref="IBackgroundJobClient"/> object.</param>
     /// <param name="hubContext">Implementation of the SignalR <seealso cref="IHubContext{TranslateHub}"/> object.</param>
-    public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, IHubContext<TranslateHub> hubContext) 
+    public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, IHubContext<TranslateHub> hubContext, DataContext entityFrameworkCoreDataContext) 
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
+        _entityFrameworkCoreDataContext = entityFrameworkCoreDataContext;
         _options = new TranslatorOptions();
     }
 
@@ -32,7 +35,7 @@ public class AsynchronousTranslatorSession : ITranslatorSession
     /// <param name="backgroundJobClient">Implementation of the Hangfire <seealso cref="IBackgroundJobClient"/> object.</param>
     /// <param name="hubContext">Implementation of the SignalR <seealso cref="IHubContext{TranslateHub}"/> object.</param>
     /// <param name="options">Options which may customise translation behaviour.</param>
-    public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, IHubContext<TranslateHub> hubContext, TranslatorOptions options) : this(backgroundJobClient, hubContext)
+    public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, IHubContext<TranslateHub> hubContext, DataContext entityFrameworkCoreDataContext, TranslatorOptions options) : this(backgroundJobClient, hubContext, entityFrameworkCoreDataContext)
     {
         _options = options;
     }
@@ -50,7 +53,7 @@ public class AsynchronousTranslatorSession : ITranslatorSession
             throw new InvalidOperationException($"{nameof(IHubContext)} implementation cannot be null");
         
         // create the hangfire job and submit
-        TranslateJob translateJob = new TranslateJob(_backgroundJobClient, _hubContext);
+        TranslateJob translateJob = new TranslateJob(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext);
         translateJob.AddTranslationJob(translationRequest);
     }
 }
