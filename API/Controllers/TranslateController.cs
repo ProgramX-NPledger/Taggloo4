@@ -47,7 +47,13 @@ public class TranslateController : Controller
      
         });
     }
-
+    
+    [HttpPost]
+    public async Task<IActionResult> RenderResult(string translator)
+    {
+        // return partial with html suitable for KO binding
+        return PartialView($"TranslatorPartialViews/{translator}");
+    }
 
 
 }

@@ -31,10 +31,10 @@ public class WordTranslator : ITranslator
         
         return new TranslationResults()
         {
-            ResultItems = wordTranslations.Select(q=>new TranslationResultItem()
+            ResultItems = wordTranslations.Select(q=>new
             {
-                MainText = q.ToWord!.TheWord,
-                SubText = null
+                Translation=q.ToWord?.TheWord,
+                ToWordId=q.ToWordId
             })
         };
     }
