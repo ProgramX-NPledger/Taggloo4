@@ -36,19 +36,19 @@ public class TranslateJob
     {
         string? jobId = _backgroundJobClient.Enqueue<TranslateJob>(x => x.ProcessTranslationJob(translationRequest));
 
-        IEnumerable<ITranslator> translators = GetTranslators();
-        foreach (ITranslator translator in translators)
+        IEnumerable<ITranslatorFactory> translatorFactories = GetTranslatorFactories();
+        foreach (ITranslatorFactory translatorFactory in translatorFactories)
         {
             // each translator gets a continueWith
-            _backgroundJobClient.ContinueJobWith<TranslateJob>(jobId, x => x.PublishTranslationResultsAsync(translator, translationRequest, jobId));
+            _backgroundJobClient.ContinueJobWith<TranslateJob>(jobId, x => x.PublishTranslationResultsAsync(translatorFactory, translationRequest, jobId));
         }
     }
 
-    private IEnumerable<ITranslator> GetTranslators()
+    private IEnumerable<ITranslatorFactory> GetTranslatorFactories()
     {
         return new[]
         {
-            new WordTranslatorFactory().Create(_dataContext)
+            new WordTranslatorFactory()
         };
     }
 
@@ -57,11 +57,12 @@ public class TranslateJob
         // basic meta data for translation
     }
 
-    public async Task PublishTranslationResultsAsync(ITranslator translator, TranslationRequest translationRequest,
+    public async Task PublishTranslationResultsAsync(ITranslatorFactory translatorFactory, TranslationRequest translationRequest,
         string hangfireJobId)
     {
         // this will be called per translator
         DateTime startTimeStamp = DateTime.Now;
+        ITranslator translator = translatorFactory.Create(_dataContext);
         TranslationResults translationResults = translator.Translate(translationRequest);
         TimeSpan delta = DateTime.Now - startTimeStamp;
         TranslationResultsWithMetaData translationResultsWithMetaData =

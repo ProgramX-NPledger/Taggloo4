@@ -1,4 +1,7 @@
 ﻿using API.Data;
+using API.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 
 namespace API.Translation.Translators;
 
@@ -13,6 +16,26 @@ public class WordTranslator : ITranslator
 
     public TranslationResults Translate(TranslationRequest translationRequest)
     {
-        return new TranslationResults();
+        WordTranslation[] wordTranslations = _entityFrameworkCoreDatabaseContext.WordTranslations
+            .Include(m => m.FromWord!.Dictionary)
+            .Include(m => m.ToWord!.Dictionary)
+            .AsNoTracking()
+            .Where(q =>
+                q.FromWord!.TheWord==translationRequest.Query &&
+                q.FromWord!.Dictionary!.IetfLanguageTag==translationRequest.FromLanguageCode &&
+                q.ToWord!.Dictionary!.IetfLanguageTag==translationRequest.ToLanguageCode
+            ).OrderBy(q => q.ToWord!.TheWord)
+            .Skip(translationRequest.OrdinalOfFirstResult)
+            .Take(translationRequest.MaximumNumberOfResults)
+            .ToArray();
+        
+        return new TranslationResults()
+        {
+            ResultItems = wordTranslations.Select(q=>new TranslationResultItem()
+            {
+                MainText = q.ToWord!.TheWord,
+                SubText = null
+            })
+        };
     }
 }
