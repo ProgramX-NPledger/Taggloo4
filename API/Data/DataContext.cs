@@ -142,9 +142,15 @@ public class DataContext : IdentityDbContext<AppUser,
 		// translations
 		
 		builder.Entity<Word>()
-			.HasMany(w => w.Translations)
+			.HasMany(w => w.FromTranslations)
 			.WithOne(wt => wt.FromWord)
 			.HasForeignKey(wt => wt.FromWordId)
+			.OnDelete(DeleteBehavior.NoAction);
+		
+		builder.Entity<Word>()
+			.HasMany(w => w.ToTranslations)
+			.WithOne(wt => wt.ToWord)
+			.HasForeignKey(wt => wt.ToWordId)
 			.OnDelete(DeleteBehavior.NoAction);
 		
 		builder.Entity<Phrase>()
