@@ -48,7 +48,12 @@ public class Word
 	/// <summary>
 	/// Translations of the Word.
 	/// </summary>
-	public ICollection<WordTranslation> Translations { get; set; } = new List<WordTranslation>();
+	public ICollection<WordTranslation> ToTranslations { get; set; } = new List<WordTranslation>();
+
+	/// <summary>
+	/// Translations of the Word.
+	/// </summary>
+	public ICollection<WordTranslation> FromTranslations { get; set; } = new List<WordTranslation>();
 
 	/// <summary>
 	/// Phrases in which this Word appears.

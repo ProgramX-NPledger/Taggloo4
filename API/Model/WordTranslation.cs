@@ -26,8 +26,8 @@ public class WordTranslation
 	/// The identifier of the <seealso cref="Word"/> translation.
 	/// </summary>
 	public int ToWordId { get; set; }
-	// this breaks migrations
-	//public Word ToWord { get; set; }
+	
+	public Word? ToWord { get; set; }
 	
 	/// <summary>
 	/// The Host from which the Word Translation was created.
