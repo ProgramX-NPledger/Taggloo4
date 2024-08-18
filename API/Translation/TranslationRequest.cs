@@ -24,4 +24,9 @@ public class TranslationRequest
     /// IETF Language Tag to translate to.
     /// </summary>
     public required  string ToLanguageCode { get; set; }
+
+    public int OrdinalOfFirstResult { get; set; }
+
+    public int MaximumNumberOfResults { get; set; }
+    
 }

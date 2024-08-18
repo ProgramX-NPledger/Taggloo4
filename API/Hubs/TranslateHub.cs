@@ -67,7 +67,9 @@ public class TranslateHub : Hub
             Query = viewModel.Query,
             ClientId = signalRConnectionId,
             FromLanguageCode = viewModel.FromLanguageCode,
-            ToLanguageCode = viewModel.ToLanguageCode
+            ToLanguageCode = viewModel.ToLanguageCode,
+            MaximumNumberOfResults = viewModel.MaximumResults,
+            OrdinalOfFirstResult = viewModel.OrdinalOfFirstResult
         };
         return translationRequest;
     }

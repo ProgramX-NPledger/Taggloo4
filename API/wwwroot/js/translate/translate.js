@@ -4,7 +4,7 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/translate").build(
 
 // this is from the server
 connection.on("UpdateTranslationResults", function (result) {
-    console.log('UpdateTrabslationResults',result);
+    console.log('UpdateTranslationResults',result);
     });
     
 // build the translation request from the query string and submit to server, which will respond as and when ready 
@@ -14,9 +14,11 @@ connection.start().then(function () {
         get: (searchParams, prop) => searchParams.get(prop),
     });
     let translationRequest = {
-      fromLanguageCode: params.FromLanguageCode,
-      toLanguageCode: params.ToLanguageCode,
-      query: params.Query
+        fromLanguageCode: params.FromLanguageCode,
+        toLanguageCode: params.ToLanguageCode,
+        query: params.Query,
+        ordinalOfFirstResult: 0,
+        maximumResults: 5        
     };
     console.log(translationRequest);
     connection.invoke("InvokeTranslation",[translationRequest]).then(v => {

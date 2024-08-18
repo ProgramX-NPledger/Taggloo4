@@ -23,5 +23,10 @@ public class TranslateViewModel : ITranslationRequestViewModel
 
     /// <inheritdoc cref="ILargeTranslateFormViewModel"/>
     public IEnumerable<SelectListItem>? AllLanguages { get; set; }
-    
+
+    [JsonPropertyName("ordinalOfFirstResult")]
+    public int OrdinalOfFirstResult { get; set; }
+
+    [JsonPropertyName("maximumResults")]
+    public int MaximumResults { get; set; }
 }
