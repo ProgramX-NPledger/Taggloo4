@@ -187,7 +187,7 @@ public class WordsController : BaseApiController
 						HRef = $"{GetBaseApiPath()}/wordinphrases?wordid={w.Id}",
 						Types = new[] { JSON_MIME_TYPE }
 					}
-				}.Union(w.Translations.Select(t=>new Link()
+				}.Union(w.ToTranslations.Select(t=>new Link()
 				{
 					Action = "get",
 					Rel = "translation",
@@ -245,7 +245,7 @@ public class WordsController : BaseApiController
 			DictionaryId = createWord.DictionaryId,
 			ExternalId = createWord.ExternalId ?? Guid.NewGuid().ToString(),
 			Phrases = new Collection<Phrase>(),
-			Translations = new Collection<WordTranslation>()
+			ToTranslations = new Collection<WordTranslation>()
 		};
 
 		_wordRepository.Create(newWord);
