@@ -22,31 +22,24 @@ public class TranslateJob
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly IHubContext<TranslateHub> _hubContext;
     private readonly DataContext _dataContext;
-    private readonly ICompositeViewEngine _compositeViewEngine;
-    private readonly ITempDataProvider _tempDataProvider;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IWebHostEnvironment _webHosEnvironment;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
     /// <summary>
     /// Constructor for purposes of injecting required services.
     /// </summary>
     /// <param name="backgroundJobClient">Implementation of Hangfire <seealso cref="IBackgroundJobClient"/>.</param>
     /// <param name="hubContext">Implementation of SignalR <seealso cref="IHubContext"/>.</param>
+    /// <param name="dataContext">Entity Framework context to enable access to underlying datastore.</param>
+    /// <param name="webHostEnvironment">Implementation of ASP.NET <seealso cref="IWebHostEnvironment"/>.</param>
     public TranslateJob(IBackgroundJobClient backgroundJobClient, 
         IHubContext<TranslateHub> hubContext, 
         DataContext dataContext,
-        // ICompositeViewEngine compositeViewEngine,
-        // ITempDataProvider tempDataProvider,
-        // IHttpContextAccessor httpContextAccessor,
-        IWebHostEnvironment webHosEnvironment)
+        IWebHostEnvironment webHostEnvironment)
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
         _dataContext = dataContext;
-        // _compositeViewEngine = compositeViewEngine;
-        // _tempDataProvider = tempDataProvider;
-        // _httpContextAccessor = httpContextAccessor;
-        _webHosEnvironment = webHosEnvironment;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     /// <summary>
@@ -73,11 +66,22 @@ public class TranslateJob
         };
     }
 
+    /// <summary>
+    /// Called by Hangfire once for each translation request.
+    /// </summary>
+    /// <param name="translationRequest">The complete Translation request from the client.</param>
     public void ProcessTranslationJob(TranslationRequest translationRequest)
     {
         // basic meta data for translation
     }
 
+    /// <summary>
+    /// Called by Hangfire per implementation of <seealso cref="ITranslator"/>, performs translation and returns the result by compiling a Razor view and sending that
+    /// view back to the client using SignalR.
+    /// </summary>
+    /// <param name="translatorFactory">Implementation of <seealso cref="ITranslatorFactory"/> to allow construction of each <seealso cref="ITranslator"/>.</param>
+    /// <param name="translationRequest">The complete Translation request from the client.</param>
+    /// <param name="hangfireJobId">The job identifier assigned to the Translation task by Hangfire.</param>
     public async Task PublishTranslationResultsAsync(ITranslatorFactory translatorFactory, TranslationRequest translationRequest,
         string hangfireJobId)
     {
@@ -90,27 +94,18 @@ public class TranslateJob
             new TranslationResultsWithMetaData(translationResults,translationRequest)
             {
                 Translator = translator.GetType().Name,
-                TimeTaken = delta
-            }; // http://localhost:5067/Translate/Translate?Query=thie&FromLanguageCode=gv-GV&ToLanguageCode=en-GB
+                TimeTaken = delta,
+                JobId = hangfireJobId
+            }; 
         
         if (!string.IsNullOrWhiteSpace(translationRequest.ClientId))
         {
-            // TODO: Compile view, passing view model and return to client for rendering - no KnockoutJS
-            var path = Path.Combine(_webHosEnvironment.ContentRootPath,"Views\\Translate\\TranslatorPartialViews\\WordTranslator.cshtml");
-            path = "Views\\Translate\\WordTranslator.cshtml";
-            //var viewDataDictionary = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
-            //var actionContext = new ActionContext(_httpContextAccessor.HttpContext, new RouteData(), new ActionDescriptor());
-            //viewDataDictionary.Model = translationResultsWithMetaData;
-            //var text = await RenderView(path, viewDataDictionary, actionContext);
-            
-
-
-            string renderedView = await RazorViewRendererFactory.New(
-                _webHosEnvironment.ContentRootPath,
-                _webHosEnvironment.WebRootPath,
+            string viewName = $"Views\\Translate\\{translator.GetType().Name}.cshtml";
+            string renderedView = await RazorViewRendererFactory.Create(
+                _webHostEnvironment.ContentRootPath,
+                _webHostEnvironment.WebRootPath,
                 "API"
-            ).RenderAsync(path, translationResultsWithMetaData);
-            
+            ).RenderAsync(viewName, translationResultsWithMetaData);
             
             await _hubContext.Clients.Client(translationRequest.ClientId).SendCoreAsync("UpdateTranslationResults", new[] 
             {
@@ -118,31 +113,5 @@ public class TranslateJob
             });
         }
     }
-    //
-    // private async Task<string> RenderView(string path, ViewDataDictionary viewDataDictionary, ActionContext actionContext)
-    // {
-    //     using (var sw = new System.IO.StringWriter())
-    //     {
-    //         var viewResult = _compositeViewEngine.FindView(actionContext, path, false);
-    //
-    //         TempDataDictionary tempDataDictionary =
-    //             new TempDataDictionary(_httpContextAccessor.HttpContext, _tempDataProvider);
-    //         HtmlHelperOptions htmlHelperOptions = new HtmlHelperOptions();
-    //         var viewContext = new ViewContext(actionContext, viewResult.View, viewDataDictionary, tempDataDictionary, sw, htmlHelperOptions);
-    //
-    //         await viewResult.View.RenderAsync(viewContext);
-    //         sw.Flush();
-    //
-    //         if (viewContext.ViewData != viewDataDictionary)
-    //         {
-    //             var keys = viewContext.ViewData.Keys.ToArray();
-    //             foreach (var key in keys)
-    //             {
-    //                 viewDataDictionary[key] = viewContext.ViewData[key];
-    //             }
-    //         }
-    //
-    //         return sw.ToString();
-    //     }
-    // }
+ 
 }

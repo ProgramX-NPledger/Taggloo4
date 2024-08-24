@@ -27,6 +27,9 @@ public class WordTranslation
 	/// </summary>
 	public int ToWordId { get; set; }
 	
+	/// <summary>
+	/// The Word being translated to.
+	/// </summary>
 	public Word? ToWord { get; set; }
 	
 	/// <summary>

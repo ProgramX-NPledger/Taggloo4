@@ -25,8 +25,14 @@ public class TranslationRequest
     /// </summary>
     public required  string ToLanguageCode { get; set; }
 
+    /// <summary>
+    /// Ordinal of the first result (useful when paging).
+    /// </summary>
     public int OrdinalOfFirstResult { get; set; }
 
+    /// <summary>
+    /// Maximum number of results in this page (useful when paging).
+    /// </summary>
     public int MaximumNumberOfResults { get; set; }
     
 }

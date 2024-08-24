@@ -17,31 +17,24 @@ public class AsynchronousTranslatorSession : ITranslatorSession
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly IHubContext<TranslateHub> _hubContext;
     private readonly DataContext _entityFrameworkCoreDataContext;
-    private readonly IWebHostEnvironment _webHosEnvironment;
-    // private readonly ICompositeViewEngine _compositeViewEngine;
-    // private readonly ITempDataProvider _tempDataProvider;
-    // private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
     /// <summary>
     /// Constructor using injected objects for Hangfire and SignalR services.
     /// </summary>
     /// <param name="backgroundJobClient">Implementation of the Hangfire <seealso cref="IBackgroundJobClient"/> object.</param>
     /// <param name="hubContext">Implementation of the SignalR <seealso cref="IHubContext{TranslateHub}"/> object.</param>
+    /// <param name="entityFrameworkCoreDataContext">Entity Framework context to enable access to underlying datastore.</param>
+    /// <param name="webHostEnvironment">Implementation of ASP.NET <seealso cref="IWebHostEnvironment"/>.</param>
     public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, 
         IHubContext<TranslateHub> hubContext, 
         DataContext entityFrameworkCoreDataContext,
-        // ICompositeViewEngine compositeViewEngine,
-        // ITempDataProvider tempDataProvider,
-        // IHttpContextAccessor httpContextAccessor
-        IWebHostEnvironment webHosEnvironment) 
+        IWebHostEnvironment webHostEnvironment) 
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
         _entityFrameworkCoreDataContext = entityFrameworkCoreDataContext;
-        _webHosEnvironment = webHosEnvironment;
-        // _compositeViewEngine = compositeViewEngine;
-        // _tempDataProvider = tempDataProvider;
-        // _httpContextAccessor = httpContextAccessor;
+        _webHostEnvironment = webHostEnvironment;
         _options = new TranslatorOptions();
     }
 
@@ -50,15 +43,14 @@ public class AsynchronousTranslatorSession : ITranslatorSession
     /// </summary>
     /// <param name="backgroundJobClient">Implementation of the Hangfire <seealso cref="IBackgroundJobClient"/> object.</param>
     /// <param name="hubContext">Implementation of the SignalR <seealso cref="IHubContext{TranslateHub}"/> object.</param>
+    /// <param name="entityFrameworkCoreDataContext">Entity Framework context to enable access to underlying datastore.</param>
+    /// <param name="webHostEnvironment">Implementation of ASP.NET <seealso cref="IWebHostEnvironment"/>.</param>
     /// <param name="options">Options which may customise translation behaviour.</param>
     public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, 
         IHubContext<TranslateHub> hubContext, 
         DataContext entityFrameworkCoreDataContext, 
-        // ICompositeViewEngine compositeViewEngine,
-        // ITempDataProvider tempDataProvider,
-        // IHttpContextAccessor httpContextAccessor,
-        IWebHostEnvironment webHosEnvironment,
-        TranslatorOptions options) : this(backgroundJobClient, hubContext, entityFrameworkCoreDataContext,webHosEnvironment)
+        IWebHostEnvironment webHostEnvironment,
+        TranslatorOptions options) : this(backgroundJobClient, hubContext, entityFrameworkCoreDataContext,webHostEnvironment)
     {
         _options = options;
     }
@@ -76,7 +68,7 @@ public class AsynchronousTranslatorSession : ITranslatorSession
             throw new InvalidOperationException($"{nameof(IHubContext)} implementation cannot be null");
         
         // create the hangfire job and submit
-        TranslateJob translateJob = new TranslateJob(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext, _webHosEnvironment);
+        TranslateJob translateJob = new TranslateJob(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext, _webHostEnvironment);
         translateJob.AddTranslationJob(translationRequest);
     }
 }

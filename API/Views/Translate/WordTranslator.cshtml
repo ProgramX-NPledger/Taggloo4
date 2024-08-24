@@ -1,11 +1,3 @@
-﻿<div id="parent">
-    <p>Word Translator</p>
-    PARENT <span data-bind="text: $parent"></span>
-    Root: <span data-bind="text: $root"></span>
-    translator <span data-bind="text: translator"></span>
+﻿@model API.Translation.TranslationResultsWithMetaData
 
-    <pre data-bind="text: ko.toJSON($parent)"></pre>
-
-</div>
-
-<p>From Views folder</p>
+<p>@Model.TimeTaken</p>

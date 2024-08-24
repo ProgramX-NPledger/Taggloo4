@@ -27,21 +27,17 @@ public class TranslateHub : Hub
     /// </summary>
     /// <param name="backgroundJobClient">Implementation of Hangfire <seealso cref="IBackgroundJobClient"/>.</param>
     /// <param name="hubContext">Implementation of SignalR <seealso cref="IHubContext"/>.</param>
+    /// <param name="entityFrameworkCoreDataContext">Entity Framework context to enable access to underlying datastore.</param>
+    /// <param name="webHostEnvironment">Implementation of ASP.NET <seealso cref="IWebHostEnvironment"/>.</param>
     public TranslateHub(IBackgroundJobClient backgroundJobClient,
         IHubContext<TranslateHub> hubContext,
         DataContext entityFrameworkCoreDataContext,
-        // ICompositeViewEngine compositeViewEngine,
-        // ITempDataProvider tempDataProvider,
-        // IHttpContextAccessor httpContextAccessor
-        IWebHostEnvironment webHosEnvironment)
+        IWebHostEnvironment webHostEnvironment)
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
         _entityFrameworkCoreDataContext = entityFrameworkCoreDataContext;
-        _webHosEnvironment = webHosEnvironment;
-        // _compositeViewEngine = compositeViewEngine;
-        // _tempDataProvider = tempDataProvider;
-        // _httpContextAccessor = httpContextAccessor;
+        _webHosEnvironment = webHostEnvironment;
     }
 
     /// <summary>

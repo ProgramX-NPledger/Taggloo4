@@ -10,9 +10,20 @@ using Microsoft.Extensions.PlatformAbstractions;
 
 namespace API.RazorViewRendering;
 
+/// <summary>
+/// Instantiates and configures a <seealso cref="RazorViewRenderer"/>.
+/// </summary>
 public static class RazorViewRendererFactory
 {
-    public static RazorViewRenderer New(string contentRootPath, string webRootPath, string defaultApplicationName)
+    /// <summary>
+    /// Instantiates and configures a <seealso cref="RazorViewRenderer"/>.
+    /// </summary>
+    /// <param name="contentRootPath">The physical location of content within the web-site.</param>
+    /// <param name="webRootPath">The physical location of web content within the web-site (typically within wwwroot)</param>
+    /// <param name="defaultApplicationName">Name of the application.</param>
+    /// <returns>A configured <seealso cref="RazorViewRenderer"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if a required argument is <c>null</c>.</exception>
+    public static RazorViewRenderer Create(string contentRootPath, string webRootPath, string defaultApplicationName)
     {
         if (string.IsNullOrWhiteSpace(contentRootPath))
             throw new ArgumentNullException(nameof(contentRootPath));

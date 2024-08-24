@@ -35,9 +35,17 @@ public class TranslateController : Controller
     /// <returns>View <c>Index</c>.</returns>
     public async Task<IActionResult> Index()
     {
+        // return full translation search form
         return View();
     }
 
+    /// <summary>
+    /// Translation results page.
+    /// </summary>
+    /// <param name="viewModel"></param>
+    /// <returns></returns>
+    /// <remarks>Translation results are returned asynchronously having been submitted using the Hangfire job management API and
+    /// are returned by SignaLR.</remarks>
     [HttpGet]
     [HttpPost]
     public async Task<IActionResult> Translate(TranslateViewModel viewModel)
@@ -48,12 +56,7 @@ public class TranslateController : Controller
         });
     }
     
-    [HttpPost]
-    public async Task<IActionResult> RenderResult(string translator)
-    {
-        // return partial with html suitable for KO binding
-        return PartialView($"TranslatorPartialViews/{translator}");
-    }
+
 
 
 }
