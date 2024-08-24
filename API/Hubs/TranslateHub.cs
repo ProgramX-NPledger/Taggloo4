@@ -3,6 +3,8 @@ using API.Data;
 using API.Translation;
 using API.ViewModels.Translate;
 using Hangfire;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.SignalR;
 
 namespace API.Hubs;
@@ -15,6 +17,10 @@ public class TranslateHub : Hub
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly IHubContext<TranslateHub> _hubContext;
     private readonly DataContext _entityFrameworkCoreDataContext;
+    private readonly IWebHostEnvironment _webHosEnvironment;
+    // private readonly ICompositeViewEngine _compositeViewEngine;
+    // private readonly ITempDataProvider _tempDataProvider;
+    // private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
     /// Constructor for injection of required services.
@@ -23,11 +29,19 @@ public class TranslateHub : Hub
     /// <param name="hubContext">Implementation of SignalR <seealso cref="IHubContext"/>.</param>
     public TranslateHub(IBackgroundJobClient backgroundJobClient,
         IHubContext<TranslateHub> hubContext,
-        DataContext entityFrameworkCoreDataContext)
+        DataContext entityFrameworkCoreDataContext,
+        // ICompositeViewEngine compositeViewEngine,
+        // ITempDataProvider tempDataProvider,
+        // IHttpContextAccessor httpContextAccessor
+        IWebHostEnvironment webHosEnvironment)
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
         _entityFrameworkCoreDataContext = entityFrameworkCoreDataContext;
+        _webHosEnvironment = webHosEnvironment;
+        // _compositeViewEngine = compositeViewEngine;
+        // _tempDataProvider = tempDataProvider;
+        // _httpContextAccessor = httpContextAccessor;
     }
 
     /// <summary>
@@ -50,7 +64,7 @@ public class TranslateHub : Hub
         
         // start the translation by using the Translator object, which schedules on the Hangfire background job client
         // having a single Translator class allows for multiple entrypoints/clients to implement translation
-        AsynchronousTranslatorSession translator = new AsynchronousTranslatorSession(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext);
+        AsynchronousTranslatorSession translator = new AsynchronousTranslatorSession(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext, _webHosEnvironment);
         translator.Translate(translationRequest);
     }
     

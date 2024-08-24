@@ -2,6 +2,8 @@
 using API.Hubs;
 using API.Jobs;
 using Hangfire;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.SignalR;
 
 namespace API.Translation;
@@ -15,17 +17,31 @@ public class AsynchronousTranslatorSession : ITranslatorSession
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly IHubContext<TranslateHub> _hubContext;
     private readonly DataContext _entityFrameworkCoreDataContext;
+    private readonly IWebHostEnvironment _webHosEnvironment;
+    // private readonly ICompositeViewEngine _compositeViewEngine;
+    // private readonly ITempDataProvider _tempDataProvider;
+    // private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
     /// Constructor using injected objects for Hangfire and SignalR services.
     /// </summary>
     /// <param name="backgroundJobClient">Implementation of the Hangfire <seealso cref="IBackgroundJobClient"/> object.</param>
     /// <param name="hubContext">Implementation of the SignalR <seealso cref="IHubContext{TranslateHub}"/> object.</param>
-    public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, IHubContext<TranslateHub> hubContext, DataContext entityFrameworkCoreDataContext) 
+    public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, 
+        IHubContext<TranslateHub> hubContext, 
+        DataContext entityFrameworkCoreDataContext,
+        // ICompositeViewEngine compositeViewEngine,
+        // ITempDataProvider tempDataProvider,
+        // IHttpContextAccessor httpContextAccessor
+        IWebHostEnvironment webHosEnvironment) 
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
         _entityFrameworkCoreDataContext = entityFrameworkCoreDataContext;
+        _webHosEnvironment = webHosEnvironment;
+        // _compositeViewEngine = compositeViewEngine;
+        // _tempDataProvider = tempDataProvider;
+        // _httpContextAccessor = httpContextAccessor;
         _options = new TranslatorOptions();
     }
 
@@ -35,7 +51,14 @@ public class AsynchronousTranslatorSession : ITranslatorSession
     /// <param name="backgroundJobClient">Implementation of the Hangfire <seealso cref="IBackgroundJobClient"/> object.</param>
     /// <param name="hubContext">Implementation of the SignalR <seealso cref="IHubContext{TranslateHub}"/> object.</param>
     /// <param name="options">Options which may customise translation behaviour.</param>
-    public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, IHubContext<TranslateHub> hubContext, DataContext entityFrameworkCoreDataContext, TranslatorOptions options) : this(backgroundJobClient, hubContext, entityFrameworkCoreDataContext)
+    public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, 
+        IHubContext<TranslateHub> hubContext, 
+        DataContext entityFrameworkCoreDataContext, 
+        // ICompositeViewEngine compositeViewEngine,
+        // ITempDataProvider tempDataProvider,
+        // IHttpContextAccessor httpContextAccessor,
+        IWebHostEnvironment webHosEnvironment,
+        TranslatorOptions options) : this(backgroundJobClient, hubContext, entityFrameworkCoreDataContext,webHosEnvironment)
     {
         _options = options;
     }
@@ -53,7 +76,7 @@ public class AsynchronousTranslatorSession : ITranslatorSession
             throw new InvalidOperationException($"{nameof(IHubContext)} implementation cannot be null");
         
         // create the hangfire job and submit
-        TranslateJob translateJob = new TranslateJob(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext);
+        TranslateJob translateJob = new TranslateJob(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext, _webHosEnvironment);
         translateJob.AddTranslationJob(translationRequest);
     }
 }
