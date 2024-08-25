@@ -18,6 +18,8 @@ public class TranslateHub : Hub
     private readonly IHubContext<TranslateHub> _hubContext;
     private readonly DataContext _entityFrameworkCoreDataContext;
     private readonly IWebHostEnvironment _webHosEnvironment;
+
+    private readonly ILogger<TranslateHub> _logger;
     // private readonly ICompositeViewEngine _compositeViewEngine;
     // private readonly ITempDataProvider _tempDataProvider;
     // private readonly IHttpContextAccessor _httpContextAccessor;
@@ -32,12 +34,14 @@ public class TranslateHub : Hub
     public TranslateHub(IBackgroundJobClient backgroundJobClient,
         IHubContext<TranslateHub> hubContext,
         DataContext entityFrameworkCoreDataContext,
-        IWebHostEnvironment webHostEnvironment)
+        IWebHostEnvironment webHostEnvironment,
+        ILogger<TranslateHub> logger)
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
         _entityFrameworkCoreDataContext = entityFrameworkCoreDataContext;
         _webHosEnvironment = webHostEnvironment;
+        _logger = logger;
     }
 
     /// <summary>
@@ -50,18 +54,27 @@ public class TranslateHub : Hub
     {
         // the first element in the arguments must be an instance of the ITranslationRequestViewModel
         if (args.Length < 1) throw new InvalidOperationException($"Invalid arguments count");
-        if (!(args[0] is JsonElement)) throw new InvalidOperationException("IInvalid argument");
+        if (!(args[0] is JsonElement)) throw new InvalidOperationException("Invalid argument");
         JsonElement jsonElement = (JsonElement)args[0];
         TranslateViewModel? translateViewModel = JsonSerializer.Deserialize<TranslateViewModel>(jsonElement.ToString());
         if (translateViewModel == null)
             throw new InvalidOperationException($"Failed to deserialize {nameof(TranslateViewModel)}");
+
+        try
+        {
+            TranslationRequest translationRequest = CreateTranslationRequestFromTranslateViewModel(translateViewModel, Context.ConnectionId);
         
-        TranslationRequest translationRequest = CreateTranslationRequestFromTranslateViewModel(translateViewModel, Context.ConnectionId);
-        
-        // start the translation by using the Translator object, which schedules on the Hangfire background job client
-        // having a single Translator class allows for multiple entrypoints/clients to implement translation
-        AsynchronousTranslatorSession translator = new AsynchronousTranslatorSession(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext, _webHosEnvironment);
-        translator.Translate(translationRequest);
+            // start the translation by using the Translator object, which schedules on the Hangfire background job client
+            // having a single Translator class allows for multiple entrypoints/clients to implement translation
+            AsynchronousTranslatorSession translator = new AsynchronousTranslatorSession(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext, _webHosEnvironment);
+            translator.Translate(translationRequest);
+        }
+        catch (InvalidOperationException ioEx)
+        {
+            // an invalid JSON request was made, so no submission is made 
+            _logger.LogError("An invalid JSON request was made");
+        }
+    
     }
     
     private static TranslationRequest CreateTranslationRequestFromTranslateViewModel(TranslateViewModel viewModel, string signalRConnectionId)

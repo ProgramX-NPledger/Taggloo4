@@ -1,3 +1,36 @@
-﻿@model API.Translation.TranslationResultsWithMetaData
+﻿@using System.Web
+@using API.Translation
+@using Microsoft.AspNetCore.Mvc.Routing
+@model API.Translation.TranslationResultsWithMetaData
 
+<div class="row">
+    <div class="col-4">
+        <h3><em>&quot;@Model.TranslationRequest.Query&quot;</em></h3>
+    </div>
+    <div class="col-8">
+        @if (Model.TranslationResults.ResultItems.Any())
+        {
+            <ul>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    TranslationResultItem resultItem = Model.TranslationResults.ResultItems.ElementAt(i-1);
+                    WordTranslationResultItem wordTranslationResultItem = (WordTranslationResultItem)resultItem;
+                    <li>
+                        <a href="@($"/translate/translate?Query={HttpUtility.UrlEncode(wordTranslationResultItem.Translation)}&FromLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.ToLanguageCode)}&ToLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.FromLanguageCode)}")">
+                            @wordTranslationResultItem.Translation
+                        </a>
+                    </li>
+                }
+            </ul>
+            @if (Model.TranslationResults.ResultItems.Count() > 5)
+            {
+                <p><a href="@($"/translate/details?Query={HttpUtility.UrlEncode(Model.TranslationRequest.Query)}&FromLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.FromLanguageCode)}&ToLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.ToLanguageCode)}&Translators={Model.Translator})")">More &gt;</a></p>
+            }
+        }
+        else
+        {
+            <p>There were no matches.</p>
+        }
+    </div>
+</div>
 <p>@Model.TimeTaken</p>

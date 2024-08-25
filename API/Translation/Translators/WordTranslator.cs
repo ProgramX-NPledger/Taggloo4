@@ -41,13 +41,23 @@ public class WordTranslator : ITranslator
             .Skip(translationRequest.OrdinalOfFirstResult)
             .Take(translationRequest.MaximumNumberOfResults)
             .ToArray();
+
+        // if there were no matches and there were spaces in the query, return null
+        if (!wordTranslations.Any() && translationRequest.Query.Contains((" ")))
+        {
+            return new TranslationResults()
+            {
+                ResultItems = null
+            };
+        }
         
         return new TranslationResults()
         {
-            ResultItems = wordTranslations.Select(q=>new
+            ResultItems = wordTranslations.Select(q=>new WordTranslationResultItem()
             {
-                Translation=q.ToWord?.TheWord,
-                ToWordId=q.ToWordId
+                ToWordId = q.ToWordId,
+                Translation = q.ToWord?.TheWord ?? "empty",
+                FromWordId = q.FromWordId
             })
         };
     }

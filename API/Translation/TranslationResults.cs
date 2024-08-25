@@ -6,8 +6,9 @@
 public class TranslationResults
 {
     /// <summary>
-    /// A list of results provided by the implementation of <seealso cref="ITranslator"/>.
+    /// A list of results provided by the implementation of <seealso cref="ITranslator"/>. If this is <c>null</c>,
+    /// the query was inappropriate for the translation and no output should be rendered.
     /// </summary>
-    public IEnumerable<dynamic> ResultItems { get; set; }
+    public IEnumerable<TranslationResultItem>? ResultItems { get; set; }
     
 }

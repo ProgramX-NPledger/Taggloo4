@@ -18,6 +18,12 @@ div#translate div.language-submit-column input[type=submit] { background-color: 
 div#translate div.language-submit-column a { color: #900; font-size: 80%; text-decoration: none; text-align: right; float: right; }
 div#translate div.language-submit-column a:hover { text-decoration: underline; }
 
+/* translation results */
+div#translationResults div.translation-result h3 { color: #900; }
+div#translationResults div.translation-result ul { list-style-type: none; }
+div#translationResults div.translation-result ul li a { color: #900; text-decoration: none; }
+div#translationResults div.translation-result ul li a:hover { text-decoration: underline; }
+
 /* admin area */
 div#adminTiles { margin-left: -10px; margin-right: 10px; }
 div#adminTiles div.admin-tile { background-color: #efefef; border: solid 1px #dedede; margin: 2px; border-radius: 5px; padding: 10px; width: 24.692%; height: 200px; }
