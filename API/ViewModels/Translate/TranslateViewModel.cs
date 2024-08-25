@@ -31,4 +31,9 @@ public class TranslateViewModel : ITranslationRequestViewModel
     /// <inheritdoc cref="ILargeTranslateFormViewModel"/>
     [JsonPropertyName("maximumResults")] 
     public int MaximumResults { get; set; } = int.MaxValue;
+
+    /// <summary>
+    /// The Translators that should be used
+    /// </summary>
+    public IEnumerable<string> Translators { get; set; }
 }

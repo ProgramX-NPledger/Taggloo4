@@ -16,4 +16,6 @@ public class WordTranslatorFactory : ITranslatorFactory
     {
         return new WordTranslator(entityFrameworkCoreDatabaseContext);
     }
+
+    public string Key { get; } = nameof(WordTranslator);
 }

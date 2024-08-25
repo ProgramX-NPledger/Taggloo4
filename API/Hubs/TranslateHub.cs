@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using API.Data;
 using API.Translation;
+using API.Translation.Utility;
 using API.ViewModels.Translate;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
@@ -62,7 +63,7 @@ public class TranslateHub : Hub
 
         try
         {
-            TranslationRequest translationRequest = CreateTranslationRequestFromTranslateViewModel(translateViewModel, Context.ConnectionId);
+            TranslationRequest translationRequest = TranslationRequestUtility.CreateTranslationRequestFromTranslateViewModel(translateViewModel, Context.ConnectionId);
         
             // start the translation by using the Translator object, which schedules on the Hangfire background job client
             // having a single Translator class allows for multiple entrypoints/clients to implement translation
@@ -77,24 +78,6 @@ public class TranslateHub : Hub
     
     }
     
-    private static TranslationRequest CreateTranslationRequestFromTranslateViewModel(TranslateViewModel viewModel, string signalRConnectionId)
-    {
-        if (string.IsNullOrWhiteSpace(viewModel.Query)) throw new InvalidOperationException("Query cannot be null");
-        if (string.IsNullOrWhiteSpace(viewModel.FromLanguageCode))
-            throw new InvalidOperationException("FromLanguageCode cannot be null");
-        if (string.IsNullOrWhiteSpace(viewModel.ToLanguageCode))
-            throw new InvalidOperationException("ToLanguageCode cannot be null");
-        
-        TranslationRequest translationRequest = new TranslationRequest()
-        {
-            Query = viewModel.Query,
-            ClientId = signalRConnectionId,
-            FromLanguageCode = viewModel.FromLanguageCode,
-            ToLanguageCode = viewModel.ToLanguageCode,
-            MaximumNumberOfResults = viewModel.MaximumResults,
-            OrdinalOfFirstResult = viewModel.OrdinalOfFirstResult
-        };
-        return translationRequest;
-    }
+    
     
 }

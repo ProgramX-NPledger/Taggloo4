@@ -40,4 +40,9 @@ public class TranslationResultsWithMetaData
         TranslationResults = translationResults;
         TranslationRequest = translationRequest;
     }
+
+    /// <summary>
+    /// Maximum number of results to display when displaying results in summary format.
+    /// </summary>
+    public int MaximumItemsToDisplayInTranslationSummaries { get; set; } = 5; // TODO this is a surfaced configuration
 }

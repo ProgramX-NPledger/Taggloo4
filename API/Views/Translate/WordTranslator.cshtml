@@ -11,7 +11,7 @@
         @if (Model.TranslationResults.ResultItems.Any())
         {
             <ul>
-                @for (int i = 1; i <= 5; i++)
+                @for (int i = 1; i <= Model.TranslationResults.MaximumItems; i++)
                 {
                     TranslationResultItem resultItem = Model.TranslationResults.ResultItems.ElementAt(i-1);
                     WordTranslationResultItem wordTranslationResultItem = (WordTranslationResultItem)resultItem;
@@ -22,9 +22,9 @@
                     </li>
                 }
             </ul>
-            @if (Model.TranslationResults.ResultItems.Count() > 5)
+            @if (Model.TranslationResults.ResultItems.Count() > 1) // Model.MaximumItemsToDisplayInTranslationSummaries)
             {
-                <p><a href="@($"/translate/details?Query={HttpUtility.UrlEncode(Model.TranslationRequest.Query)}&FromLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.FromLanguageCode)}&ToLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.ToLanguageCode)}&Translators={Model.Translator})")">More &gt;</a></p>
+                <p class="more-results"><a href="@($"/translate/details?Query={HttpUtility.UrlEncode(Model.TranslationRequest.Query)}&FromLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.FromLanguageCode)}&ToLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.ToLanguageCode)}&Translators={Model.Translator}")">More &gt;</a></p>
             }
         }
         else

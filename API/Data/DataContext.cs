@@ -1,4 +1,6 @@
 ﻿using API.Model;
+using API.Translation.Translators;
+using API.Translation.Translators.Factories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +58,8 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// Reindexing Jobs
 	/// </summary>
 	public DbSet<ReindexingJob> ReindexingJobs { get; set; }
-	
+
+	public DbSet<Translator> Translators { get; set; }
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -173,6 +176,15 @@ public class DataContext : IdentityDbContext<AppUser,
 			.HasForeignKey(wip => wip.WordId)
 			.OnDelete(DeleteBehavior.NoAction);
 		
+		// translators
+		builder.Entity<Translator>().HasData(new Translator()
+		{
+			Key = nameof(WordTranslator),
+			DotNetFactoryAssembly = typeof(WordTranslator).Assembly.GetName().Name!,
+			DotNetFactoryType = $"API.Translation.Translators.Factories{nameof(WordTranslatorFactory)}",
+			IsEnabled = true,
+			CreatedAt = DateTime.Now
+		});
 
 	}
 }

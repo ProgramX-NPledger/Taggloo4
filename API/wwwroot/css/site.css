@@ -23,6 +23,10 @@ div#translationResults div.translation-result h3 { color: #900; }
 div#translationResults div.translation-result ul { list-style-type: none; }
 div#translationResults div.translation-result ul li a { color: #900; text-decoration: none; }
 div#translationResults div.translation-result ul li a:hover { text-decoration: underline; }
+div#translationResults div.translation-result p.more-results { text-align: right; }
+div#translationResults div.translation-result p.more-results a { color: #900; text-decoration: none; }
+div#translationResults div.translation-result p.more-results a:hover { text-decoration: underline; }
+
 
 /* admin area */
 div#adminTiles { margin-left: -10px; margin-right: 10px; }
