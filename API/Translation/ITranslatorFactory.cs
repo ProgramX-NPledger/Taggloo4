@@ -13,5 +13,11 @@ public interface ITranslatorFactory
     /// <param name="entityFrameworkCoreDatabaseContext">Entity Framework context to enable access to underlying datastore.</param>
     /// <returns>Implementation of <seealso cref="ITranslator"/> for servicing translation results.</returns>
     ITranslator Create(DataContext entityFrameworkCoreDatabaseContext);
-    
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    string GetTranslatorName();
+
 }

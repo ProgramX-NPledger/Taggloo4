@@ -4,8 +4,6 @@ using API.Translation;
 using API.Translation.Utility;
 using API.ViewModels.Translate;
 using Hangfire;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.SignalR;
 
 namespace API.Hubs;
@@ -21,9 +19,6 @@ public class TranslateHub : Hub
     private readonly IWebHostEnvironment _webHosEnvironment;
 
     private readonly ILogger<TranslateHub> _logger;
-    // private readonly ICompositeViewEngine _compositeViewEngine;
-    // private readonly ITempDataProvider _tempDataProvider;
-    // private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
     /// Constructor for injection of required services.
@@ -32,6 +27,7 @@ public class TranslateHub : Hub
     /// <param name="hubContext">Implementation of SignalR <seealso cref="IHubContext"/>.</param>
     /// <param name="entityFrameworkCoreDataContext">Entity Framework context to enable access to underlying datastore.</param>
     /// <param name="webHostEnvironment">Implementation of ASP.NET <seealso cref="IWebHostEnvironment"/>.</param>
+    /// <param name="logger">Logging provider to allow for logging.</param>
     public TranslateHub(IBackgroundJobClient backgroundJobClient,
         IHubContext<TranslateHub> hubContext,
         DataContext entityFrameworkCoreDataContext,
@@ -73,7 +69,7 @@ public class TranslateHub : Hub
         catch (InvalidOperationException ioEx)
         {
             // an invalid JSON request was made, so no submission is made 
-            _logger.LogError("An invalid JSON request was made");
+            _logger.LogError(ioEx,"An invalid JSON request was made");
         }
     
     }

@@ -11,8 +11,14 @@ public class TranslationResults
     /// </summary>
     public IEnumerable<TranslationResultItem>? ResultItems { get; set; }
 
+    /// <summary>
+    /// Maximum number of items to return in the result set.
+    /// </summary>
     public int MaximumItems { get; set; } = 5;
-
+    
+    /// <summary>
+    /// The number of available items that could be provided after filtering and before paging.
+    /// </summary>
     public int? NumberOfAvailableItemsBeforePaging { get; set; }
 
     

@@ -35,5 +35,5 @@ public class TranslateViewModel : ITranslationRequestViewModel
     /// <summary>
     /// The Translators that should be used
     /// </summary>
-    public IEnumerable<string> Translators { get; set; }
+    public IEnumerable<string>? Translators { get; set; }
 }

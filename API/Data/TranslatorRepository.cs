@@ -21,8 +21,7 @@ public class TranslatorRepository : ITranslatorRepository
 	}
 
 	/// <inheritdoc cref="ITranslationRepository"/>
-	public async Task<IEnumerable<Translator>> GetAllTranslatorsAsync(string? key, string? dotNetFactoryType,
-		string? dotNetFactoryAssembly, bool? isEnabled)
+	public async Task<IEnumerable<Translator>> GetAllTranslatorsAsync(string? key, bool? isEnabled)
 	{
 		IQueryable<Translator> query = _dataContext.Translators
 			.AsNoTracking()
@@ -32,17 +31,7 @@ public class TranslatorRepository : ITranslatorRepository
 		{
 			query = query.Where(q => q.Key == key);
 		}
-
-		if (!string.IsNullOrWhiteSpace(dotNetFactoryType))
-		{
-			query = query.Where(q => q.DotNetFactoryType == dotNetFactoryType);
-		}
-
-		if (!string.IsNullOrWhiteSpace(dotNetFactoryAssembly))
-		{
-			query = query.Where(q => q.DotNetFactoryAssembly == dotNetFactoryAssembly);
-		}
-
+		
 		if (isEnabled.HasValue)
 		{
 			if (isEnabled.Value)
