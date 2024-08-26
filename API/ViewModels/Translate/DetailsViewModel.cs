@@ -8,5 +8,11 @@ public class DetailsViewModel
 
     public string RenderedSubView { get; set; }
 
+    public int CurrentPageNumber { get; set; } = 1;
+
+    public int? NumberOfPages { get; set; }
+
+    public int? NumberOfItemsPerPage { get; set; }
+    
 
 }

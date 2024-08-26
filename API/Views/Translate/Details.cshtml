@@ -1,4 +1,5 @@
-﻿@model API.ViewModels.Translate.DetailsViewModel
+﻿@using System.Web
+@model API.ViewModels.Translate.DetailsViewModel
 
 @{
     ViewBag.Title = "Translate";
@@ -9,6 +10,25 @@
     <div class="translation-result">
         @Html.Raw(Model.RenderedSubView)
         
+            <ul class="page-numbers">
+                @for (int i = 1; i <= Model.NumberOfPages; i++)
+                {
+                    @if (Model.CurrentPageNumber == i)
+                    {
+                        <li class="current-page">
+                            <strong>@i</strong>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a href="@($"/translate/details?Query={HttpUtility.UrlEncode(Model.TranslationResultsWithMetaData.TranslationRequest.Query)}&FromLanguageCode={HttpUtility.UrlEncode(Model.TranslationResultsWithMetaData.TranslationRequest.FromLanguageCode)}&ToLanguageCode={HttpUtility.UrlEncode(Model.TranslationResultsWithMetaData.TranslationRequest.ToLanguageCode)}&Translators={Model.TranslationResultsWithMetaData.Translator}&OrdinalOfFirstResult={(i*Model.NumberOfItemsPerPage)-Model.NumberOfItemsPerPage}&MaximumNumberOfResults={Model.NumberOfItemsPerPage}")">
+                                @i
+                            </a>
+                        </li>
+                    }
+                }
+            </ul>
     </div>
 </div>
 

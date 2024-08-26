@@ -26,28 +26,7 @@
             {
                 <p class="more-results"><a href="@($"/translate/details?Query={HttpUtility.UrlEncode(Model.TranslationRequest.Query)}&FromLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.FromLanguageCode)}&ToLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.ToLanguageCode)}&Translators={Model.Translator}")">More &gt;</a></p>
             }
-            @if (Model.IsRenderedAsDetailsView)
-            {
-                <ul class="page-numbers"> <!-- TODO: Move to Details View -->
-                    @for (int i = 1; i <= Model.NumberOfPages; i++)
-                    {
-                        @if (Model.CurrentPageNumber == i)
-                        {
-                            <li class="current-page">
-                                <strong>@i</strong>
-                            </li>
-                        }
-                        else
-                        {
-                            <li>
-                                <a href="@($"/translate/details?Query={HttpUtility.UrlEncode(Model.TranslationRequest.Query)}&FromLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.FromLanguageCode)}&ToLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.ToLanguageCode)}&Translators={Model.Translator}&OrdinalOfFirstResult={(i*Model.NumberOfItemsPerPage)-Model.NumberOfItemsPerPage}&MaximumNumberOfResults={Model.NumberOfItemsPerPage}")">
-                                    @i
-                                </a>
-                            </li>
-                        }
-                    }
-                </ul>
-            }
+            
         }
         else
         {

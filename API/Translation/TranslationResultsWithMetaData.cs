@@ -47,10 +47,6 @@ public class TranslationResultsWithMetaData
     /// </summary>
     public bool IsRenderedAsDetailsView { get; set; } = false;
     
-    public int CurrentPageNumber { get; set; } = 1;
 
-    public int? NumberOfPages { get; set; }
-
-    public int? NumberOfItemsPerPage { get; set; }
     
 }

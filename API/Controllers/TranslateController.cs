@@ -93,7 +93,6 @@ public class TranslateController : Controller
             numberOfPossiblePages++;
 
         int currentPageNumber = (translationRequest.OrdinalOfFirstResult / maximumNumberOfItemsToDisplayPerPage) + 1;
-        //if (translationRequest.OrdinalOfFirstResult % maximumNumberOfItemsToDisplayPerPage > 0) currentPageNumber++;
         
         TimeSpan delta = DateTime.Now - startTimeStamp;
         TranslationResultsWithMetaData translationResultsWithMetaData =
@@ -102,10 +101,7 @@ public class TranslateController : Controller
                 Translator = translator.GetType().Name,
                 TimeTaken = delta,
                 JobId = null,
-                IsRenderedAsDetailsView = true,
-                CurrentPageNumber = currentPageNumber,
-                NumberOfPages = numberOfPossiblePages,
-                NumberOfItemsPerPage = maximumNumberOfItemsToDisplayPerPage
+                IsRenderedAsDetailsView = true
             }; 
         
         
@@ -120,7 +116,10 @@ public class TranslateController : Controller
         DetailsViewModel detailsViewModel = new DetailsViewModel()
         {
             TranslationResultsWithMetaData = translationResultsWithMetaData,
-            RenderedSubView = renderedView
+            RenderedSubView = renderedView,
+            CurrentPageNumber = currentPageNumber,
+            NumberOfPages = numberOfPossiblePages,
+            NumberOfItemsPerPage = maximumNumberOfItemsToDisplayPerPage
         };
         
         return View(detailsViewModel);
