@@ -1,10 +1,12 @@
-﻿using API.Data;
+﻿using System.Composition;
+using API.Data;
 
 namespace API.Translation.Translators.Factories;
 
 /// <summary>
 /// Instantiates and configures <seealso cref="WordTranslator"/> instance.
 /// </summary>
+
 public class WordTranslatorFactory : ITranslatorFactory
 {
     /// <summary>
@@ -16,6 +18,13 @@ public class WordTranslatorFactory : ITranslatorFactory
     {
         return new WordTranslator(entityFrameworkCoreDatabaseContext);
     }
+    
+    
+    /// <inheritdoc cref="ITranslatorFactory"/>
+    public string GetTranslatorName()
+    {
+        return nameof(WordTranslator);
+    }
 
-    public string Key { get; } = nameof(WordTranslator);
+    
 }

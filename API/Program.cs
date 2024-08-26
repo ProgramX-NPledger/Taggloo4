@@ -6,6 +6,7 @@ using API.Extension;
 using API.Hubs;
 using API.Jobs;
 using API.Model;
+using API.Translation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
@@ -156,5 +157,9 @@ string? reindexCron = app.Configuration["Index:ReIndex:Every"];
 if (string.IsNullOrWhiteSpace(reindexCron))
     throw new NullReferenceException("Configuration Index:ReIndex.Every must be specified");
 RecurringJob.AddOrUpdate<ReindexJob>("reindexJob",job=>job.Reindex(),reindexCron);
+
+// initialise the ITranslatorFactories using MEF
+TranslationFactoryService translatorFactoryService = app.Services.GetRequiredService<TranslationFactoryService>();
+translatorFactoryService.Initialise();
 
 app.Run();
