@@ -19,13 +19,17 @@ div#translate div.language-submit-column a { color: #900; font-size: 80%; text-d
 div#translate div.language-submit-column a:hover { text-decoration: underline; }
 
 /* translation results */
-div#translationResults div.translation-result h3 { color: #900; }
+div#translationResults div.translation-result h3 { color: #000; }
 div#translationResults div.translation-result ul { list-style-type: none; }
 div#translationResults div.translation-result ul li a { color: #900; text-decoration: none; }
 div#translationResults div.translation-result ul li a:hover { text-decoration: underline; }
 div#translationResults div.translation-result p.more-results { text-align: right; }
 div#translationResults div.translation-result p.more-results a { color: #900; text-decoration: none; }
 div#translationResults div.translation-result p.more-results a:hover { text-decoration: underline; }
+div#translationResults div.translation-result ul.page-numbers { list-style-type: none; font-size: 90%; text-align: right; }
+div#translationResults div.translation-result ul.page-numbers li { display: inline-block; padding: 0 10px 0 10px; }
+div#translationResults div.translation-result ul.page-numbers li.current-page { list-style-type: none; }
+
 
 
 /* admin area */

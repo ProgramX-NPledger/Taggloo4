@@ -1,0 +1,14 @@
+﻿@model API.ViewModels.Translate.DetailsViewModel
+
+@{
+    ViewBag.Title = "Translate";
+    Layout = "_Layout";
+}
+
+<div id="translationResults">
+    <div class="translation-result">
+        @Html.Raw(Model.RenderedSubView)
+        
+    </div>
+</div>
+

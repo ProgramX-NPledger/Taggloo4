@@ -91,7 +91,6 @@ public class TranslateJob
         TranslationResults translationResults = translator.Translate(translationRequest);
         // translation results for summaries are truncated and the paginator is not displayed
         translationResults.MaximumItems = 5; // TODO this should be a configuration
-        translationResults.ShowPaginator = false;
         
         TimeSpan delta = DateTime.Now - startTimeStamp;
         TranslationResultsWithMetaData translationResultsWithMetaData =

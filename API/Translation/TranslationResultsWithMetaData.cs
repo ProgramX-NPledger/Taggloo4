@@ -40,9 +40,17 @@ public class TranslationResultsWithMetaData
         TranslationResults = translationResults;
         TranslationRequest = translationRequest;
     }
+    
 
     /// <summary>
-    /// Maximum number of results to display when displaying results in summary format.
+    /// When <c>True</c> is being rendered as a Details View, allowing the View to customise its output between the summary and detail view modes.
     /// </summary>
-    public int MaximumItemsToDisplayInTranslationSummaries { get; set; } = 5; // TODO this is a surfaced configuration
+    public bool IsRenderedAsDetailsView { get; set; } = false;
+    
+    public int CurrentPageNumber { get; set; } = 1;
+
+    public int? NumberOfPages { get; set; }
+
+    public int? NumberOfItemsPerPage { get; set; }
+    
 }

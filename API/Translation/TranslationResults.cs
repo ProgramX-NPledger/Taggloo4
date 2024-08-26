@@ -13,11 +13,8 @@ public class TranslationResults
 
     public int MaximumItems { get; set; } = 5;
 
-    public bool ShowPaginator { get; set; } = false;
+    public int? NumberOfAvailableItemsBeforePaging { get; set; }
 
-    public int CurrentPageNumber { get; set; } = 1;
-
-    public int? NumberOfPages { get; set; }
     
 
 }

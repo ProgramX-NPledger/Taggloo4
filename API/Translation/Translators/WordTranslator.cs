@@ -50,15 +50,29 @@ public class WordTranslator : ITranslator
                 ResultItems = null
             };
         }
-        
-        return new TranslationResults()
+
+        TranslationResults translationResults = new TranslationResults()
         {
-            ResultItems = wordTranslations.Select(q=>new WordTranslationResultItem()
+            ResultItems = wordTranslations.Select(q => new WordTranslationResultItem()
             {
                 ToWordId = q.ToWordId,
                 Translation = q.ToWord?.TheWord ?? "empty",
                 FromWordId = q.FromWordId
             })
         };
+        
+        if (translationRequest.DataWillBePaged)
+        {
+            // get count of available items to allow paging
+            translationResults.NumberOfAvailableItemsBeforePaging = _entityFrameworkCoreDatabaseContext.WordTranslations
+                .Include(m => m.FromWord!.Dictionary)
+                .Include(m => m.ToWord!.Dictionary)
+                .AsNoTracking()
+                .Count(q => q.FromWord!.TheWord==translationRequest.Query &&
+                                           q.FromWord!.Dictionary!.IetfLanguageTag==translationRequest.FromLanguageCode &&
+                                           q.ToWord!.Dictionary!.IetfLanguageTag==translationRequest.ToLanguageCode);
+        }
+
+        return translationResults;
     }
 }

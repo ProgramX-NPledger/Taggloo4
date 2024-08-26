@@ -28,14 +28,16 @@ public class TranslateController : Controller
 {
     private readonly DataContext _dataContext;
     private readonly ITranslatorRepository _translatorRepository;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
     /// <summary>
     /// Default constructor with injected properties.
     /// </summary>
-    public TranslateController(DataContext dataContext, ITranslatorRepository translatorRepository)
+    public TranslateController(DataContext dataContext, ITranslatorRepository translatorRepository, IWebHostEnvironment webHostEnvironment)
     {
         _dataContext = dataContext;
         _translatorRepository = translatorRepository;
+        _webHostEnvironment = webHostEnvironment;
     }
     
     /// <summary>
@@ -74,14 +76,24 @@ public class TranslateController : Controller
         ITranslator translator=translatorFactory.Create(_dataContext);
 
         TranslationRequest translationRequest = TranslationRequestUtility.CreateTranslationRequestFromTranslateViewModel(viewModel,null);
+        translationRequest.DataWillBePaged = true;
+        
         TranslationResults translationResults = translator.Translate(translationRequest);
         if (translationResults.ResultItems == null)
             throw new NotImplementedException("Translator reported a null result");
         
         // translation results for summaries are truncated and the paginator is not displayed
-        int maximumNumberOfItemsToDisplay = 10; // TODO this should be a configuration
-        translationResults.MaximumItems = maximumNumberOfItemsToDisplay < translationResults.ResultItems.Count() ? maximumNumberOfItemsToDisplay : translationResults.ResultItems.Count(); 
-        translationResults.ShowPaginator = true;
+        int maximumNumberOfItemsToDisplayPerPage = 10; // TODO this should be a configuration
+        translationResults.MaximumItems = maximumNumberOfItemsToDisplayPerPage < translationResults.ResultItems.Count() ? maximumNumberOfItemsToDisplayPerPage : translationResults.ResultItems.Count(); 
+        
+        // generate pagination data
+        int numberOfPossiblePages =
+            (translationResults.NumberOfAvailableItemsBeforePaging ?? 1) / maximumNumberOfItemsToDisplayPerPage;
+        if (translationResults.NumberOfAvailableItemsBeforePaging.HasValue && translationResults.NumberOfAvailableItemsBeforePaging % maximumNumberOfItemsToDisplayPerPage > 0)
+            numberOfPossiblePages++;
+
+        int currentPageNumber = (translationRequest.OrdinalOfFirstResult / maximumNumberOfItemsToDisplayPerPage) + 1;
+        //if (translationRequest.OrdinalOfFirstResult % maximumNumberOfItemsToDisplayPerPage > 0) currentPageNumber++;
         
         TimeSpan delta = DateTime.Now - startTimeStamp;
         TranslationResultsWithMetaData translationResultsWithMetaData =
@@ -89,11 +101,29 @@ public class TranslateController : Controller
             {
                 Translator = translator.GetType().Name,
                 TimeTaken = delta,
-                JobId = null
+                JobId = null,
+                IsRenderedAsDetailsView = true,
+                CurrentPageNumber = currentPageNumber,
+                NumberOfPages = numberOfPossiblePages,
+                NumberOfItemsPerPage = maximumNumberOfItemsToDisplayPerPage
             }; 
         
+        
         string viewName = $"Views\\Translate\\{translator.GetType().Name}.cshtml";
-        return View(viewName, translationResultsWithMetaData);
+        string renderedView = await RazorViewRendererFactory.Create(
+            _webHostEnvironment.ContentRootPath,
+            _webHostEnvironment.WebRootPath,
+            "API").RenderAsync(viewName, translationResultsWithMetaData);
+
+
+            
+        DetailsViewModel detailsViewModel = new DetailsViewModel()
+        {
+            TranslationResultsWithMetaData = translationResultsWithMetaData,
+            RenderedSubView = renderedView
+        };
+        
+        return View(detailsViewModel);
     }
 
     private async Task<ITranslatorFactory> GetTranslatorFactoryAsync(string translatorKey)
