@@ -89,6 +89,9 @@ public class TranslateJob
         DateTime startTimeStamp = DateTime.Now;
         ITranslator translator = translatorFactory.Create(_dataContext);
         TranslationResults translationResults = translator.Translate(translationRequest);
+        // translation results for summaries are truncated and the paginator is not displayed
+        translationResults.MaximumItems = 5; // TODO this should be a configuration
+        
         TimeSpan delta = DateTime.Now - startTimeStamp;
         TranslationResultsWithMetaData translationResultsWithMetaData =
             new TranslationResultsWithMetaData(translationResults,translationRequest)

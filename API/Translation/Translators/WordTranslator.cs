@@ -41,14 +41,38 @@ public class WordTranslator : ITranslator
             .Skip(translationRequest.OrdinalOfFirstResult)
             .Take(translationRequest.MaximumNumberOfResults)
             .ToArray();
-        
-        return new TranslationResults()
+
+        // if there were no matches and there were spaces in the query, return null
+        if (!wordTranslations.Any() && translationRequest.Query.Contains((" ")))
         {
-            ResultItems = wordTranslations.Select(q=>new
+            return new TranslationResults()
             {
-                Translation=q.ToWord?.TheWord,
-                ToWordId=q.ToWordId
+                ResultItems = null
+            };
+        }
+
+        TranslationResults translationResults = new TranslationResults()
+        {
+            ResultItems = wordTranslations.Select(q => new WordTranslationResultItem()
+            {
+                ToWordId = q.ToWordId,
+                Translation = q.ToWord?.TheWord ?? "empty",
+                FromWordId = q.FromWordId
             })
         };
+        
+        if (translationRequest.DataWillBePaged)
+        {
+            // get count of available items to allow paging
+            translationResults.NumberOfAvailableItemsBeforePaging = _entityFrameworkCoreDatabaseContext.WordTranslations
+                .Include(m => m.FromWord!.Dictionary)
+                .Include(m => m.ToWord!.Dictionary)
+                .AsNoTracking()
+                .Count(q => q.FromWord!.TheWord==translationRequest.Query &&
+                                           q.FromWord!.Dictionary!.IetfLanguageTag==translationRequest.FromLanguageCode &&
+                                           q.ToWord!.Dictionary!.IetfLanguageTag==translationRequest.ToLanguageCode);
+        }
+
+        return translationResults;
     }
 }

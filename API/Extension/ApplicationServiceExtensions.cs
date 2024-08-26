@@ -1,6 +1,7 @@
 ﻿using API.Contract;
 using API.Data;
 using API.Services;
+using API.Translation;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -35,6 +36,7 @@ public static class ApplicationServiceExtensions
 		services.AddScoped<ITranslationRepository, TranslationRepository>();
 		services.AddScoped<IDatabaseManagement, DatabaseManagement>();
 		services.AddScoped<IWordInPhraseRepository, WordInPhraseRepository>();
+		services.AddScoped<ITranslatorRepository, TranslatorRepository>();
 		
 		services.AddLogging(loggingBuilder =>
 			loggingBuilder.AddSerilog(dispose: true));

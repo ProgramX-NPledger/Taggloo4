@@ -34,5 +34,9 @@ public class TranslationRequest
     /// Maximum number of results in this page (useful when paging).
     /// </summary>
     public int MaximumNumberOfResults { get; set; }
-    
+
+    /// <summary>
+    /// Set to <c>True</c> to perform extra queries that enable paging.
+    /// </summary>
+    public bool DataWillBePaged { get; set; } = false;
 }
