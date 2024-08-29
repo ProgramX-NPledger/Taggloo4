@@ -1,6 +1,4 @@
-﻿using API.Translation.Translators;
-
-namespace API.Translation;
+﻿namespace API.Translation.Translators.Results;
 
 /// <summary>
 /// Represents a result from the <seealso cref="WordTranslator"/>.

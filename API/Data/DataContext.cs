@@ -165,6 +165,12 @@ public class DataContext : IdentityDbContext<AppUser,
 			.HasForeignKey(pt => pt.FromPhraseId)
 			.OnDelete(DeleteBehavior.NoAction);
 
+		builder.Entity<Phrase>()
+			.HasMany(p => p.Translations)
+			.WithOne(pt => pt.ToPhrase)
+			.HasForeignKey(pt => pt.ToPhraseId)
+			.OnDelete(DeleteBehavior.NoAction);
+		
 		// words in phrase
 
 		builder.Entity<Phrase>()

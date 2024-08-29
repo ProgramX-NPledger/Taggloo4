@@ -23,8 +23,11 @@ public class PhraseTranslation
 	/// The identifier of the <seealso cref="Phrase"/> translation.
 	/// </summary>
 	public int ToPhraseId { get; set; }
-	// this breaks migrations
-	//public Word ToWord { get; set; }
+	
+	/// <summary>
+	/// The Phrase Translation
+	/// </summary>
+	public Phrase? ToPhrase { get; set; }
 	
 	/// <summary>
 	/// The Host from which the Phrase Translation was created.
