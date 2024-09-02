@@ -54,12 +54,13 @@ public class PhraseTranslator : ITranslator
 
         // translate the phrases
         List<PhraseTranslationResultItem> phraseTranslationResultItems = new List<PhraseTranslationResultItem>();
-        foreach (IGrouping<int, Phrase> groupedUntranslatedPhrase in untranslatedWordAppearsInPhrases)
+        foreach (IGrouping<int, Phrase> groupedUntranslatedPhrase in untranslatedPhrases)
         {
             Phrase untranslatedPhrase = groupedUntranslatedPhrase.First();
 
             PhraseTranslation[] phraseTranslations = _entityFrameworkCoreDatabaseContext.PhraseTranslations
                 .Include(m=>m.ToPhrase)
+                .Include(m=>m.FromPhrase)
                 .AsNoTracking()
                 .Where(q => q.FromPhraseId == untranslatedPhrase.Id)
                 .ToArray();
@@ -72,7 +73,7 @@ public class PhraseTranslator : ITranslator
                     FromPhraseId = phraseTranslation.FromPhraseId,
                     ToPhraseId = phraseTranslation.ToPhraseId,
                     Translation = phraseTranslation.ToPhrase!.ThePhrase,
-                    FromPhrase = phraseTranslation.FromPhrase!.ThePhrase,
+                    FromPhrase = phraseTranslation.FromPhrase?.ThePhrase, // this is null
                     PercentageMatch = 100 // TODO
                 };
                 

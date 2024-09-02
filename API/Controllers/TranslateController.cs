@@ -134,7 +134,7 @@ public class TranslateController : Controller
 
     private async Task<ITranslatorFactory> GetTranslatorFactoryAsync(string translatorKey)
     {
-        // have to pass the ITranslatorReposiotry because it is scoped
+        // have to pass the ITranslatorRepository because it is scoped
         var translatorFactories =await _translationFactoryService.GetTranslatorFactoriesAsync(_translatorRepository, true);
 
         ITranslatorFactory? matchingTranslator = translatorFactories.SingleOrDefault(q =>

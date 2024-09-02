@@ -51,7 +51,7 @@ public class TranslationFactoryService
         
         IEnumerable<ITranslatorFactory>? translatorFactories =_compositionHost.GetExports<ITranslatorFactory>();
         
-        // pass some filters to teh repository and return their configurations
+        // pass some filters to the repository and return their configurations
         Translator[] translatorFactoryEntities=(await translatorRepository.GetAllTranslatorsAsync(null, isEnabled)).ToArray();
 
         List<ITranslatorFactory> matchingTranslatorFactories = new List<ITranslatorFactory>();

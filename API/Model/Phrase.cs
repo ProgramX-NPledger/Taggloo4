@@ -56,6 +56,11 @@ public class Phrase
 	/// <summary>
 	/// Translations of the Phrase
 	/// </summary>
+	public ICollection<PhraseTranslation> FromTranslations { get; set; } = new List<PhraseTranslation>();
+
+	/// <summary>
+	/// Translations of the Phrase
+	/// </summary>
 	public ICollection<PhraseTranslation> Translations { get; set; } = new List<PhraseTranslation>();
 
 	/// <summary>

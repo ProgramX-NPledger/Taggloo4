@@ -160,7 +160,7 @@ public class DataContext : IdentityDbContext<AppUser,
 			.OnDelete(DeleteBehavior.NoAction);
 		
 		builder.Entity<Phrase>()
-			.HasMany(p => p.Translations)
+			.HasMany(p => p.FromTranslations)
 			.WithOne(pt => pt.FromPhrase)
 			.HasForeignKey(pt => pt.FromPhraseId)
 			.OnDelete(DeleteBehavior.NoAction);

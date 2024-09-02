@@ -16,15 +16,24 @@
                 {
                     TranslationResultItem resultItem = Model.TranslationResults.ResultItems!.ElementAt(i-1);
                     PhraseTranslationResultItem phraseTranslationResultItem = (PhraseTranslationResultItem)resultItem;
-                    <!-- translations per word -->
                     <li>
-                        <a href="@($"/translate/translate?Query={HttpUtility.UrlEncode(wordTranslationResultItem.Translation)}&FromLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.ToLanguageCode)}&ToLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.FromLanguageCode)}")">
-                            @wordTranslationResultItem.Translation
-                        </a>
+                        <span class="phrase-from-phrase">
+                            @foreach (string word in phraseTranslationResultItem.FromPhrase.Split(new char[] { ' ' }))
+                            {
+                                <a href="@($"/translate/translate?Query={HttpUtility.UrlEncode(word)}&FromLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.FromLanguageCode)}&ToLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.ToLanguageCode)}")">@word</a>
+                            }
+                        </span>
+                        <br/>
+                        <span class="phrase-to-phrase">
+                            @foreach (string word in phraseTranslationResultItem.Translation!.Split(new char[] { ' ' }))
+                            {
+                                <a href="@($"/translate/translate?Query={HttpUtility.UrlEncode(word)}&FromLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.ToLanguageCode)}&ToLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.FromLanguageCode)}")">@word</a>
+                            }
+                        </span>
                     </li>
                 }
             </ul>
-            @if (!Model.IsRenderedAsDetailsView && Model.TranslationResults.ResultItems!.Count() > 1) // Model.MaximumItemsToDisplayInTranslationSummaries)
+            @if (!Model.IsRenderedAsDetailsView && Model.TranslationResults.ResultItems!.Count() > 1) 
             {
                 <p class="more-results"><a href="@($"/translate/details?Query={HttpUtility.UrlEncode(Model.TranslationRequest.Query)}&FromLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.FromLanguageCode)}&ToLanguageCode={HttpUtility.UrlEncode(Model.TranslationRequest.ToLanguageCode)}&Translators={Model.Translator}")">More &gt;</a></p>
             }
