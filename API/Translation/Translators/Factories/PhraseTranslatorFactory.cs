@@ -1,4 +1,5 @@
 ﻿using System.Composition;
+using API.Contract;
 using API.Data;
 
 namespace API.Translation.Translators.Factories;
@@ -26,5 +27,5 @@ public class PhraseTranslatorFactory : ITranslatorFactory
         return nameof(PhraseTranslator);
     }
 
-    
+    public ITranslatorConfiguration Configuration { get; set; }
 }

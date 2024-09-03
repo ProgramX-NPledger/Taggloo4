@@ -28,13 +28,13 @@ public class TranslateController : Controller
 {
     private readonly DataContext _dataContext;
     private readonly IWebHostEnvironment _webHostEnvironment;
-    private readonly ITranslatorRepository _translatorRepository;
+    private readonly ITranslatorConfigurationRepository _translatorRepository;
     private readonly TranslationFactoryService _translationFactoryService;
 
     /// <summary>
     /// Default constructor with injected properties.
     /// </summary>
-    public TranslateController(DataContext dataContext, IWebHostEnvironment webHostEnvironment, ITranslatorRepository translatorRepository, TranslationFactoryService translationFactoryService)
+    public TranslateController(DataContext dataContext, IWebHostEnvironment webHostEnvironment, ITranslatorConfigurationRepository translatorRepository, TranslationFactoryService translationFactoryService)
     {
         _dataContext = dataContext;
         _webHostEnvironment = webHostEnvironment;
@@ -135,7 +135,7 @@ public class TranslateController : Controller
     private async Task<ITranslatorFactory> GetTranslatorFactoryAsync(string translatorKey)
     {
         // have to pass the ITranslatorRepository because it is scoped
-        var translatorFactories =await _translationFactoryService.GetTranslatorFactoriesAsync(_translatorRepository, true);
+        var translatorFactories =await _translationFactoryService.GetTranslatorFactoriesAsync(_translatorRepository);
 
         ITranslatorFactory? matchingTranslator = translatorFactories.SingleOrDefault(q =>
             q.GetTranslatorName().Equals(translatorKey, StringComparison.OrdinalIgnoreCase));

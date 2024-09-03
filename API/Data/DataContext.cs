@@ -62,7 +62,8 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// <summary>
 	/// Configuration data for Translators.
 	/// </summary>
-	public DbSet<Translator> Translators { get; set; }
+	public DbSet<TranslatorConfiguration> TranslatorConfigurations { get; set; }
+
 	
 	/// <summary>
 	/// Constructor with options parameter.
