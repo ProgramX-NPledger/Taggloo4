@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{2F70C2A9-31F7-411F-A13B-401BE6C2A147}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4.Web", "Taggloo4.Web\Taggloo4.Web.csproj", "{2F70C2A9-31F7-411F-A13B-401BE6C2A147}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4Mgt", "Taggloo4Mgt\Taggloo4Mgt.csproj", "{B28A6BD6-9954-4314-8140-B8A5CF1A8D72}"
 EndProject

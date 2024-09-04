@@ -8,13 +8,13 @@ public class ImportOptions
 	[Option(HelpText="Connection string of source MS SQL Server database", Required=true)]
 	public required string SourceConnectionString { get; set; }
 	
-	[Option(HelpText="Username of Taggloo 4 API", Required=true)] 
+	[Option(HelpText="Username of Taggloo 4 Taggloo4.Web", Required=true)] 
 	public required string UserName { get; set; }
 	
-	[Option(HelpText = "Password of Taggloo 4 API", Required=true)]
+	[Option(HelpText = "Password of Taggloo 4 Taggloo4.Web", Required=true)]
 	public required string Password { get; set; }
 	
-	[Option(HelpText="Url of Taggloo 4 API",Required = true)]
+	[Option(HelpText="Url of Taggloo 4 Taggloo4.Web",Required = true)]
 	public required string Url { get; set; }
 
 	[Option(HelpText = "Log processing")]
