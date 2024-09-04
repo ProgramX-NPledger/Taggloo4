@@ -44,14 +44,14 @@ public class Importer : ApiClientBase
 		await using (SqlConnection sqlConnection = ConnectToSqlServer())
 		{
 			Log("\tOk");
-			Log($"Connect to API at {_importOptions.Url}");
+			Log($"Connect to Taggloo4.Web at {_importOptions.Url}");
 			HttpClient httpClient = CreateHttpClient(_httpClientFactory, _importOptions.Url);
 		
 			Log("\tOk");
 
-			Log($"\tLog in to API as {_importOptions.UserName}");
+			Log($"\tLog in to Taggloo4.Web as {_importOptions.UserName}");
 			LoginUserResult loginUserResult = await ConnectToApi(httpClient);
-			if (loginUserResult == null) throw new InvalidOperationException("Failed to log in to API");
+			if (loginUserResult == null) throw new InvalidOperationException("Failed to log in to Taggloo4.Web");
 			Log("\t\tOk");
 
 			httpClient.DefaultRequestHeaders.Authorization =

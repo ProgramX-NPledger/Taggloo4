@@ -1,0 +1,62 @@
+﻿@model Taggloo4.Web.ViewModels.LoginViewModel
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "_Layout";
+}
+
+<div class="row mt-5">
+    <div class="col-md-3">
+        
+    </div>
+    <div class="col-md-6">
+        @Html.ValidationSummary()
+        
+        <form method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.EmailOrUserName, new
+                {
+                    @class = "col-form-label-lg"
+                })
+                @Html.TextBoxFor(q => q.EmailOrUserName, new
+                {
+                    @class = "form-control form-control-lg",
+                    required = "required"
+                })
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password, new
+                {
+                    @class = "col-form-label-lg"
+                })
+                @Html.PasswordFor(m => m.Password, new
+                {
+                    @class = "form-control form-control-lg",
+                    required = "required"
+                })
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-check mt-3">
+                @Html.CheckBoxFor(m => m.RememberMe, new
+                {
+                    id = "RememberMe",
+                    @class = "form-check-input"
+                })
+                @Html.LabelFor(m => m.RememberMe)
+
+            </div>
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </form>
+
+    </div>
+    <div class="col-md-3">
+        
+    </div>
+
+</div>
