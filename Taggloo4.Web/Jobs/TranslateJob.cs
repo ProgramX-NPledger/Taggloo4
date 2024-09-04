@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.SignalR;
+using Taggloo4.Web.Contract;
 using Taggloo4.Web.Data;
 using Taggloo4.Web.Hubs;
 using Taggloo4.Web.RazorViewRendering;
@@ -23,6 +24,8 @@ public class TranslateJob
     private readonly IHubContext<TranslateHub> _hubContext;
     private readonly DataContext _dataContext;
     private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly TranslatorConfigurationCache _translatorConfigurationCache;
+    private readonly ITranslatorConfigurationRepository _translatorConfigurationRepository;
 
     /// <summary>
     /// Constructor for purposes of injecting required services.
@@ -31,15 +34,21 @@ public class TranslateJob
     /// <param name="hubContext">Implementation of SignalR <seealso cref="IHubContext"/>.</param>
     /// <param name="dataContext">Entity Framework context to enable access to underlying datastore.</param>
     /// <param name="webHostEnvironment">Implementation of ASP.NET <seealso cref="IWebHostEnvironment"/>.</param>
+    /// <param name="translatorConfigurationCache">Translator configuration cache.</param>
+    /// <param name="translatorConfigurationRepository">Implementation of <seealso cref="ITranslatorConfigurationRepository"/>.</param>
     public TranslateJob(IBackgroundJobClient backgroundJobClient, 
         IHubContext<TranslateHub> hubContext, 
         DataContext dataContext,
-        IWebHostEnvironment webHostEnvironment)
+        IWebHostEnvironment webHostEnvironment,
+        TranslatorConfigurationCache translatorConfigurationCache,
+        ITranslatorConfigurationRepository translatorConfigurationRepository)
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
         _dataContext = dataContext;
         _webHostEnvironment = webHostEnvironment;
+        _translatorConfigurationCache = translatorConfigurationCache;
+        _translatorConfigurationRepository = translatorConfigurationRepository;
     }
 
     /// <summary>
@@ -89,10 +98,13 @@ public class TranslateJob
     {
         // this will be called per translator
         DateTime startTimeStamp = DateTime.Now;
-        ITranslator translator = translatorFactory.Create(_dataContext);
+
+        ITranslatorConfiguration translatorConfiguration =
+            await _translatorConfigurationCache.GetTranslatorConfiguration(translatorFactory.GetTranslatorName(),_translatorConfigurationRepository);
+        ITranslator translator = translatorFactory.Create(_dataContext,translatorConfiguration);
         TranslationResults translationResults = translator.Translate(translationRequest);
         // translation results for summaries are truncated and the paginator is not displayed
-        translationResults.MaximumItems = 5; // TODO this should be a configuration
+        translationResults.MaximumItems = translatorConfiguration.NumberOfItemsInSummary;
         
         TimeSpan delta = DateTime.Now - startTimeStamp;
         TranslationResultsWithMetaData translationResultsWithMetaData =

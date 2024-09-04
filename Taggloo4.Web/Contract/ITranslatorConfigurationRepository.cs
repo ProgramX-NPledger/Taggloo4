@@ -7,13 +7,12 @@ namespace Taggloo4.Web.Contract;
 /// </summary>
 public interface ITranslatorConfigurationRepository
 {
-	/// <summary>
-	/// Retrieves all matching <seealso cref="Translator"/>s.
-	/// </summary>
-	/// <param name="key">If specified, filters by <c>Key</c>.</param>
-	/// <param name="isEnabled">If specified, filters by whether the Translator is enabled for use.</param>
-	/// <returns>A collection of matching <seealso cref="Translator"/>s.</returns>
-	Task<IEnumerable<TranslatorConfiguration>> GetAllTranslatorsAsync(string? key, bool? isEnabled);
 
+	/// <summary>
+	/// Retrieves configurational data for a Translator.
+	/// </summary>
+	/// <param name="translatorKey">The key for the Translator.</param>
+	/// <returns>Configurational data for a Translator, or <c>null</c> if no configuration exists.</returns>
+	Task<TranslatorConfiguration?> GetTranslatorConfiguration(string translatorKey);
 	
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.SignalR;
+using Taggloo4.Web.Contract;
 using Taggloo4.Web.Data;
 using Taggloo4.Web.Hubs;
 using Taggloo4.Web.Jobs;
@@ -18,6 +19,8 @@ public class AsynchronousTranslatorSession : ITranslatorSession
     private readonly IHubContext<TranslateHub> _hubContext;
     private readonly DataContext _entityFrameworkCoreDataContext;
     private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly TranslatorConfigurationCache _translatorConfigurationCache;
+    private readonly ITranslatorConfigurationRepository _translatorConfigurationRepository;
 
     /// <summary>
     /// Constructor using injected objects for Hangfire and SignalR services.
@@ -26,15 +29,21 @@ public class AsynchronousTranslatorSession : ITranslatorSession
     /// <param name="hubContext">Implementation of the SignalR <seealso cref="IHubContext{TranslateHub}"/> object.</param>
     /// <param name="entityFrameworkCoreDataContext">Entity Framework context to enable access to underlying datastore.</param>
     /// <param name="webHostEnvironment">Implementation of ASP.NET <seealso cref="IWebHostEnvironment"/>.</param>
+    /// <param name="translatorConfigurationCache">Translator configuration cache.</param>
+    /// <param name="translatorConfigurationRepository">Implementation of <seealso cref="ITranslatorConfigurationRepository"/>.</param>
     public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, 
         IHubContext<TranslateHub> hubContext, 
         DataContext entityFrameworkCoreDataContext,
-        IWebHostEnvironment webHostEnvironment) 
+        IWebHostEnvironment webHostEnvironment,
+        TranslatorConfigurationCache translatorConfigurationCache,
+        ITranslatorConfigurationRepository translatorConfigurationRepository) 
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
         _entityFrameworkCoreDataContext = entityFrameworkCoreDataContext;
         _webHostEnvironment = webHostEnvironment;
+        _translatorConfigurationCache = translatorConfigurationCache;
+        _translatorConfigurationRepository = translatorConfigurationRepository;
         _options = new TranslatorOptions();
     }
 
@@ -45,12 +54,16 @@ public class AsynchronousTranslatorSession : ITranslatorSession
     /// <param name="hubContext">Implementation of the SignalR <seealso cref="IHubContext{TranslateHub}"/> object.</param>
     /// <param name="entityFrameworkCoreDataContext">Entity Framework context to enable access to underlying datastore.</param>
     /// <param name="webHostEnvironment">Implementation of ASP.NET <seealso cref="IWebHostEnvironment"/>.</param>
+    /// <param name="translatorConfigurationCache">Translator configuration cache.</param>
+    /// <param name="translatorConfigurationRepository">Implementation of <seealso cref="ITranslatorConfigurationRepository"/>.</param>
     /// <param name="options">Options which may customise translation behaviour.</param>
     public AsynchronousTranslatorSession(IBackgroundJobClient backgroundJobClient, 
         IHubContext<TranslateHub> hubContext, 
         DataContext entityFrameworkCoreDataContext, 
         IWebHostEnvironment webHostEnvironment,
-        TranslatorOptions options) : this(backgroundJobClient, hubContext, entityFrameworkCoreDataContext,webHostEnvironment)
+        TranslatorConfigurationCache translatorConfigurationCache,
+        ITranslatorConfigurationRepository translatorConfigurationRepository,
+        TranslatorOptions options) : this(backgroundJobClient, hubContext, entityFrameworkCoreDataContext,webHostEnvironment,translatorConfigurationCache,translatorConfigurationRepository)
     {
         _options = options;
     }
@@ -68,7 +81,7 @@ public class AsynchronousTranslatorSession : ITranslatorSession
             throw new InvalidOperationException($"{nameof(IHubContext)} implementation cannot be null");
         
         // create the hangfire job and submit
-        TranslateJob translateJob = new TranslateJob(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext, _webHostEnvironment);
+        TranslateJob translateJob = new TranslateJob(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext, _webHostEnvironment, _translatorConfigurationCache, _translatorConfigurationRepository);
         translateJob.AddTranslationJob(translationRequest);
     }
 }

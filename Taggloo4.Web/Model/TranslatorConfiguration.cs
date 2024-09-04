@@ -20,5 +20,10 @@ public class TranslatorConfiguration : ITranslatorConfiguration
     /// Whether the Translator is enabled.
     /// </summary>
     public bool IsEnabled { get; set; }
-    
+
+    /// <inheritdoc cref="ITranslatorConfiguration.Priority"/>
+    public int Priority { get; set; }
+
+    /// <inheritdoc cref="ITranslatorConfiguration.NumberOfItemsInSummary"/>
+    public int NumberOfItemsInSummary { get; set;  }
 }

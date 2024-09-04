@@ -11,4 +11,12 @@ public class DefaultTranslatorConfiguration : ITranslatorConfiguration
     /// Whether the Translator is enabled for use. Always <c>True</c>.
     /// </summary>
     public bool IsEnabled { get; } = true;
+
+    /// <summary>
+    /// Priority of the Translator. Always a fixed number.
+    /// </summary>
+    public int Priority { get; } = int.MaxValue;
+
+    /// <inheritdoc cref="ITranslatorConfiguration.NumberOfItemsInSummary"/>
+    public int NumberOfItemsInSummary { get; } = 5;
 }

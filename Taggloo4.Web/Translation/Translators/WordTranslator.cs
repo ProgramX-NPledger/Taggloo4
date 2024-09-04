@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
+using Taggloo4.Web.Contract;
 using Taggloo4.Web.Data;
 using Taggloo4.Web.Model;
 using Taggloo4.Web.Translation.Translators.Factories;
@@ -13,14 +14,17 @@ namespace Taggloo4.Web.Translation.Translators;
 public class WordTranslator : ITranslator
 {
     private readonly DataContext _entityFrameworkCoreDatabaseContext;
+    private readonly ITranslatorConfiguration _translatorConfiguration;
 
     /// <summary>
     /// Constructor for configuring the object, called by the <seealso cref="WordTranslatorFactory"/>.
     /// </summary>
     /// <param name="entityFrameworkCoreDatabaseContext">Entity Framework context to enable access to underlying datastore.</param>
-    public WordTranslator(DataContext entityFrameworkCoreDatabaseContext)
+    /// <param name="translatorConfiguration">Configuration for Translator.</param>
+    public WordTranslator(DataContext entityFrameworkCoreDatabaseContext, ITranslatorConfiguration translatorConfiguration)
     {
         _entityFrameworkCoreDatabaseContext = entityFrameworkCoreDatabaseContext;
+        _translatorConfiguration = translatorConfiguration;
     }
 
     /// <summary>
@@ -76,4 +80,8 @@ public class WordTranslator : ITranslator
 
         return translationResults;
     }
+    
+    /// <inheritdoc cref="ITranslator.Configuration"/>
+    public ITranslatorConfiguration Configuration => _translatorConfiguration;
+
 }

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Hangfire;
 using Microsoft.AspNetCore.SignalR;
+using Taggloo4.Web.Contract;
 using Taggloo4.Web.Data;
 using Taggloo4.Web.Translation;
 using Taggloo4.Web.Translation.Utility;
@@ -17,6 +18,8 @@ public class TranslateHub : Hub
     private readonly IHubContext<TranslateHub> _hubContext;
     private readonly DataContext _entityFrameworkCoreDataContext;
     private readonly IWebHostEnvironment _webHosEnvironment;
+    private readonly TranslatorConfigurationCache _translatorConfigurationCache;
+    private readonly ITranslatorConfigurationRepository _translatorConfigurationRepository;
 
     private readonly ILogger<TranslateHub> _logger;
 
@@ -27,17 +30,23 @@ public class TranslateHub : Hub
     /// <param name="hubContext">Implementation of SignalR <seealso cref="IHubContext"/>.</param>
     /// <param name="entityFrameworkCoreDataContext">Entity Framework context to enable access to underlying datastore.</param>
     /// <param name="webHostEnvironment">Implementation of ASP.NET <seealso cref="IWebHostEnvironment"/>.</param>
+    /// <param name="translatorConfigurationCache">Translator configuration cache.</param>
+    /// <param name="translatorConfigurationRepository">Implementation of <seealso cref="ITranslatorConfigurationRepository"/>.</param>
     /// <param name="logger">Logging provider to allow for logging.</param>
     public TranslateHub(IBackgroundJobClient backgroundJobClient,
         IHubContext<TranslateHub> hubContext,
         DataContext entityFrameworkCoreDataContext,
         IWebHostEnvironment webHostEnvironment,
+        TranslatorConfigurationCache translatorConfigurationCache,
+        ITranslatorConfigurationRepository translatorConfigurationRepository,
         ILogger<TranslateHub> logger)
     {
         _backgroundJobClient = backgroundJobClient;
         _hubContext = hubContext;
         _entityFrameworkCoreDataContext = entityFrameworkCoreDataContext;
         _webHosEnvironment = webHostEnvironment;
+        _translatorConfigurationCache = translatorConfigurationCache;
+        _translatorConfigurationRepository = translatorConfigurationRepository;
         _logger = logger;
     }
 
@@ -63,7 +72,7 @@ public class TranslateHub : Hub
         
             // start the translation by using the Translator object, which schedules on the Hangfire background job client
             // having a single Translator class allows for multiple entrypoints/clients to implement translation
-            AsynchronousTranslatorSession translator = new AsynchronousTranslatorSession(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext, _webHosEnvironment);
+            AsynchronousTranslatorSession translator = new AsynchronousTranslatorSession(_backgroundJobClient, _hubContext, _entityFrameworkCoreDataContext, _webHosEnvironment, _translatorConfigurationCache, _translatorConfigurationRepository);
             translator.Translate(translationRequest);
         }
         catch (InvalidOperationException ioEx)

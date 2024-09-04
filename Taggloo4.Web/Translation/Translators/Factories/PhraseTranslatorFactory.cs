@@ -1,4 +1,5 @@
 ﻿using System.Composition;
+using System.Configuration;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Data;
 
@@ -14,10 +15,11 @@ public class PhraseTranslatorFactory : ITranslatorFactory
     /// Instantiates and configures a <seealso cref="PhraseTranslator"/> instance.
     /// </summary>
     /// <param name="entityFrameworkCoreDatabaseContext">Entity Framework context to enable access to underlying datastore.</param>
+    /// <param name="translatorConfiguration">Configuration for Translator.</param>
     /// <returns>A configured <seealso cref="PhraseTranslator"/> as an implementation of <seealso cref="ITranslator"/>.</returns>
-    public ITranslator Create(DataContext entityFrameworkCoreDatabaseContext)
+    public ITranslator Create(DataContext entityFrameworkCoreDatabaseContext, ITranslatorConfiguration translatorConfiguration)
     {
-        return new PhraseTranslator(entityFrameworkCoreDatabaseContext);
+        return new PhraseTranslator(entityFrameworkCoreDatabaseContext, translatorConfiguration);
     }
     
     
@@ -27,6 +29,4 @@ public class PhraseTranslatorFactory : ITranslatorFactory
         return nameof(PhraseTranslator);
     }
 
-    /// <inheritdoc cref="ITranslatorFactory.Configuration"/>
-    public ITranslatorConfiguration Configuration { get; set; }
 }
