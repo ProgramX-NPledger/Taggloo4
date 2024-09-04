@@ -29,7 +29,9 @@ div#translationResults div.translation-result p.more-results a:hover { text-deco
 div#translationResults div.translation-result ul.page-numbers { list-style-type: none; font-size: 90%; text-align: right; }
 div#translationResults div.translation-result ul.page-numbers li { display: inline-block; padding: 0 10px 0 10px; }
 div#translationResults div.translation-result ul.page-numbers li.current-page { list-style-type: none; }
-
+div#translationResults div.translation-result ul li span.phrase-from-phrase { }
+div#translationResults div.translation-result ul li span.phrase-to-phrase { font-size: 90%; display: inline-block; margin-left: 20px; }
+div#translationResults div.translation-result ul li span.phrase-to-phrase a { color: #000; }
 
 
 /* admin area */

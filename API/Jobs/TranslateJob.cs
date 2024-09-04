@@ -60,9 +60,11 @@ public class TranslateJob
 
     private IEnumerable<ITranslatorFactory> GetTranslatorFactories()
     {
-        return new[]
+        // TODO: see TranslateController.GetTranslatorFactoryAsync
+        return new ITranslatorFactory[]
         {
-            new WordTranslatorFactory()
+            new WordTranslatorFactory(),
+            new PhraseTranslatorFactory()
         };
     }
 

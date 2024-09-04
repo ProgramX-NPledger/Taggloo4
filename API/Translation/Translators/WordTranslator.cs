@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.Model;
 using API.Translation.Translators.Factories;
+using API.Translation.Translators.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 

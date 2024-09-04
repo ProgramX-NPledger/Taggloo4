@@ -40,25 +40,27 @@ public class TranslationFactoryService
     /// <summary>
     /// Returns a filtered list of <seealso cref="ITranslatorFactory"/> instances matching the provided filter. 
     /// </summary>
-    /// <param name="translatorRepository">An implementation of the <seealso cref="ITranslatorRepository"/> that
+    /// <param name="translatorRepository">An implementation of the <seealso cref="ITranslatorConfigurationRepository"/> that
     /// may be used to access configurational data for the <seealso cref="ITranslatorFactory"/>.</param>
     /// <param name="isEnabled">If specified, whether the <seealso cref="ITranslatorFactory"/> should be enabled.</param>
     /// <returns>A list of matching instances of <seealso cref="ITranslatorFactory"/> which may be used to provide
     /// translations.</returns>
-    public async Task<IEnumerable<ITranslatorFactory>> GetTranslatorFactoriesAsync(ITranslatorRepository translatorRepository, bool? isEnabled)
+    public async Task<IEnumerable<ITranslatorFactory>> GetTranslatorFactoriesAsync(ITranslatorConfigurationRepository translatorRepository)
     {
         if (_compositionHost == null) throw new InvalidOperationException($"{nameof(_compositionHost)} cannot be null");
         
         IEnumerable<ITranslatorFactory>? translatorFactories =_compositionHost.GetExports<ITranslatorFactory>();
         
-        // pass some filters to teh repository and return their configurations
-        Translator[] translatorFactoryEntities=(await translatorRepository.GetAllTranslatorsAsync(null, isEnabled)).ToArray();
-
         List<ITranslatorFactory> matchingTranslatorFactories = new List<ITranslatorFactory>();
         foreach (ITranslatorFactory translatorFactory in translatorFactories)
         {
-            if (translatorFactoryEntities.Any(q=>q.Key.Equals(translatorFactory.GetTranslatorName(),StringComparison.OrdinalIgnoreCase)))
-                matchingTranslatorFactories.Add(translatorFactory);
+            ITranslatorConfiguration? translatorConfiguration = (await 
+                translatorRepository.GetAllTranslatorsAsync(translatorFactory.GetTranslatorName(), null)).FirstOrDefault();
+            if (translatorConfiguration == null) translatorConfiguration = new DefaultTranslatorConfiguration();
+
+            translatorFactory.Configuration = translatorConfiguration;
+            
+            matchingTranslatorFactories.Add(translatorFactory);
         }
         
         return matchingTranslatorFactories;

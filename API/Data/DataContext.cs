@@ -62,7 +62,8 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// <summary>
 	/// Configuration data for Translators.
 	/// </summary>
-	public DbSet<Translator> Translators { get; set; }
+	public DbSet<TranslatorConfiguration> TranslatorConfigurations { get; set; }
+
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -160,11 +161,17 @@ public class DataContext : IdentityDbContext<AppUser,
 			.OnDelete(DeleteBehavior.NoAction);
 		
 		builder.Entity<Phrase>()
-			.HasMany(p => p.Translations)
+			.HasMany(p => p.FromTranslations)
 			.WithOne(pt => pt.FromPhrase)
 			.HasForeignKey(pt => pt.FromPhraseId)
 			.OnDelete(DeleteBehavior.NoAction);
 
+		builder.Entity<Phrase>()
+			.HasMany(p => p.Translations)
+			.WithOne(pt => pt.ToPhrase)
+			.HasForeignKey(pt => pt.ToPhraseId)
+			.OnDelete(DeleteBehavior.NoAction);
+		
 		// words in phrase
 
 		builder.Entity<Phrase>()

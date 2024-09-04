@@ -7,7 +7,7 @@ namespace API.Data;
 /// <summary>
 /// Represents a repository for working with Languages.
 /// </summary>
-public class TranslatorRepository : ITranslatorRepository
+public class TranslatorConfigurationRepository : ITranslatorConfigurationRepository
 {
 	private readonly DataContext _dataContext;
 
@@ -15,15 +15,15 @@ public class TranslatorRepository : ITranslatorRepository
 	/// Constructor with injected Entity Framework <seealso cref="DataContext"/>.
 	/// </summary>
 	/// <param name="dataContext">Entity Framework <seealso cref="DataContext"/>.</param>
-	public TranslatorRepository(DataContext dataContext)
+	public TranslatorConfigurationRepository(DataContext dataContext)
 	{
 		_dataContext = dataContext;
 	}
 
 	/// <inheritdoc cref="ITranslationRepository"/>
-	public async Task<IEnumerable<Translator>> GetAllTranslatorsAsync(string? key, bool? isEnabled)
+	public async Task<IEnumerable<TranslatorConfiguration>> GetAllTranslatorsAsync(string? key, bool? isEnabled)
 	{
-		IQueryable<Translator> query = _dataContext.Translators
+		IQueryable<TranslatorConfiguration> query = _dataContext.TranslatorConfigurations
 			.AsNoTracking()
 			.AsQueryable();
 		

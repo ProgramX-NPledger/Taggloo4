@@ -1,4 +1,6 @@
-﻿using API.Data;
+﻿using API.Contract;
+using API.Data;
+using API.Model;
 
 namespace API.Translation;
 
@@ -20,4 +22,6 @@ public interface ITranslatorFactory
     /// <returns></returns>
     string GetTranslatorName();
 
+    ITranslatorConfiguration Configuration { get; set; }
+    
 }

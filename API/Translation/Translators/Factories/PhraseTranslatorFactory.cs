@@ -5,26 +5,26 @@ using API.Data;
 namespace API.Translation.Translators.Factories;
 
 /// <summary>
-/// Instantiates and configures <seealso cref="WordTranslator"/> instance.
+/// Instantiates and configures <seealso cref="PhraseTranslator"/> instance.
 /// </summary>
 
-public class WordTranslatorFactory : ITranslatorFactory
+public class PhraseTranslatorFactory : ITranslatorFactory
 {
     /// <summary>
-    /// Instantiates and configures a <seealso cref="WordTranslator"/> instance.
+    /// Instantiates and configures a <seealso cref="PhraseTranslator"/> instance.
     /// </summary>
     /// <param name="entityFrameworkCoreDatabaseContext">Entity Framework context to enable access to underlying datastore.</param>
-    /// <returns>A configured <seealso cref="WordTranslator"/> as an implementation of <seealso cref="ITranslator"/>.</returns>
+    /// <returns>A configured <seealso cref="PhraseTranslator"/> as an implementation of <seealso cref="ITranslator"/>.</returns>
     public ITranslator Create(DataContext entityFrameworkCoreDatabaseContext)
     {
-        return new WordTranslator(entityFrameworkCoreDatabaseContext);
+        return new PhraseTranslator(entityFrameworkCoreDatabaseContext);
     }
     
     
     /// <inheritdoc cref="ITranslatorFactory"/>
     public string GetTranslatorName()
     {
-        return nameof(WordTranslator);
+        return nameof(PhraseTranslator);
     }
 
     public ITranslatorConfiguration Configuration { get; set; }
