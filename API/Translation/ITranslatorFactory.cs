@@ -22,6 +22,9 @@ public interface ITranslatorFactory
     /// <returns></returns>
     string GetTranslatorName();
 
+    /// <summary>
+    /// Configuration of the Translator.
+    /// </summary>
     ITranslatorConfiguration Configuration { get; set; }
     
 }

@@ -27,5 +27,6 @@ public class PhraseTranslatorFactory : ITranslatorFactory
         return nameof(PhraseTranslator);
     }
 
+    /// <inheritdoc cref="ITranslatorFactory.Configuration"/>
     public ITranslatorConfiguration Configuration { get; set; }
 }

@@ -42,7 +42,6 @@ public class TranslationFactoryService
     /// </summary>
     /// <param name="translatorRepository">An implementation of the <seealso cref="ITranslatorConfigurationRepository"/> that
     /// may be used to access configurational data for the <seealso cref="ITranslatorFactory"/>.</param>
-    /// <param name="isEnabled">If specified, whether the <seealso cref="ITranslatorFactory"/> should be enabled.</param>
     /// <returns>A list of matching instances of <seealso cref="ITranslatorFactory"/> which may be used to provide
     /// translations.</returns>
     public async Task<IEnumerable<ITranslatorFactory>> GetTranslatorFactoriesAsync(ITranslatorConfigurationRepository translatorRepository)

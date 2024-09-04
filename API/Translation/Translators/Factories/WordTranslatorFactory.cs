@@ -21,11 +21,12 @@ public class WordTranslatorFactory : ITranslatorFactory
     }
     
     
-    /// <inheritdoc cref="ITranslatorFactory"/>
+    /// <inheritdoc cref="ITranslatorFactory.GetTranslatorName"/>
     public string GetTranslatorName()
     {
         return nameof(WordTranslator);
     }
 
+    /// <inheritdoc cref="ITranslatorFactory.Configuration"/>
     public ITranslatorConfiguration Configuration { get; set; }
 }
