@@ -112,7 +112,8 @@ public class TranslateJob
             {
                 Translator = translator.GetType().Name,
                 TimeTaken = delta,
-                JobId = hangfireJobId
+                JobId = hangfireJobId,
+                Priority = translatorConfiguration.Priority
             }; 
         
         if (!string.IsNullOrWhiteSpace(translationRequest.ClientId))
@@ -126,6 +127,8 @@ public class TranslateJob
             
             await _hubContext.Clients.Client(translationRequest.ClientId).SendCoreAsync("UpdateTranslationResults", new[] 
             {
+                translator.GetType().Name,
+                translatorConfiguration.Priority.ToString(),
                 renderedView
             });
         }

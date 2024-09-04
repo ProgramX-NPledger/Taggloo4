@@ -46,7 +46,11 @@ public class TranslationResultsWithMetaData
     /// When <c>True</c> is being rendered as a Details View, allowing the View to customise its output between the summary and detail view modes.
     /// </summary>
     public bool IsRenderedAsDetailsView { get; set; } = false;
-    
+
+    /// <summary>
+    /// Priority of the Translator, lower priority indicates higher appearance in sorting.
+    /// </summary>
+    public int Priority { get; set; }
 
     
 }
