@@ -4,24 +4,27 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/translate").build(
 
 // this is from the server
 connection.on("UpdateTranslationResults", function (translator,priority,result) {
+    const translatorPriority=+priority;
     const translationResultElementId="translationResults_"+translator;
     let div = $("<div>", {id: translationResultElementId, "class": "translation-result translation-result-"+translator, 'data-priority':priority});
     div.append(result);
 
     // iterate through elements inside #translationResults
-    // as soon as see a priority > incoming priority, prepend content
-
-    $('#translationResults').children('.translation-result').each(function (ordinal) {
-        //alert(this.value); // "this" is the current element in the loop
-        console.log(translator,ordinal,$(this).attr('data-priority'));
-        const nextPriority=$(this).attr('data-priority');
-        console.log(nextPriority,priority,nextPriority>=priority);
-        if (nextPriority>=priority) { // this isn't working
-            $("#translationResults").prepend(div);
-        }
-    });
+    // as soon as see a priority < incoming priority, append content
+    const previousResults=$('#translationResults').children('.translation-result');
+    if (previousResults.length===0) {
+        // no other items, so just insert here
+        $("#translationResults").append(div);
+    } else {
+        previousResults.each(function (ordinal) {
+            ordinal++;
+            const previousTranslatorPriority=+($(this).attr('data-priority'));
+            if (previousTranslatorPriority<=translatorPriority) { 
+                $("#translationResults").append(div);
+            }
+        });
+    }
     
-    $("#translationResults").append(div);
 });
     
 // build the translation request from the query string and submit to server, which will respond as and when ready 
