@@ -1,4 +1,4 @@
-﻿namespace Taggloo4.Web.Contract;
+﻿namespace Taggloo4.Contract;
 
 /// <summary>
 /// Configuration for a Translator.

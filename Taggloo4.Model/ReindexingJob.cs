@@ -1,4 +1,4 @@
-﻿namespace Taggloo4.Web.Model;
+﻿namespace Taggloo4.Model;
 
 /// <summary>
 /// Represents an instance of a re-indexing job.

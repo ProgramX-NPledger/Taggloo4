@@ -1,4 +1,5 @@
-﻿using Taggloo4.Web.Contract;
+﻿using Taggloo4.Contract;
+using Taggloo4.Web.Contract;
 
 namespace Taggloo4.Web.Translation;
 

@@ -10,4 +10,8 @@
       <Folder Include="Criteria\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Taggloo4.Contract\Taggloo4.Contract.csproj" />
+    </ItemGroup>
+
 </Project>

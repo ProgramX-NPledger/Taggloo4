@@ -3,6 +3,7 @@ using Taggloo4.Web.Translation.Translators.Factories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Taggloo4.Model;
 using Taggloo4.Web.Model;
 
 namespace Taggloo4.Web.Data;

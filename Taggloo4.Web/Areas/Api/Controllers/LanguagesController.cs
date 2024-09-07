@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Taggloo4.Dto;
+using Taggloo4.Model;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Controllers;
 using Taggloo4.Web.Model;

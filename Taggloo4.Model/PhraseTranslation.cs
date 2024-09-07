@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Taggloo4.Web.Model;
+﻿namespace Taggloo4.Model;
 
 /// <summary>
-/// Translation of a <seealso cref="Word"/>.
+/// Translation of a <seealso cref="Phrase"/>.
 /// </summary>
-public class WordTranslation
+public class PhraseTranslation
 {
 	/// <summary>
 	/// Identifier of the Translation.
@@ -13,27 +11,24 @@ public class WordTranslation
 	public int Id { get; set; }
 	
 	/// <summary>
-	/// The identifier of the <seealso cref="Word"/> being translated.
+	/// The identifier of the <seealso cref="Phrase"/> being translated.
 	/// </summary>
-	public int FromWordId { get; set; }
+	public int FromPhraseId { get; set; }
+	// this breaks migrations
+	//public Word FromWord { get; set; }
 	
 	/// <summary>
-	/// Word being translated.
+	/// The identifier of the <seealso cref="Phrase"/> translation.
 	/// </summary>
-	public Word? FromWord { get; set; }
+	public int ToPhraseId { get; set; }
 	
 	/// <summary>
-	/// The identifier of the <seealso cref="Word"/> translation.
+	/// The Phrase Translation
 	/// </summary>
-	public int ToWordId { get; set; }
+	public Phrase? ToPhrase { get; set; }
 	
 	/// <summary>
-	/// The Word being translated to.
-	/// </summary>
-	public Word? ToWord { get; set; }
-	
-	/// <summary>
-	/// The Host from which the Word Translation was created.
+	/// The Host from which the Phrase Translation was created.
 	/// </summary>
 	public string? CreatedOn { get; set; }
 	
@@ -58,6 +53,10 @@ public class WordTranslation
 	/// </summary>
 	public Dictionary? Dictionary { get; set; }
 	
+	/// <summary>
+	/// Phrase being translated.
+	/// </summary>
+	public Phrase? FromPhrase { get; set; }
 	
 	
 }

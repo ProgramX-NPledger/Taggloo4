@@ -118,7 +118,7 @@ public class Initialiser
             foreach (Language language in languages)
             {
                 Log.Information($"Seeding missing Language '{language.IetfLanguageTag}'");
-                _dataContext.Languages.Add(new Web.Model.Language()
+                _dataContext.Languages.Add(new Taggloo4.Model.Language()
                 {
                     Name = language.Name,
                     IetfLanguageTag = language.IetfLanguageTag

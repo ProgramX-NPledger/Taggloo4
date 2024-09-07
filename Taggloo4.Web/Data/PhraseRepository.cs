@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Taggloo4.Model;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Model;
 

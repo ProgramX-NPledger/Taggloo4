@@ -1,4 +1,5 @@
-﻿using Taggloo4.Web.ViewModels.Home;
+﻿using Taggloo4.Model;
+using Taggloo4.Web.ViewModels.Home;
 using Taggloo4.Web.ViewModels.Home.Factory;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Model;

@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Taggloo4.Web.Contract;
-using Taggloo4.Web.Translation;
+using Taggloo4.Contract;
 
-namespace Taggloo4.Web.Model;
+namespace Taggloo4.Model;
 
 /// <summary>
 /// Configurational data for a Translator.

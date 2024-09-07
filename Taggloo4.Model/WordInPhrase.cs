@@ -1,4 +1,4 @@
-﻿namespace Taggloo4.Web.Model;
+﻿namespace Taggloo4.Model;
 
 /// <summary>
 /// A <see cref="Word"/> within a <see cref="Phrase"/>.

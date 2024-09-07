@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using Hangfire;
 using Taggloo4.Dto;
+using Taggloo4.Model;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Jobs;
 using Taggloo4.Web.Model;

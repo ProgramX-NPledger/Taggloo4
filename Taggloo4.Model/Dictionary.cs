@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Taggloo4.Web.Model;
+namespace Taggloo4.Model;
 
 /// <summary>
 /// A Dictionary has a Language and content such as Words, Phrases, Translations, etc.

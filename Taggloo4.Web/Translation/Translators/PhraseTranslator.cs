@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
+using Taggloo4.Contract;
+using Taggloo4.Model;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Data;
 using Taggloo4.Web.Model;

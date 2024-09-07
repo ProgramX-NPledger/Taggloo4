@@ -1,4 +1,5 @@
-﻿using Taggloo4.Web.Contract;
+﻿using Taggloo4.Model;
+using Taggloo4.Web.Contract;
 using Taggloo4.Web.Model;
 
 namespace Taggloo4.Web.Jobs;

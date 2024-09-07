@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Taggloo4.Web.Model;
+namespace Taggloo4.Model;
 
 /// <summary>
 /// A Phrase within a Dictionary.
