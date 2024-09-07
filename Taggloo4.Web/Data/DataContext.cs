@@ -186,6 +186,14 @@ public class DataContext : IdentityDbContext<AppUser,
 			.HasForeignKey(wip => wip.WordId)
 			.OnDelete(DeleteBehavior.NoAction);
 		
+		// translation configuration
 
+		builder.Entity<TranslatorConfiguration>().HasData(new TranslatorConfiguration()
+		{
+			Key = nameof(WordTranslator),
+			Priority = 1,
+			IsEnabled = true,
+			NumberOfItemsInSummary = 6
+		});
 	}
 }
