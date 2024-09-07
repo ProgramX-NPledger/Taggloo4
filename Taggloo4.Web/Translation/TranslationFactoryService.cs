@@ -50,19 +50,7 @@ public class TranslationFactoryService
         
         IEnumerable<ITranslatorFactory>? translatorFactories =_compositionHost.GetExports<ITranslatorFactory>();
         
-        List<ITranslatorFactory> matchingTranslatorFactories = new List<ITranslatorFactory>();
-        foreach (ITranslatorFactory translatorFactory in translatorFactories)
-        {
-            ITranslatorConfiguration? translatorConfiguration = (await 
-                translatorRepository.GetAllTranslatorsAsync(translatorFactory.GetTranslatorName(), null)).FirstOrDefault();
-            if (translatorConfiguration == null) translatorConfiguration = new DefaultTranslatorConfiguration();
-
-            translatorFactory.Configuration = translatorConfiguration;
-            
-            matchingTranslatorFactories.Add(translatorFactory);
-        }
-        
-        return matchingTranslatorFactories;
+        return translatorFactories;
     }
     
     

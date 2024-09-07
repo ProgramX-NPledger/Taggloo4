@@ -13,8 +13,9 @@ public interface ITranslatorFactory
     /// Instantiate and configure the Translator.
     /// </summary>
     /// <param name="entityFrameworkCoreDatabaseContext">Entity Framework context to enable access to underlying datastore.</param>
+    /// <param name="translatorConfiguration">Configuration for Translator.</param>
     /// <returns>Implementation of <seealso cref="ITranslator"/> for servicing translation results.</returns>
-    ITranslator Create(DataContext entityFrameworkCoreDatabaseContext);
+    ITranslator Create(DataContext entityFrameworkCoreDatabaseContext, ITranslatorConfiguration translatorConfiguration);
 
     /// <summary>
     /// 
@@ -22,9 +23,6 @@ public interface ITranslatorFactory
     /// <returns></returns>
     string GetTranslatorName();
 
-    /// <summary>
-    /// Configuration of the Translator.
-    /// </summary>
-    ITranslatorConfiguration Configuration { get; set; }
+ 
     
 }

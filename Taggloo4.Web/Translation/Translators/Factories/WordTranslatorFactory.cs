@@ -13,11 +13,12 @@ public class WordTranslatorFactory : ITranslatorFactory
     /// <summary>
     /// Instantiates and configures a <seealso cref="WordTranslator"/> instance.
     /// </summary>
+    /// <param name="translatorConfiguration">Configuration for Translator.</param>
     /// <param name="entityFrameworkCoreDatabaseContext">Entity Framework context to enable access to underlying datastore.</param>
     /// <returns>A configured <seealso cref="WordTranslator"/> as an implementation of <seealso cref="ITranslator"/>.</returns>
-    public ITranslator Create(DataContext entityFrameworkCoreDatabaseContext)
+    public ITranslator Create(DataContext entityFrameworkCoreDatabaseContext, ITranslatorConfiguration translatorConfiguration)
     {
-        return new WordTranslator(entityFrameworkCoreDatabaseContext);
+        return new WordTranslator(entityFrameworkCoreDatabaseContext,translatorConfiguration);
     }
     
     

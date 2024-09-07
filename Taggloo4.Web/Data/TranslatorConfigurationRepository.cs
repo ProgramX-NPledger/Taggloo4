@@ -20,26 +20,10 @@ public class TranslatorConfigurationRepository : ITranslatorConfigurationReposit
 		_dataContext = dataContext;
 	}
 
-	/// <inheritdoc cref="ITranslationRepository"/>
-	public async Task<IEnumerable<TranslatorConfiguration>> GetAllTranslatorsAsync(string? key, bool? isEnabled)
+	/// <inheritdoc cref="ITranslatorConfigurationRepository.GetTranslatorConfiguration"/>
+	public async Task<TranslatorConfiguration?> GetTranslatorConfiguration(string translatorKey)
 	{
-		IQueryable<TranslatorConfiguration> query = _dataContext.TranslatorConfigurations
-			.AsNoTracking()
-			.AsQueryable();
-		
-		if (!string.IsNullOrWhiteSpace(key))
-		{
-			query = query.Where(q => q.Key == key);
-		}
-		
-		if (isEnabled.HasValue)
-		{
-			if (isEnabled.Value)
-				query = query.Where(q => q.IsEnabled);
-			else
-				query = query.Where(q => !q.IsEnabled);
-		}
-
-		return await query.ToArrayAsync();
+		return await _dataContext.TranslatorConfigurations.AsNoTracking()
+			.SingleOrDefaultAsync(q => q.Key == translatorKey);
 	}
 }

@@ -38,6 +38,8 @@ public static class ApplicationServiceExtensions
 		services.AddScoped<IWordInPhraseRepository, WordInPhraseRepository>();
 		services.AddScoped<ITranslatorConfigurationRepository, TranslatorConfigurationRepository>();
 		services.AddSingleton<TranslationFactoryService, TranslationFactoryService>();
+		services.AddSingleton<TranslatorConfigurationCache, TranslatorConfigurationCache>();
+		
 		
 		services.AddLogging(loggingBuilder =>
 			loggingBuilder.AddSerilog(dispose: true));

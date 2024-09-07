@@ -30,16 +30,25 @@ public class TranslateController : Controller
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly ITranslatorConfigurationRepository _translatorRepository;
     private readonly TranslationFactoryService _translationFactoryService;
+    private readonly TranslatorConfigurationCache _translatorConfigurationCache;
+    private readonly ITranslatorConfigurationRepository _translatorConfigurationRepository;
 
     /// <summary>
     /// Default constructor with injected properties.
     /// </summary>
-    public TranslateController(DataContext dataContext, IWebHostEnvironment webHostEnvironment, ITranslatorConfigurationRepository translatorRepository, TranslationFactoryService translationFactoryService)
+    public TranslateController(DataContext dataContext, 
+        IWebHostEnvironment webHostEnvironment, 
+        ITranslatorConfigurationRepository translatorRepository, 
+        TranslationFactoryService translationFactoryService,
+        TranslatorConfigurationCache translatorConfigurationCache,
+        ITranslatorConfigurationRepository translatorConfigurationRepository)
     {
         _dataContext = dataContext;
         _webHostEnvironment = webHostEnvironment;
         _translatorRepository = translatorRepository;
         _translationFactoryService = translationFactoryService;
+        _translatorConfigurationCache = translatorConfigurationCache;
+        _translatorConfigurationRepository = translatorConfigurationRepository;
     }
     
     /// <summary>
@@ -80,9 +89,13 @@ public class TranslateController : Controller
     {
         DateTime startTimeStamp = DateTime.Now;
         AssertValidTranslators(viewModel.Translators!);
-
+        
         ITranslatorFactory translatorFactory = await GetTranslatorFactoryAsync(viewModel.Translators!.Single());
-        ITranslator translator=translatorFactory.Create(_dataContext);
+
+        ITranslatorConfiguration translatorConfiguration =
+            await _translatorConfigurationCache.GetTranslatorConfiguration(translatorFactory.GetTranslatorName(),_translatorConfigurationRepository);
+        
+        ITranslator translator=translatorFactory.Create(_dataContext,translatorConfiguration);
 
         TranslationRequest translationRequest = TranslationRequestUtility.CreateTranslationRequestFromTranslateViewModel(viewModel,null);
         translationRequest.DataWillBePaged = true;

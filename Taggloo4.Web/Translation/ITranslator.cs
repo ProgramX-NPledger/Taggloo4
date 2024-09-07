@@ -1,4 +1,6 @@
-﻿namespace Taggloo4.Web.Translation;
+﻿using Taggloo4.Web.Contract;
+
+namespace Taggloo4.Web.Translation;
 
 /// <summary>
 /// Provides Translation services for specific content.
@@ -11,5 +13,10 @@ public interface ITranslator
     /// <param name="translationRequest">The requested translation.</param>
     /// <returns>The results of the translation.</returns>
     TranslationResults Translate(TranslationRequest translationRequest);
+    
+    /// <summary>
+    /// Configuration for the Translator.
+    /// </summary>
+    ITranslatorConfiguration Configuration { get; }
     
 }
