@@ -10,7 +10,7 @@ concurrency:
 on:
   push:
     branches:
-      - release/taggloo_im
+      - release/taggloo.im
   
 jobs:
   Build:
