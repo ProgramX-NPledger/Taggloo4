@@ -6,6 +6,8 @@ using System.Reflection;
 using Taggloo4.Web.Model;
 using NuGet.Protocol.Plugins;
 using Taggloo4.Contract;
+using Taggloo4.Contract.Translation;
+using Taggloo4.Translation;
 using Taggloo4.Web.Contract;
 
 namespace Taggloo4.Web.Translation;

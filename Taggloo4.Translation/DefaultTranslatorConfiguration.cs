@@ -1,8 +1,6 @@
-﻿using Taggloo4.Contract;
-using Taggloo4.Contract.Translation;
-using Taggloo4.Web.Contract;
+﻿using Taggloo4.Contract.Translation;
 
-namespace Taggloo4.Web.Translation;
+namespace Taggloo4.Translation;
 
 /// <summary>
 /// Default configuration applied to a Translator when a defined configuration cannot be resolved.

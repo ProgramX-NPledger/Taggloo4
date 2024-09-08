@@ -1,4 +1,5 @@
-﻿using Taggloo4.Web.ViewModels.Translate;
+﻿using Taggloo4.Contract.Translation;
+using Taggloo4.Web.ViewModels.Translate;
 
 namespace Taggloo4.Web.Translation.Utility;
 

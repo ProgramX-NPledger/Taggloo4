@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Taggloo4.Contract\Taggloo4.Contract.csproj" />
       <ProjectReference Include="..\Taggloo4.Data.EntityFrameworkCore\Taggloo4.Data.EntityFrameworkCore.csproj" />
     </ItemGroup>
 

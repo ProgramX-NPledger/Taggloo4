@@ -1,4 +1,6 @@
-﻿namespace Taggloo4.Web.Translation;
+﻿using Taggloo4.Contract.Translation;
+
+namespace Taggloo4.Web.Translation;
 
 /// <summary>
 /// Wraps <seealso cref="TranslationResults"/> with data about the request being made.

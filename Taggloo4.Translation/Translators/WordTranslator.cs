@@ -1,16 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
-using Taggloo4.Contract;
 using Taggloo4.Contract.Translation;
 using Taggloo4.Data.EntityFrameworkCore;
 using Taggloo4.Model;
-using Taggloo4.Web.Contract;
-using Taggloo4.Web.Data;
-using Taggloo4.Web.Model;
-using Taggloo4.Web.Translation.Translators.Factories;
+using Taggloo4.Translation.Translators.Factories;
 using Taggloo4.Web.Translation.Translators.Results;
 
-namespace Taggloo4.Web.Translation.Translators;
+namespace Taggloo4.Translation.Translators;
 
 /// <summary>
 /// Performs translations for Words.

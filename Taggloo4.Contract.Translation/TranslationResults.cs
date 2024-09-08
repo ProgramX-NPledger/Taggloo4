@@ -1,4 +1,4 @@
-﻿namespace Taggloo4.Web.Translation;
+﻿namespace Taggloo4.Contract.Translation;
 
 /// <summary>
 /// Returned by implementations of <seealso cref="ITranslator"/>.

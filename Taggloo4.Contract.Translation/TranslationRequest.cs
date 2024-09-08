@@ -1,4 +1,4 @@
-﻿namespace Taggloo4.Web.Translation;
+﻿namespace Taggloo4.Contract.Translation;
 
 /// <summary>
 /// Represents a Translation request of the <seealso cref="AsynchronousTranslatorSession"/> object.
