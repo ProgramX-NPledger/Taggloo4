@@ -16,6 +16,8 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
+using Taggloo4.Data.EntityFrameworkCore;
+using Taggloo4.Data.EntityFrameworkCore.Identity;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 

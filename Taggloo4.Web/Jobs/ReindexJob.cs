@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Hangfire;
+using Taggloo4.Contract;
 using Taggloo4.Dto;
 using Taggloo4.Model;
 using Taggloo4.Model.Exceptions;

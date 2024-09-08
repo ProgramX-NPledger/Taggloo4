@@ -1,4 +1,6 @@
 ﻿using Taggloo4.Contract;
+using Taggloo4.Contract.Translation;
+using Taggloo4.Data.EntityFrameworkCore;
 using Taggloo4.Web.Model;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Data;

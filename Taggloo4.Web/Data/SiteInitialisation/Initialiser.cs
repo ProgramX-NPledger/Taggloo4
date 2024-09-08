@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Taggloo4.Data.EntityFrameworkCore;
+using Taggloo4.Data.EntityFrameworkCore.Identity;
 using Taggloo4.Web.Data.SiteInitialisation.Model;
 using Taggloo4.Web.Model;
 using Language = Taggloo4.Web.Data.SiteInitialisation.Model.Language;

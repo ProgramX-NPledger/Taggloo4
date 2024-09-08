@@ -1,5 +1,8 @@
 ﻿using System.Composition;
+using System.Configuration;
 using Taggloo4.Contract;
+using Taggloo4.Contract.Translation;
+using Taggloo4.Data.EntityFrameworkCore;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Data;
 
@@ -29,6 +32,6 @@ public class WordTranslatorFactory : ITranslatorFactory
         return nameof(WordTranslator);
     }
 
-    /// <inheritdoc cref="ITranslatorFactory.Configuration"/>
+    /// <inheritdoc cref="System.Configuration.Configuration"/>
     public ITranslatorConfiguration Configuration { get; set; }
 }

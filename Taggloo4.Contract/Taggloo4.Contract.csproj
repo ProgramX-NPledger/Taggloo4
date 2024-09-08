@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Taggloo4.Model\Taggloo4.Model.csproj" />
+    </ItemGroup>
+
 </Project>

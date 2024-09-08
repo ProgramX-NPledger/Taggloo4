@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Taggloo4.Contract;
+using Taggloo4.Contract.Translation;
 
 namespace Taggloo4.Model;
 

@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Taggloo4.Contract\Taggloo4.Contract.csproj" />
+      <ProjectReference Include="..\Taggloo4.Data.EntityFrameworkCore\Taggloo4.Data.EntityFrameworkCore.csproj" />
+      <ProjectReference Include="..\Taggloo4.Model\Taggloo4.Model.csproj" />
+    </ItemGroup>
+
+</Project>
