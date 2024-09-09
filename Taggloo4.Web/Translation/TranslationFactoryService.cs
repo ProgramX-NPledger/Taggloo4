@@ -8,6 +8,7 @@ using NuGet.Protocol.Plugins;
 using Taggloo4.Contract;
 using Taggloo4.Contract.Translation;
 using Taggloo4.Translation;
+using Taggloo4.Translation.Translators;
 using Taggloo4.Web.Contract;
 
 namespace Taggloo4.Web.Translation;
@@ -31,7 +32,8 @@ public class TranslationFactoryService
             .Export<ITranslatorFactory>()
             .Shared();
  
-        Assembly[] assemblies = new[] { typeof(Program).Assembly };
+        // TODO: get all assemblies
+        Assembly[] assemblies = new[] { typeof(WordTranslator).Assembly };
  
         ContainerConfiguration containerConfiguration = new ContainerConfiguration()
             .WithAssemblies(assemblies, conventions);

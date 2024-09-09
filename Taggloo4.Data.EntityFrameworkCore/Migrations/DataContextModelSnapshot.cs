@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taggloo4.Data.EntityFrameworkCore;
 
-
 #nullable disable
 
 namespace Taggloo4.Data.EntityFrameworkCore.Migrations
@@ -123,7 +122,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     b.HasIndex("WordsId");
 
-                    b.ToTable("PhraseWord");
+                    b.ToTable("PhraseWord", (string)null);
                 });
 
             modelBuilder.Entity("Taggloo4.Web.Model.AppRole", b =>
@@ -297,7 +296,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     b.HasIndex("IetfLanguageTag");
 
-                    b.ToTable("Dictionaries");
+                    b.ToTable("Dictionaries", (string)null);
                 });
 
             modelBuilder.Entity("Taggloo4.Web.Model.Language", b =>
@@ -312,7 +311,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     b.HasKey("IetfLanguageTag");
 
-                    b.ToTable("Languages");
+                    b.ToTable("Languages", (string)null);
                 });
 
             modelBuilder.Entity("Taggloo4.Web.Model.Phrase", b =>
@@ -349,7 +348,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                     b.HasIndex("DictionaryId", "ThePhrase")
                         .IsUnique();
 
-                    b.ToTable("Phrases");
+                    b.ToTable("Phrases", (string)null);
                 });
 
             modelBuilder.Entity("Taggloo4.Web.Model.PhraseTranslation", b =>
@@ -386,7 +385,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     b.HasIndex("ToPhraseId");
 
-                    b.ToTable("PhraseTranslations");
+                    b.ToTable("PhraseTranslations", (string)null);
                 });
 
             modelBuilder.Entity("Taggloo4.Web.Model.ReindexingJob", b =>
@@ -434,7 +433,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReindexingJobs");
+                    b.ToTable("ReindexingJobs", (string)null);
                 });
 
             modelBuilder.Entity("Taggloo4.Web.Model.TranslatorConfiguration", b =>
@@ -453,7 +452,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     b.HasKey("Key");
 
-                    b.ToTable("TranslatorConfigurations");
+                    b.ToTable("TranslatorConfigurations", (string)null);
 
                     b.HasData(
                         new
@@ -499,7 +498,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                     b.HasIndex("DictionaryId", "TheWord")
                         .IsUnique();
 
-                    b.ToTable("Words");
+                    b.ToTable("Words", (string)null);
                 });
 
             modelBuilder.Entity("Taggloo4.Web.Model.WordInPhrase", b =>
@@ -536,7 +535,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     b.HasIndex("WordId");
 
-                    b.ToTable("WordsInPhrases");
+                    b.ToTable("WordsInPhrases", (string)null);
                 });
 
             modelBuilder.Entity("Taggloo4.Web.Model.WordTranslation", b =>
@@ -573,7 +572,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     b.HasIndex("ToWordId");
 
-                    b.ToTable("WordTranslations");
+                    b.ToTable("WordTranslations", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
