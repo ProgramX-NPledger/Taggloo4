@@ -97,7 +97,10 @@ public class TranslateJob
 
         ITranslatorConfiguration translatorConfiguration =
             await _translatorConfigurationCache.GetTranslatorConfiguration(translatorFactory.GetTranslatorName(),_translatorConfigurationRepository);
+
+        translationRequest.MaximumNumberOfResults = translatorConfiguration.NumberOfItemsInSummary;
         ITranslator translator = translatorFactory.Create(_dataContext,translatorConfiguration);
+        
         TranslationResults translationResults = translator.Translate(translationRequest);
         // translation results for summaries are truncated and the paginator is not displayed
         translationResults.MaximumItems = translatorConfiguration.NumberOfItemsInSummary;

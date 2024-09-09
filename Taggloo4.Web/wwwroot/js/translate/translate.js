@@ -37,8 +37,7 @@ connection.start().then(function () {
         fromLanguageCode: params.FromLanguageCode,
         toLanguageCode: params.ToLanguageCode,
         query: params.Query,
-        ordinalOfFirstResult: 0,
-        maximumResults: 5        
+        ordinalOfFirstResult: 0
     };
     connection.invoke("InvokeTranslation",[translationRequest]).then(v => {
         // noop, ignoring the promise for now
