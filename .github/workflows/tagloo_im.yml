@@ -46,7 +46,7 @@ jobs:
     - name: Prepare temporary folder for archive
       run: mkdir ./deploy_net8_linux-x64
     - name: Copy built artefacts
-      run: cp -r ./API/bin/Release/net8.0/linux-x64/* deploy_net8_linux-x64
+      run: cp -r ./Taggloo4.Web/bin/Release/net8.0/linux-x64/* deploy_net8_linux-x64
     - name: Compress
       uses: TonyBogdanov/zip@1.0
       with:
