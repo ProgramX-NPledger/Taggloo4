@@ -16,6 +16,10 @@ public class WordTranslationImportSession : IImportSession
 		_wordTranslations = wordTranslations;
 	}
 
+	public string ContentTypeKey { get; } = "WordTranslation";
+	public string ContentTypeFriendlyName { get; } = "Word Translation";
+	public string ContentTypeController { get; } = "wordTranslations";
+	
 	public event EventHandler<ImportMetricsEventArgs>? UpdateMetrics;
 	public event EventHandler<ImportedEventArgs>? Imported;
 	public event EventHandler<ImportEventArgs>? LogMessage;

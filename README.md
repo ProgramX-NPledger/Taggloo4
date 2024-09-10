@@ -10,3 +10,9 @@ Taggloo is a Manx Gaelic to English translation tool, designed to fill a hole in
 
 * Microsoft SQL Server
 * .NET 8
+
+## Dependencies
+
+* Hangfire
+* SignalR
+* jQuery

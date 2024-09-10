@@ -17,6 +17,11 @@ public class WordImportSession : IImportSession
         _words = words;
     }
 
+    public string ContentTypeKey { get; } = "Word";
+    public string ContentTypeFriendlyName { get; } = "Word";
+    public string ContentTypeController { get; } = "words";
+
+    
     public event EventHandler<ImportMetricsEventArgs>? UpdateMetrics;
     public event EventHandler<ImportedEventArgs>? Imported;
 

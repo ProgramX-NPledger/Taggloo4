@@ -44,14 +44,14 @@ public class Importer : ApiClientBase
 		await using (SqlConnection sqlConnection = ConnectToSqlServer())
 		{
 			Log("\tOk");
-			Log($"Connect to API at {_importOptions.Url}");
+			Log($"Connect to Taggloo4.Web at {_importOptions.Url}");
 			HttpClient httpClient = CreateHttpClient(_httpClientFactory, _importOptions.Url);
 		
 			Log("\tOk");
 
-			Log($"\tLog in to API as {_importOptions.UserName}");
+			Log($"\tLog in to Taggloo4.Web as {_importOptions.UserName}");
 			LoginUserResult loginUserResult = await ConnectToApi(httpClient);
-			if (loginUserResult == null) throw new InvalidOperationException("Failed to log in to API");
+			if (loginUserResult == null) throw new InvalidOperationException("Failed to log in to Taggloo4.Web");
 			Log("\t\tOk");
 
 			httpClient.DefaultRequestHeaders.Authorization =
@@ -127,9 +127,9 @@ public class Importer : ApiClientBase
 			{
 				// create a Dictionary for each language code
 				CreateDictionaryResult dictionary1 = await CreateDictionaryForLanguage(httpClient,
-					sourceLanguageCodes.ElementAt(0), importSession.GetType().Name);
+					sourceLanguageCodes.ElementAt(0), importSession);
 				CreateDictionaryResult dictionary2 = await CreateDictionaryForLanguage(httpClient,
-					sourceLanguageCodes.ElementAt(1), importSession.GetType().Name);
+					sourceLanguageCodes.ElementAt(1), importSession);
 				await importSession.ImportAcrossDictionariesAsync(httpClient, sourceLanguageCodes.ElementAt(0), dictionary1.Id,
 					sourceLanguageCodes.ElementAt(1), dictionary2.Id);
 			}
@@ -291,15 +291,18 @@ public class Importer : ApiClientBase
 	// 	return createPhraseTranslationResult;
 	// }
 
-	private async Task<CreateDictionaryResult> CreateDictionaryForLanguage(HttpClient httpClient, string languageCode, string importType)
+	private async Task<CreateDictionaryResult> CreateDictionaryForLanguage(HttpClient httpClient, string languageCode, IImportSession importSession)
 	{
 		string url = "/api/v4/dictionaries";
 		CreateDictionary createDictionary = new CreateDictionary()
 		{
-			Name = $"Imported from Taggloo2 by {importType}",
+			Name = $"Imported from Taggloo2 by {importSession.GetType().Name}",
 			IetfLanguageTag = languageCode,
 			SourceUrl = "https://taggloo.im",
-			Description = "Imported from SQL Server Taggloo2 database"
+			Description = "Imported from SQL Server Taggloo2 database",
+			ContentTypeFriendlyName = importSession.ContentTypeFriendlyName,
+			Controller = importSession.ContentTypeController,
+			ContentTypeKey = importSession.ContentTypeKey
 		};
 		
 		HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createDictionary);
