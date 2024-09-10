@@ -4,7 +4,9 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Taggloo4.Contract;
 using Taggloo4.Dto;
+using Taggloo4.Model;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Model;
 
@@ -285,7 +287,7 @@ public class WordsController : BaseApiController
 	/// <response code="404">Word not found.</response>
 	[HttpPatch]
 	[Authorize(Roles="administrator, dataImporter")]
-	public async Task<ActionResult<AppUser>> UpdateWord(UpdateWord updateWord)
+	public async Task<ActionResult> UpdateWord(UpdateWord updateWord)
 	{
 		Word? word= await _wordRepository.GetByIdAsync(updateWord.WordId);
 		if (word == null) return NotFound();

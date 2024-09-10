@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Taggloo4.Contract;
+using Taggloo4.Model;
 using Taggloo4.Web.Areas.Admin.ViewModels.Home;
 using Taggloo4.Web.Areas.Admin.ViewModels.Home.Factory;
 using Taggloo4.Web.Contract;

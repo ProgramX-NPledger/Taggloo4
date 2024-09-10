@@ -1,17 +1,13 @@
 ﻿using Hangfire;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.SignalR;
-using Taggloo4.Web.Contract;
-using Taggloo4.Web.Data;
+using Taggloo4.Contract;
+using Taggloo4.Contract.Translation;
+using Taggloo4.Data.EntityFrameworkCore;
+using Taggloo4.Translation;
+using Taggloo4.Translation.Translators.Factories;
 using Taggloo4.Web.Hubs;
 using Taggloo4.Web.RazorViewRendering;
 using Taggloo4.Web.Translation;
-using Taggloo4.Web.Translation.Translators.Factories;
 
 namespace Taggloo4.Web.Jobs;
 
@@ -101,7 +97,10 @@ public class TranslateJob
 
         ITranslatorConfiguration translatorConfiguration =
             await _translatorConfigurationCache.GetTranslatorConfiguration(translatorFactory.GetTranslatorName(),_translatorConfigurationRepository);
+
+        translationRequest.MaximumNumberOfResults = translatorConfiguration.NumberOfItemsInSummary;
         ITranslator translator = translatorFactory.Create(_dataContext,translatorConfiguration);
+        
         TranslationResults translationResults = translator.Translate(translationRequest);
         // translation results for summaries are truncated and the paginator is not displayed
         translationResults.MaximumItems = translatorConfiguration.NumberOfItemsInSummary;

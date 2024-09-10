@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Taggloo4.Contract;
 using Taggloo4.Dto;
+using Taggloo4.Model;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Model;
 
@@ -46,7 +48,7 @@ public class TranslationsController : BaseApiController
 	/// <response code="403">Not permitted.</response>
 	[HttpPost("word")] // /api/v4/translations/word
 	[Authorize(Roles="administrator, dataImporter")]
-	public async Task<ActionResult<AppUser>> CreateWordTranslation(CreateWordTranslation createWordTranslation)
+	public async Task<ActionResult> CreateWordTranslation(CreateWordTranslation createWordTranslation)
 	{
 		// try to resolve the dictionary
 		Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(createWordTranslation.DictionaryId);
@@ -124,7 +126,7 @@ public class TranslationsController : BaseApiController
 	/// <response code="403">Not permitted.</response>
 	[HttpPatch("word/{wordTranslationId}")] // /api/v4/translations/word
 	[Authorize(Roles="administrator, dataImporter")]
-	public async Task<ActionResult<AppUser>> UpdateWordTranslation(int wordTranslationId, UpdateWordTranslation updateWordTranslation)
+	public async Task<ActionResult> UpdateWordTranslation(int wordTranslationId, UpdateWordTranslation updateWordTranslation)
 	{
 		// does the translation exist?
 		WordTranslation? wordTranslation = await _translationRepository.GetWordTranslationByIdAsync(wordTranslationId);
@@ -295,7 +297,7 @@ public class TranslationsController : BaseApiController
 	/// <response code="403">Not permitted.</response>
 	[HttpPatch("phrase/{phraseTranslationId}")] // /api/v4/translations/word
 	[Authorize(Roles="administrator, dataImporter")]
-	public async Task<ActionResult<AppUser>> UpdatePhraseTranslation(int phraseTranslationId, UpdatePhraseTranslation updatePhraseTranslation)
+	public async Task<ActionResult> UpdatePhraseTranslation(int phraseTranslationId, UpdatePhraseTranslation updatePhraseTranslation)
 	{
 		// does the translation exist?
 		PhraseTranslation? phraseTranslation = await _translationRepository.GetPhraseTranslationByIdAsync(phraseTranslationId);

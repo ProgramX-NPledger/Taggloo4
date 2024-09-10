@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Taggloo4.Data.EntityFrameworkCore;
+using Taggloo4.Data.EntityFrameworkCore.Identity;
 using Taggloo4.Web.Data.SiteInitialisation.Model;
 using Taggloo4.Web.Model;
 using Language = Taggloo4.Web.Data.SiteInitialisation.Model.Language;
@@ -118,7 +120,7 @@ public class Initialiser
             foreach (Language language in languages)
             {
                 Log.Information($"Seeding missing Language '{language.IetfLanguageTag}'");
-                _dataContext.Languages.Add(new Web.Model.Language()
+                _dataContext.Languages.Add(new Taggloo4.Model.Language()
                 {
                     Name = language.Name,
                     IetfLanguageTag = language.IetfLanguageTag

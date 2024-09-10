@@ -1,5 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Taggloo4.Contract;
+using Taggloo4.Data.EntityFrameworkCore;
+using Taggloo4.Data.EntityFrameworkCore.Identity;
+using Taggloo4.Repository;
+using Taggloo4.Translation;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Data;
 using Taggloo4.Web.Services;

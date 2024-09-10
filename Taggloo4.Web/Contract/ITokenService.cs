@@ -1,4 +1,5 @@
-﻿using Taggloo4.Web.Model;
+﻿using Taggloo4.Data.EntityFrameworkCore.Identity;
+using Taggloo4.Web.Model;
 
 namespace Taggloo4.Web.Contract;
 

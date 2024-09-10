@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Taggloo4.Data.EntityFrameworkCore.Identity;
 using Taggloo4.Dto;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Model;

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Taggloo4.Data.EntityFrameworkCore.Identity;
 using Taggloo4.Web.Contract;
 using Taggloo4.Web.Model;
 

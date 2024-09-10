@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Taggloo4.Data.EntityFrameworkCore;
+using Taggloo4.Data.EntityFrameworkCore.Identity;
 using Taggloo4.Web.Data;
 using Taggloo4.Web.Model;
 using Taggloo4.Web.Services;
