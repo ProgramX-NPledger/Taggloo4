@@ -59,25 +59,7 @@
     <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">GitHub</a></li>
     <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">About</a></li>
   </ul>
-  <p class="text-center text-body-secondary">© 2012-@(DateTime.Now.Year) Taggloo, Nathan Pledger, Build: @{
-                                                                                                           if (Context.Response.Headers.ContainsKey("X-Version"))
-                                                                                                           {
-                                                                                                             <text>@Context.Response.Headers["X-Version"]</text>
-                                                                                                           }
-
-                                                                                                           if (Context.Response.Headers.ContainsKey("X-BuildDate"))
-                                                                                                           {
-                                                                                                             <text>@Context.Response.Headers["X-BuildDate"]</text>
-                                                                                                           }
-                                                                                                           
-                                                                                                           if (!Context.Response.Headers.ContainsKey("X-Version") &&
-                                                                                                               !Context.Response.Headers.ContainsKey("X-BuildDate"))
-                                                                                                           {
-                                                                                                             <text>(unknown)</text>
-                                                                                                           }
-
-                                                                                                         
-                                                                                                         }</p>
+  <p class="text-center text-body-secondary">© 2012-@(DateTime.Now.Year) Taggloo, Nathan Pledger, Build: !BUILD_REPLACED_BY_NGINX!</p>
 </footer>
 
 
