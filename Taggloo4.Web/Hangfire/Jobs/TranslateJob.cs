@@ -9,7 +9,7 @@ using Taggloo4.Web.Hubs;
 using Taggloo4.Web.RazorViewRendering;
 using Taggloo4.Web.Translation;
 
-namespace Taggloo4.Web.Jobs;
+namespace Taggloo4.Web.Hangfire.Jobs;
 
 /// <summary>
 /// A Hangfire Job instantiated per translationr request, providing asynchronous user-experience.

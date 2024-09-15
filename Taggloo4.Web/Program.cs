@@ -4,12 +4,12 @@ using Taggloo4.Web.Data;
 using Taggloo4.Web.Data.SiteInitialisation;
 using Taggloo4.Web.Extension;
 using Taggloo4.Web.Hubs;
-using Taggloo4.Web.Jobs;
 using Taggloo4.Web.Model;
 using Taggloo4.Web.Translation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
+using Hangfire.Dashboard;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
@@ -18,6 +18,8 @@ using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
 using Taggloo4.Data.EntityFrameworkCore;
 using Taggloo4.Data.EntityFrameworkCore.Identity;
+using Taggloo4.Web.Hangfire;
+using Taggloo4.Web.Hangfire.Jobs;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 
@@ -117,7 +119,16 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.UseHangfireDashboard("/admin/hangfire");
+DashboardOptions dashboardOptions = new DashboardOptions()
+{
+   Authorization = [
+    new RoleAuthorizationFilter(new []
+    {
+        "administrator"
+    })
+   ]
+};
+app.UseHangfireDashboard("/admin/hangfire",dashboardOptions);
 
 using (IServiceScope scope = app.Services.CreateScope())
 {

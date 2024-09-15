@@ -1,8 +1,6 @@
 ﻿using Taggloo4.Contract;
-using Taggloo4.Web.Model;
-using Taggloo4.Web.Contract;
 
-namespace Taggloo4.Web.Jobs;
+namespace Taggloo4.Web.Hangfire.Jobs;
 
 /// <summary>
 /// Job to enforce required database size.
