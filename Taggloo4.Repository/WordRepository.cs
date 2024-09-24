@@ -99,8 +99,16 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 		DataContext.WordsInPhrases.Add(wordInPhrase);
 	}
 
-	public Task<WordsSummary> GetWordsSummaryAsync()
+	/// <inheritdoc cref="IWordRepository.GetWordsSummaryAsync"/>
+	public async Task<WordsSummary> GetWordsSummaryAsync()
 	{
-		
+		WordsInDictionariesSummary[] wordsInDictionariesSummaries=await DataContext.WordsInDictionariesSummaries.ToArrayAsync();
+		WordsSummary wordsSummary = new WordsSummary()
+		{
+			TotalWords = wordsInDictionariesSummaries.Sum(q=>q.WordCount ?? 0),
+			AcrossDictionariesCount = wordsInDictionariesSummaries.Length,
+			LastWordCreatedTimeStamp = wordsInDictionariesSummaries.Max(q=>q.LatestWordCreatedAt)
+		};
+		return wordsSummary;
 	}
 }

@@ -63,6 +63,7 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// </summary>
 	public DbSet<TranslatorConfiguration> TranslatorConfigurations { get; set; }
 
+	public DbSet<WordsInDictionariesSummary> WordsInDictionariesSummaries { get; set; }
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -194,5 +195,11 @@ public class DataContext : IdentityDbContext<AppUser,
 			IsEnabled = true,
 			NumberOfItemsInSummary = 6
 		});
+		
+		// views
+
+		builder.Entity<WordsInDictionariesSummary>()
+			.ToView("vw_WordsInDictionariesSummary")
+			.HasKey(t => t.DictionaryId);
 	}
 }
