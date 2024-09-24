@@ -7,10 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Taggloo4.Contract;
 using Taggloo4.Dto;
 using Taggloo4.Model;
-using Taggloo4.Web.Contract;
-using Taggloo4.Web.Model;
+using Taggloo4.Web.Controllers;
 
-namespace Taggloo4.Web.Controllers;
+namespace Taggloo4.Web.Areas.Api.Controllers;
 
 /// <summary>
 /// User operations. All methods require authorisation.
