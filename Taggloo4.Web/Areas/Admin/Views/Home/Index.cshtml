@@ -52,7 +52,12 @@
   <div class="row">
     <div class="col-sm-3 admin-tile">
       <h3>Words</h3>
-      <p><span class="taggloo-red">@Model.TotalWords.ToString("N0")</span> Words configured across <span class="taggloo-red">@Model.AcrossDictionariesCount.ToString("N0")</span> Dictionaries.</p>
+      <p><span class="taggloo-red">@Model.TotalWords.ToString("N0")</span> Words configured across <span class="taggloo-red">@Model.AcrossDictionariesCount.ToString("N0")</span> Dictionaries.
+        @if (Model.LastWordCreatedTimeStamp.HasValue)
+        {
+          <text>The most recently created Word was created on <span class="taggloo-red">@(Model.LastWordCreatedTimeStamp.Value.ToString("R"))</span></text>
+        }
+        </p>
       <p class="admin-tile-bottom"><a href="@Url.Action("Index","Words", new { area = "Admin" })">Manage &gt;</a></p>
     </div>
     <div class="col-sm-3 admin-tile">
