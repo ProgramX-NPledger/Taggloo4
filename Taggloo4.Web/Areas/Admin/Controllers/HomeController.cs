@@ -25,14 +25,17 @@ namespace Taggloo4.Web.Controllers.Admin;
 public class HomeController : Controller
 {
     private readonly ILanguageRepository _languageRepository;
-    
+    private readonly IWordRepository _wordRepository;
+
     /// <summary>
     /// Default constructor with injected properties.
     /// </summary>
     /// <param name="languageRepository">Implementation of <seealso cref="ILanguageRepository"/>.</param>
-    public HomeController(ILanguageRepository languageRepository)
+    /// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
+    public HomeController(ILanguageRepository languageRepository, IWordRepository wordRepository)
     {
         _languageRepository = languageRepository;
+        _wordRepository = wordRepository;
     }
     
     /// <summary>
@@ -42,15 +45,16 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         IEnumerable<Language> allLanguages = await _languageRepository.GetAllLanguagesAsync();
-
+        WordsSummary wordsSummary = await _wordRepository.GetWordsSummaryAsync();
+        
         int numberOfRecurringHangfireJobs;
-        DateTime? latestHangireJobExecution;
+        DateTime? latestHangfireJobExecution;
         DateTime? nextHangfireJobExecution;
         using (var connection = JobStorage.Current.GetConnection())
         {
             var recurringJobs = connection.GetRecurringJobs();
             numberOfRecurringHangfireJobs = recurringJobs.Count;
-            latestHangireJobExecution = recurringJobs.MaxBy(q => q.LastExecution)?.LastExecution;
+            latestHangfireJobExecution = recurringJobs.MaxBy(q => q.LastExecution)?.LastExecution;
             nextHangfireJobExecution = recurringJobs.MinBy(q => q.NextExecution)?.NextExecution;
             // foreach (var recurringJob in recurringJobs)
             // {
@@ -60,7 +64,7 @@ public class HomeController : Controller
             // }
         }
         
-        IndexViewModelFactory viewModelFactory = new IndexViewModelFactory(allLanguages,numberOfRecurringHangfireJobs,latestHangireJobExecution,nextHangfireJobExecution);
+        IndexViewModelFactory viewModelFactory = new IndexViewModelFactory(allLanguages,numberOfRecurringHangfireJobs,latestHangfireJobExecution,nextHangfireJobExecution,wordsSummary);
         IndexViewModel viewModel = viewModelFactory.Create();
         return View(viewModel);
     }

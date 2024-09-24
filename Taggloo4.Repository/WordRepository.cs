@@ -98,4 +98,9 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 	{
 		DataContext.WordsInPhrases.Add(wordInPhrase);
 	}
+
+	public Task<WordsSummary> GetWordsSummaryAsync()
+	{
+		
+	}
 }

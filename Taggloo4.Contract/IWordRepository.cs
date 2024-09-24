@@ -45,4 +45,11 @@ public interface IWordRepository : IRepositoryBase<Word>
 	/// </summary>
 	/// <param name="wordInPhrase">The created <see cref="WordInPhrase"/> item.</param>
 	void AddPhraseForWord(WordInPhrase wordInPhrase);
+
+	/// <summary>
+	/// Get summary information about Words in the Taggloo database.
+	/// </summary>
+	/// <returns>A <seealso cref="WordsSummary"/> containing summary data.</returns>
+	Task<WordsSummary> GetWordsSummaryAsync();
+
 }

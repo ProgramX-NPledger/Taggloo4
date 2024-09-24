@@ -48,4 +48,22 @@
       <p class="admin-tile-bottom"><a href="/admin/hangfire">Dashboard &gt;</a></p>
     </div>
   </div>
+
+  <div class="row">
+    <div class="col-sm-3 admin-tile">
+      <h3>Words</h3>
+      <p><span class="taggloo-red">@Model.AllLanguages?.Count()</span> Words configured across <span class="taggloo-red">@Model.AllLanguages?.Sum(q=>q.DictionariesCount)</span> Dictionaries.</p>
+      <p class="admin-tile-bottom"><a href="@Url.Action("Index","Languages", new { area = "Admin" })">Manage &gt;</a></p>
+    </div>
+    <div class="col-sm-3 admin-tile">
+
+    </div>
+    <div class="col-sm-3 admin-tile">
+
+    </div>
+    <div class="col-sm-3 admin-tile">
+
+    </div>
+  </div>
+  
 </div>
