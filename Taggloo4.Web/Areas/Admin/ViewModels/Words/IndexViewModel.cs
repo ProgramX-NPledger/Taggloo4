@@ -7,4 +7,6 @@ public class IndexViewModel
     public IEnumerable<WordInDictionary> Results { get; set; }
     public int CurrentPageNumber { get; set; }
     public int NumberOfPages { get; set; }
+
+    
 }

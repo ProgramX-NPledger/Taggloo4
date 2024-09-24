@@ -45,7 +45,7 @@ public class WordsController : Controller
     /// Default page with paged grid and filters.
     /// </summary>
     /// <returns></returns>
-    public async Task<IActionResult> Index(int? from, int? itemsPerPage, int? dictionaryId, string? query, WordsSortColumn? sortBy, SortDirection? sortDirection)
+    public async Task<IActionResult> Index(int? from, int? itemsPerPage, int? dictionaryId, string? query, string? ietfLanguageTag, WordsSortColumn? sortBy, SortDirection? sortDirection)
     {
         int ordinalOfFirstItem = from ?? 0;
         int maximumItems = itemsPerPage ?? _configuration.GetValue<int?>("DefaultPageSize") ?? SearchAndPages.MaximumItemsPerPage;

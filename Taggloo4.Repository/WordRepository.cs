@@ -123,6 +123,8 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 		
 		if (!string.IsNullOrWhiteSpace(criteria.Query)) query = query.Where(q=>(q.TheWord ?? string.Empty).Contains(criteria.Query));
 
+		if (!string.IsNullOrWhiteSpace(criteria.IetfLanguageTag)) query = query.Where(q => q.IetfLanguageTag==criteria.IetfLanguageTag);
+		
 		PagedResults<WordInDictionary> results = new PagedResults<WordInDictionary>()
 		{
 			TotalUnpagedItems = await query.CountAsync()

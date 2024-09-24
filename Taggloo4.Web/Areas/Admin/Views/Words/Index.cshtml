@@ -9,6 +9,47 @@
 <p>This is the admin area.</p>
 <!-- there should be warnings here -->
 
-<!-- filters -->
-<!-- paged grid -->
-<!-- paginator -->
+<div class="filtered-paged-datagrid">
+    <ul class="filters">
+        @using (Html.BeginForm())
+        {
+            <li><input type="text" placeholder="Filter" name="query" /></li>
+            <li><input type="submit" value="Search"></li>
+        }   
+    </ul>
+
+    <table class="datagrid">
+        <tr>
+            <th id="thId">Id</th>
+            <th id="thTheWord">Word</th>
+            <th id="thDictionary">Dictionary</th>
+            <th id="thLanguage">Language</th>
+        </tr>
+
+        @foreach (var result in Model.Results)
+        {
+        <tr>
+            <td headers="thId">@result.WordId</td>
+            <td headers="thTheWord">@result.TheWord</td>
+            <td headers="thDictionary">@result.DictionaryName</td>
+            <td headers="thLanguage">@result.LanguageName</td>
+        </tr>
+        }
+    </table>
+
+    <ol class="page-numbers">
+        @for (int i = 1; i <= Model.NumberOfPages; i++)
+        {
+        if (i == Model.CurrentPageNumber)
+        {
+        <strong>@i</strong>
+        }
+        else
+        {
+        <li>@i</li>
+        }
+        }
+    </ol>
+</div>
+
+
