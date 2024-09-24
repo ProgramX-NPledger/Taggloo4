@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Taggloo4.Contract;
+using Taggloo4.Contract.Criteria;
 using Taggloo4.Data.EntityFrameworkCore;
 using Taggloo4.Model;
 
@@ -110,5 +112,39 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 			LastWordCreatedTimeStamp = wordsInDictionariesSummaries.Max(q=>q.LatestWordCreatedAt)
 		};
 		return wordsSummary;
+	}
+
+	/// <inheritdoc cref="IWordRepository.GetWordsByCriteriaAsync"/>
+	public async Task<PagedResults<WordInDictionary>> GetWordsByCriteriaAsync(GetWordsCriteria criteria)
+	{
+		var query = DataContext.WordsInDictionaries.AsQueryable();
+		
+		if (criteria.DictionaryId.HasValue) query = query.Where(q => q.DictionaryId == criteria.DictionaryId.Value);
+		
+		if (!string.IsNullOrWhiteSpace(criteria.Query)) query = query.Where(q=>(q.TheWord ?? string.Empty).Contains(criteria.Query));
+
+		PagedResults<WordInDictionary> results = new PagedResults<WordInDictionary>()
+		{
+			TotalUnpagedItems = await query.CountAsync()
+		};
+		
+		switch (criteria.SortBy)
+		{
+			case WordsSortColumn.TheWord:
+				if (criteria.SortDirection==SortDirection.Ascending) query = query.OrderBy(q => q.TheWord);
+				else query = query.OrderByDescending(q => q.TheWord);
+				break;
+			case WordsSortColumn.WordId:
+				if (criteria.SortDirection == SortDirection.Ascending) query = query.OrderBy(q => q.WordId);
+				else query = query.OrderByDescending(q => q.WordId);
+				break;
+		}
+
+		results.Results = await query
+			.Skip(criteria.OrdinalOfFirstItem)
+			.Take(criteria.ItemsPerPage)
+			.ToArrayAsync();
+		
+		return results;
 	}
 }

@@ -64,6 +64,8 @@ public class DataContext : IdentityDbContext<AppUser,
 	public DbSet<TranslatorConfiguration> TranslatorConfigurations { get; set; }
 
 	public DbSet<WordsInDictionariesSummary> WordsInDictionariesSummaries { get; set; }
+
+	public DbSet<WordInDictionary> WordsInDictionaries { get; set; }
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -201,5 +203,10 @@ public class DataContext : IdentityDbContext<AppUser,
 		builder.Entity<WordsInDictionariesSummary>()
 			.ToView("vw_WordsInDictionariesSummary")
 			.HasKey(t => t.DictionaryId);
+
+		builder.Entity<WordInDictionary>()
+			.ToView("vw_WordsInDictionaries")
+			.HasKey(t => t.WordId);
+
 	}
 }

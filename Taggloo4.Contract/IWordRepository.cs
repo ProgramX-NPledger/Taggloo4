@@ -1,4 +1,5 @@
-﻿using Taggloo4.Model;
+﻿using Taggloo4.Contract.Criteria;
+using Taggloo4.Model;
 
 namespace Taggloo4.Contract;
 
@@ -16,7 +17,7 @@ public interface IWordRepository : IRepositoryBase<Word>
 	Task<bool> SaveAllAsync();
 
 	/// <summary>
-	/// Retrieves a all matching <seealso cref="Word"/>s within a <seealso cref="Dictionary"/>.
+	/// Retrieves all matching <seealso cref="Word"/>s within a <seealso cref="Dictionary"/>.
 	/// </summary>
 	/// <param name="word">Word to match within the <seealso cref="Dictionary"/>.</param>
 	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
@@ -51,5 +52,12 @@ public interface IWordRepository : IRepositoryBase<Word>
 	/// </summary>
 	/// <returns>A <seealso cref="WordsSummary"/> containing summary data.</returns>
 	Task<WordsSummary> GetWordsSummaryAsync();
+
+	/// <summary>
+	/// Get Words matching criteria.
+	/// </summary>
+	/// <param name="criteria">Criteria of Words to return.</param>
+	/// <returns>List of <seealso cref="WordInDictionary"/> items.</returns>
+	Task<PagedResults<WordInDictionary>> GetWordsByCriteriaAsync(GetWordsCriteria criteria);
 
 }
