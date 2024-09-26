@@ -24,32 +24,64 @@
             <th id="thTheWord">Word</th>
             <th id="thDictionary">Dictionary</th>
             <th id="thLanguage">Language</th>
+            <th id="thAppearsInPhrasesCount">Appears in Phrases</th>
         </tr>
 
         @foreach (var result in Model.Results)
         {
         <tr>
-            <td headers="thId">@result.WordId</td>
+            <td headers="thId">
+                <a href="@Url.Action("Details","Words",new { id = result.WordId })">
+                    @result.WordId
+                </a>
+            </td>
             <td headers="thTheWord">@result.TheWord</td>
-            <td headers="thDictionary">@result.DictionaryName</td>
-            <td headers="thLanguage">@result.LanguageName</td>
+            <td headers="thDictionary">
+                <a href="@Url.Action("Details","Dictionaries",new { id = result.DictionaryId })">
+                    @result.DictionaryName
+                </a>
+            </td>
+            <td headers="thLanguage">
+                <a href="@Url.Action("Details","Languages",new { id = result.IetfLanguageTag })">
+                    @result.LanguageName
+                </a>
+            </td>
+            <td headers="thAppearsInPhrasesCount">@result.AppearsInPhrasesCount?.ToString("N0")</td>
         </tr>
         }
     </table>
 
     <ol class="page-numbers">
-        @for (int i = 1; i <= Model.NumberOfPages; i++)
-        {
-        if (i == Model.CurrentPageNumber)
-        {
-        <strong>@i</strong>
-        }
-        else
-        {
-        <li>@i</li>
-        }
+        @{
+            bool haveInsertedEllipsis = false;
+            for (int i = 1; i <= Model.NumberOfPages; i++)
+            {
+                if (i <= 3 ||
+                    (i >= Model.CurrentPageNumber - 3 && i <= Model.CurrentPageNumber + 3) ||
+                    i >= Model.NumberOfPages - 3
+                   )
+                {
+                    haveInsertedEllipsis = false;
+                    if (i == Model.CurrentPageNumber)
+                    {
+                        <li class="current-page"><strong>@i</strong></li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a href="@Url.Action("Index", "Words", new { from = (i-1) * Model.ItemsPerPage, itemsPerPage = Model.ItemsPerPage, })">@i</a></li>
+                    }
+                }
+                else if (!haveInsertedEllipsis)
+                {
+                    <li>...</li>
+                    haveInsertedEllipsis = true;
+                }
+            }
         }
     </ol>
+    
+    <p><strong>@Model.TotalUnpagedItems.ToString("N0")</strong> items</p>
 </div>
 
 

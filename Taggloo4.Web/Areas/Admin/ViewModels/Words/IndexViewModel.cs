@@ -8,5 +8,10 @@ public class IndexViewModel
     public int CurrentPageNumber { get; set; }
     public int NumberOfPages { get; set; }
 
+    public int TotalUnpagedItems { get; set; }
+
+    public int ItemsPerPage { get; set; }
+    
+
     
 }

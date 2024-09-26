@@ -66,7 +66,7 @@ public class WordsController : Controller
         int numberOfPages = results.TotalUnpagedItems / maximumItems;
         if (results.TotalUnpagedItems % maximumItems>0) numberOfPages++;
         
-        IndexViewModelFactory viewModelFactory = new IndexViewModelFactory(results.Results, currentPageNumber, numberOfPages);
+        IndexViewModelFactory viewModelFactory = new IndexViewModelFactory(results.Results, currentPageNumber, numberOfPages, results.TotalUnpagedItems, maximumItems);
         IndexViewModel viewModel = viewModelFactory.Create();
         return View(viewModel);
         
