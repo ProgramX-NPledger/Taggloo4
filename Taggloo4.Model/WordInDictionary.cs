@@ -13,6 +13,8 @@ public class WordInDictionary
     public string? ContentTypeFriendlyName { get; set; }
     public string? IetfLanguageTag { get; set; }
     public string? LanguageName { get; set; }
+
+    public int? AppearsInPhrasesCount { get; set; }
     
     
 }
