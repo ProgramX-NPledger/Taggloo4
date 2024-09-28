@@ -37,6 +37,9 @@ public class WordsController : Controller
     /// Default constructor with injected properties.
     /// </summary>
     /// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
+    /// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
+    /// <param name="languageRepository">Implementation of <seealso cref="ILanguageRepository"/>.</param>
+    /// <param name="configuration">Implementation of ASP.NET configuration API.</param>
     public WordsController(IWordRepository wordRepository, IDictionaryRepository dictionaryRepository, ILanguageRepository languageRepository, IConfiguration configuration)
     {
         _wordRepository = wordRepository;

@@ -5,15 +5,27 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Taggloo4.Web.Hangfire;
 
+/// <summary>
+/// Customised filter for authentication against Hangfire Dashboard for ASP.NET Roles.
+/// </summary>
 public class RoleAuthorizationFilter : IDashboardAuthorizationFilter
 {
     private readonly IEnumerable<string> _roles;
 
+    /// <summary>
+    /// Constructor for configuration of the <seealso cref="RoleAuthorizationFilter"/>.
+    /// </summary>
+    /// <param name="roles">List of permitted roles.</param>
     public RoleAuthorizationFilter(IEnumerable<string> roles)
     {
         _roles = roles;
     }
     
+    /// <summary>
+    /// Authorises the request.
+    /// </summary>
+    /// <param name="context">The <seealso cref="DashboardContext"/> for the request.</param>
+    /// <returns><c>True</c> if authorisation is successful.</returns>
     public bool Authorize(DashboardContext context)
     {   
         // Attempt to authenticate against Identity.Application scheme.

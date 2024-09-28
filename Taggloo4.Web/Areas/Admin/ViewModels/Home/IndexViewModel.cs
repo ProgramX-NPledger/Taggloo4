@@ -17,7 +17,10 @@ public class IndexViewModel : ILanguageSummaryViewModel, IDictionarySummaryViewM
     /// <inheritdoc cref="IHangfireSummaryViewModel"/>
     public DateTime? NextJobExecution { get; set; }
 
+    /// <inheritdoc cref="IWordSummaryViewModel"/>
     public int TotalWords { get; set; }
+    /// <inheritdoc cref="IWordSummaryViewModel"/>
     public int AcrossDictionariesCount { get; set;  }
+    /// <inheritdoc cref="IWordSummaryViewModel"/>
     public DateTime? LastWordCreatedTimeStamp { get; set; }
 }

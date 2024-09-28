@@ -5,6 +5,9 @@ using Taggloo4.Web.Contract;
 
 namespace Taggloo4.Web.Areas.Admin.ViewModels.Words.Factory;
 
+/// <summary>
+/// Factory for constructing a configured <seealso cref="IndexViewModel"/>.
+/// </summary>
 public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
 {
     private readonly IEnumerable<WordInDictionary> _wordsInDictionary;
