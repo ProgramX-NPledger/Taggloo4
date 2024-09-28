@@ -94,7 +94,7 @@ public class TranslateController : Controller
         DateTime startTimeStamp = DateTime.Now;
         AssertValidTranslators(viewModel.Translators!);
         
-        ITranslatorFactory translatorFactory = await GetTranslatorFactory(viewModel.Translators!.Single());
+        ITranslatorFactory translatorFactory = GetTranslatorFactory(viewModel.Translators!.Single());
 
         ITranslatorConfiguration translatorConfiguration =
             await _translatorConfigurationCache.GetTranslatorConfiguration(translatorFactory.GetTranslatorName(),_translatorConfigurationRepository);
