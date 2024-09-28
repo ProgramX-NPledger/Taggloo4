@@ -74,7 +74,7 @@ public class TranslateController : Controller
     /// are returned by SignaLR.</remarks>
     [HttpGet]
     [HttpPost]
-    public async Task<IActionResult> Translate(TranslateViewModel viewModel)
+    public IActionResult Translate(TranslateViewModel viewModel)
     {
         return View("Translate", new TranslateViewModel()
         {
