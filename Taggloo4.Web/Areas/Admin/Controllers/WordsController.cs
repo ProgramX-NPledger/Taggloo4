@@ -29,15 +29,19 @@ namespace Taggloo4.Web.Controllers.Admin;
 public class WordsController : Controller
 {
     private readonly IWordRepository _wordRepository;
+    private readonly IDictionaryRepository _dictionaryRepository;
+    private readonly ILanguageRepository _languageRepository;
     private readonly IConfiguration _configuration;
 
     /// <summary>
     /// Default constructor with injected properties.
     /// </summary>
     /// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
-    public WordsController(IWordRepository wordRepository, IConfiguration configuration)
+    public WordsController(IWordRepository wordRepository, IDictionaryRepository dictionaryRepository, ILanguageRepository languageRepository, IConfiguration configuration)
     {
         _wordRepository = wordRepository;
+        _dictionaryRepository = dictionaryRepository;
+        _languageRepository = languageRepository;
         _configuration = configuration;
     }
     
@@ -58,15 +62,20 @@ public class WordsController : Controller
             Query = query,
             SortBy = sortBy ?? WordsSortColumn.WordId,
             ItemsPerPage = maximumItems,
-            OrdinalOfFirstItem = ordinalOfFirstItem
+            OrdinalOfFirstItem = ordinalOfFirstItem,
+            IetfLanguageTag = ietfLanguageTag
         });
 
         int currentPageNumber = (ordinalOfFirstItem+1) / maximumItems;
         currentPageNumber++;
         int numberOfPages = results.TotalUnpagedItems / maximumItems;
         if (results.TotalUnpagedItems % maximumItems>0) numberOfPages++;
-        
-        IndexViewModelFactory viewModelFactory = new IndexViewModelFactory(results.Results, currentPageNumber, numberOfPages, results.TotalUnpagedItems, maximumItems, sortBy, sortDirection);
+
+        IEnumerable<Language> allLanguages = await _languageRepository.GetAllLanguagesAsync();
+        IEnumerable<Dictionary> allDictionaries = await _dictionaryRepository.GetDictionariesAsync(null,null);
+
+        IndexViewModelFactory viewModelFactory = new IndexViewModelFactory(results.Results, currentPageNumber,
+            numberOfPages, results.TotalUnpagedItems, maximumItems, sortBy, sortDirection, query,ietfLanguageTag, allLanguages, dictionaryId, allDictionaries);
         IndexViewModel viewModel = viewModelFactory.Create();
         return View(viewModel);
         

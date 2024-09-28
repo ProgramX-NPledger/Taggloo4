@@ -55,12 +55,18 @@ div.validation-summary-errors ul { margin: 0; padding: 5px 5px 5px 25px; }
 
 /* grids */
 div.filtered-paged-datagrid { }
-div.filtered-paged-datagrid ul.filters { }
+div.filtered-paged-datagrid form ul.filters { list-style: none; padding: 0 0 10px 0; margin: 0; }
+div.filtered-paged-datagrid form ul.filters li { display: inline-block; padding: 0 10px 0 0; }
+div.filtered-paged-datagrid form ul.filters li input,
+div.filtered-paged-datagrid form ul.filters li select { font-size: 90%; height: 28px; padding: 4px; }
+div.filtered-paged-datagrid form ul.filters li input[type=submit] { height: 28px; padding: 0 5px 0 5px; }
+div.filtered-paged-datagrid form ul.filters li a { color: #212529; text-decoration: none; font-size: 90%; }
+div.filtered-paged-datagrid form ul.filters li a:hover { text-decoration: underline; }
 div.filtered-paged-datagrid table.datagrid { font-size: 85%; width: 100%; }
 div.filtered-paged-datagrid table.datagrid th,
 div.filtered-paged-datagrid table.datagrid td { padding: 2px 5px 2px 2px; }
 div.filtered-paged-datagrid table.datagrid tr:first-child+tr td { padding-top: 10px; }
-div.filtered-paged-datagrid table.datagrid th { font-weight: bold; border-bottom: solid 1px #dedede; }
+div.filtered-paged-datagrid table.datagrid th { font-weight: bold; border-bottom: solid 1px #dedede;  }
 div.filtered-paged-datagrid ol.page-numbers { list-style-type: none; margin: 10px 0 10px 0; padding: 0; text-align: right; }
 div.filtered-paged-datagrid ol.page-numbers li { display: inline-block; margin: 0; padding: 0 5px 0 5px; }
 
