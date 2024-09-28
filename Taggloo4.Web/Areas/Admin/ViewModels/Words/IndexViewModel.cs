@@ -12,7 +12,7 @@ public class IndexViewModel
     /// <summary>
     /// Paged results.
     /// </summary>
-    public IEnumerable<WordInDictionary> Results { get; set; }
+    public IEnumerable<WordInDictionary> Results { get; set; } = [];
     
     /// <summary>
     /// The currently selected page.
@@ -47,12 +47,12 @@ public class IndexViewModel
     /// <summary>
     /// All available Language options for selection for filtering.
     /// </summary>
-    public IEnumerable<SelectListItem> AllLanguagesOptions { get; set; }
+    public IEnumerable<SelectListItem> AllLanguagesOptions { get; set; } = [];
 
     /// <summary>
     /// All available Dictionary options for selection for filtering.
     /// </summary>
-    public IEnumerable<SelectListItem> AllDictionariesOptions { get; set; }
+    public IEnumerable<SelectListItem> AllDictionariesOptions { get; set; } = [];
 
     /// <summary>
     /// When specified, allows filtering by Dictionary.
