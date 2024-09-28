@@ -1,4 +1,5 @@
-﻿using Taggloo4.Model;
+﻿using Taggloo4.Contract.Criteria;
+using Taggloo4.Model;
 using Taggloo4.Web.Contract;
 
 namespace Taggloo4.Web.Areas.Admin.ViewModels.Words.Factory;
@@ -10,18 +11,22 @@ public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
     private readonly int _numberOfPages;
     private readonly int _totalUnpagedItems;
     private readonly int _itemsPerPage;
+    private readonly WordsSortColumn? _sortBy;
+    private readonly SortDirection? _sortDirection;
 
     /// <summary>
     /// Default constructor.
     /// </summary>
     public IndexViewModelFactory(IEnumerable<WordInDictionary> wordsInDictionary, int currentPageNumber,
-        int numberOfPages, int totalUnpagedItems, int itemsPerPage)
+        int numberOfPages, int totalUnpagedItems, int itemsPerPage, WordsSortColumn? sortBy, SortDirection? sortDirection)
     {
         _wordsInDictionary = wordsInDictionary;
         _currentPageNumber = currentPageNumber;
         _numberOfPages = numberOfPages;
         _totalUnpagedItems = totalUnpagedItems;
         _itemsPerPage = itemsPerPage;
+        _sortBy = sortBy;
+        _sortDirection = sortDirection;
     }
 
     /// <inheritdoc cref="IViewModelFactory{TViewModelType}"/>
@@ -41,5 +46,7 @@ public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
         viewModel.NumberOfPages = _numberOfPages;
         viewModel.TotalUnpagedItems = _totalUnpagedItems;
         viewModel.ItemsPerPage = _itemsPerPage;
+        viewModel.SortBy = _sortBy ?? WordsSortColumn.WordId;
+        viewModel.SortDirection = _sortDirection ?? SortDirection.Ascending;
     }
 }

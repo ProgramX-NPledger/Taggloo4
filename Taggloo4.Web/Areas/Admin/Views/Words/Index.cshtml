@@ -1,4 +1,5 @@
-﻿@model Taggloo4.Web.Areas.Admin.ViewModels.Words.IndexViewModel
+﻿@using Taggloo4.Contract.Criteria
+@model Taggloo4.Web.Areas.Admin.ViewModels.Words.IndexViewModel
 
 @{
     ViewBag.Title = "Words";
@@ -20,11 +21,93 @@
 
     <table class="datagrid">
         <tr>
-            <th id="thId">Id</th>
-            <th id="thTheWord">Word</th>
-            <th id="thDictionary">Dictionary</th>
-            <th id="thLanguage">Language</th>
-            <th id="thAppearsInPhrasesCount">Appears in Phrases</th>
+            <th id="thId">
+                <a href="@Url.Action("Index", "Words", new {
+                             from = (Model.CurrentPageNumber-1) * Model.ItemsPerPage,
+                             itemsPerPage = Model.ItemsPerPage,
+                             sortBy = WordsSortColumn.WordId,
+                             sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.WordId } ? SortDirection.Descending : SortDirection.Ascending })">Id
+                @if (Model.SortBy == WordsSortColumn.WordId)
+                {
+                    if (Model.SortDirection == SortDirection.Ascending)
+                    {
+                        <text><img src="../../img/sort-asc.png" /></text>
+                    }
+                    else
+                    {
+                        <text><img src="../../img/sort-desc.png" /></text>
+                    }
+                }
+                </a>
+            </th>
+            <th id="thTheWord">
+                <a href="@Url.Action("Index", "Words", new { 
+                            from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage, 
+                            itemsPerPage = Model.ItemsPerPage, 
+                            sortBy = WordsSortColumn.TheWord, 
+                            sortDirection =  Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.TheWord } ? SortDirection.Descending : SortDirection.Ascending })">Word
+                @if (Model.SortBy == WordsSortColumn.TheWord)
+                {
+                    if (Model.SortDirection == SortDirection.Ascending)
+                    {
+                        <text><img src="../../img/sort-asc.png" /></text>
+                    }
+                    else
+                    {
+                        <text><img src="../../img/sort-desc.png" /></text>
+                    }
+                }
+                </a>
+            </th>
+            <th id="thDictionary">
+                <a href="@Url.Action("Index", "Words", new {
+                from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage,
+                itemsPerPage = Model.ItemsPerPage,
+                sortBy = WordsSortColumn.Dictionary,
+                sortDirection =  Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.Dictionary } ? SortDirection.Descending : SortDirection.Ascending })">Dictionary
+                    @if (Model.SortBy == WordsSortColumn.Dictionary)
+                    {
+                    if (Model.SortDirection == SortDirection.Ascending)
+                    {
+                    <text><img src="../../img/sort-asc.png" /></text>
+                    }
+                    else
+                    {
+                    <text><img src="../../img/sort-desc.png" /></text>
+                    }
+                    }
+                </a>
+            </th>
+            <th id="thLanguage">
+                <a href="@Url.Action("Index", "Words", new { from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage, itemsPerPage = Model.ItemsPerPage, sortBy = WordsSortColumn.Language, sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.Dictionary } ? SortDirection.Descending : SortDirection.Ascending })">Language
+                    @if (Model.SortBy == WordsSortColumn.Language)
+                    {
+                        if (Model.SortDirection == SortDirection.Ascending)
+                        {
+                            <text><img src="../../img/sort-asc.png"/></text>
+                        }
+                        else
+                        {
+                            <text><img src="../../img/sort-desc.png"/></text>
+                        }
+                    }
+                </a>
+            </th>
+            <th id="thAppearsInPhrasesCount">
+                <a href="@Url.Action("Index", "Words", new { from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage, itemsPerPage = Model.ItemsPerPage, sortBy = WordsSortColumn.AppearsInPhrases, sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.AppearsInPhrases } ? SortDirection.Descending : SortDirection.Ascending })">Appears in Phrases
+                    @if (Model.SortBy == WordsSortColumn.AppearsInPhrases)
+                    {
+                        if (Model.SortDirection == SortDirection.Ascending)
+                        {
+                           <text><img src="../../img/sort-asc.png"/></text>
+                        }
+                        else
+                        {
+                           <text><img src="../../img/sort-desc.png"/></text>
+                        }
+                    }
+                </a>
+            </th>
         </tr>
 
         @foreach (var result in Model.Results)
@@ -69,7 +152,11 @@
                     else
                     {
                         <li>
-                            <a href="@Url.Action("Index", "Words", new { from = (i-1) * Model.ItemsPerPage, itemsPerPage = Model.ItemsPerPage, })">@i</a></li>
+                            <a href="@Url.Action("Index", "Words", new { 
+    from = (i-1) * Model.ItemsPerPage, 
+    itemsPerPage = Model.ItemsPerPage,
+    sortBy = Model.SortBy,
+    sortDirection = Model.SortDirection })">@i</a></li>
                     }
                 }
                 else if (!haveInsertedEllipsis)

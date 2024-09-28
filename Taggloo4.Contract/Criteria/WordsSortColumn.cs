@@ -4,5 +4,8 @@ public enum WordsSortColumn
 {
     WordId,
     TheWord,
+    Dictionary,
+    Language,
+    AppearsInPhrases
     
 }

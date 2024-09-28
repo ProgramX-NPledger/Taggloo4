@@ -1,4 +1,5 @@
-﻿using Taggloo4.Model;
+﻿using Taggloo4.Contract.Criteria;
+using Taggloo4.Model;
 
 namespace Taggloo4.Web.Areas.Admin.ViewModels.Words;
 
@@ -11,7 +12,11 @@ public class IndexViewModel
     public int TotalUnpagedItems { get; set; }
 
     public int ItemsPerPage { get; set; }
-    
 
+    public WordsSortColumn SortBy { get; set; }
+
+    public SortDirection SortDirection { get; set; }
+    
+    
     
 }

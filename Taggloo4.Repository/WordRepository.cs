@@ -140,6 +140,18 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 				if (criteria.SortDirection == SortDirection.Ascending) query = query.OrderBy(q => q.WordId);
 				else query = query.OrderByDescending(q => q.WordId);
 				break;
+			case WordsSortColumn.Dictionary:
+				if (criteria.SortDirection == SortDirection.Ascending) query=query.OrderBy(q=>q.DictionaryName);
+				else query = query.OrderByDescending(q=>q.DictionaryName);
+				break;
+			case WordsSortColumn.Language:
+				if (criteria.SortDirection == SortDirection.Ascending) query=query.OrderBy(q=>q.LanguageName);
+				else query = query.OrderByDescending(q=>q.LanguageName);
+				break;
+			case WordsSortColumn.AppearsInPhrases:
+				if (criteria.SortDirection == SortDirection.Ascending) query=query.OrderBy(q=>q.AppearsInPhrasesCount);
+				else query = query.OrderByDescending(q=>q.AppearsInPhrasesCount);
+				break;
 		}
 
 		results.Results = await query
