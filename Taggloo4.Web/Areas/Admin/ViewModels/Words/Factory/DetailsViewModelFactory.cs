@@ -29,6 +29,9 @@ public class DetailsViewModelFactory : IViewModelFactory<DetailsViewModel>
             TheWord = _word.TheWord,
             CreatedByUserName = _word.CreatedByUserName,
             CreatedOn = _word.CreatedOn,
+            DictionaryName = _word.Dictionary?.Name ?? "(no name)",
+            LanguageName = _word.Dictionary?.Language?.Name ?? "(no name)",
+            IetfLanguageTag = _word.Dictionary?.IetfLanguageTag ?? "(no tag)",
         };
         Configure(ref viewModel);
 
@@ -42,7 +45,12 @@ public class DetailsViewModelFactory : IViewModelFactory<DetailsViewModel>
         viewModel.CreatedAt = _word.CreatedAt;
         viewModel.CreatedOn = _word.CreatedOn;
         viewModel.CreatedByUserName = _word.CreatedByUserName;
-        viewModel.ExternalId = _word.ExternalId;
+        viewModel.ExternalId = _word.ExternalId ?? "(none)";
         viewModel.TheWord = _word.TheWord;
+        viewModel.DictionaryId = _word.Dictionary?.Id ?? -1;
+        viewModel.DictionaryName = _word.Dictionary?.Name ?? "(no name)";
+        viewModel.LanguageName = _word.Dictionary?.Language?.Name ?? "(no name)";
+        viewModel.IetfLanguageTag = _word.Dictionary?.IetfLanguageTag ?? "(no tag)";
+
     }
 }

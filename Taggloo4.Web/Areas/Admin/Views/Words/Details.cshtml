@@ -47,5 +47,38 @@
             </p>
         </fieldset>
     </div>
+    <div class="panel">
+        <h3>Dictionary</h3>
+        <fieldset>
+            <legend>Dictionary</legend>
+            <p>
+                @Html.LabelFor(m=>m.DictionaryId)
+                @Html.TextBoxFor(m=>m.DictionaryId, new { @readonly= "readonly" })
+            </p>
+            <p>
+                @Html.LabelFor(m=>m.DictionaryName)
+                @Html.TextBoxFor(m=>m.DictionaryName, new { @readonly= "readonly" })
+            </p>
+        </fieldset>
+        <fieldset>
+            <legend>Language</legend>
+            <p>
+                @Html.LabelFor(m=>m.IetfLanguageTag)
+                @Html.TextBoxFor(m=>m.IetfLanguageTag, new { @readonly= "readonly" })
+            </p>
+            <p>
+                @Html.LabelFor(m=>m.LanguageName)
+                @Html.TextBoxFor(m=>m.LanguageName, new { @readonly= "readonly" })
+            </p>
+        </fieldset>
+    </div>
+    <div class="panel">
+        <h3>Translations</h3>
+        <!-- to -->
+        <!-- from -->
+    </div>
+    <div class="panel">
+        <h3>Phrases</h3>
+    </div>
     
 </div>
