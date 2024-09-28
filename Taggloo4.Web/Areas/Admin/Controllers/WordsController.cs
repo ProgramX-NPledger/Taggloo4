@@ -83,5 +83,18 @@ public class WordsController : Controller
         return View(viewModel);
         
     }
+
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id == null) return BadRequest();
+        
+        Word? word = await _wordRepository.GetByIdAsync(id.Value);
+        if (word == null) return NotFound();
+
+        DetailsViewModelFactory viewModelFactory = new DetailsViewModelFactory(word);
+        DetailsViewModel viewModel = viewModelFactory.Create();
+        return View(viewModel);
+
+    }
     
 }

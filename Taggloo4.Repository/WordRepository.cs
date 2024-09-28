@@ -70,8 +70,9 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 	public async Task<Word?> GetByIdAsync(int id)
 	{
 		return await DataContext.Words
-			.Include("Dictionary")
-			.Include("Translations")
+			.Include("Dictionary.Language")
+			.Include("ToTranslations")
+			.Include("FromTranslations")
 			.Include("AppearsInPhrases")
 			.SingleOrDefaultAsync(q => q.Id == id);
 	}
