@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taggloo4.Data.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using Taggloo4.Data.EntityFrameworkCore;
 namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240926201609_Add column to view")]
+    partial class Addcolumntoview
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -504,9 +507,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
             modelBuilder.Entity("Taggloo4.Model.WordInDictionary", b =>
                 {
                     b.Property<int?>("WordId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AppearsInPhrasesCount")
                         .HasColumnType("int");
 
                     b.Property<string>("ContentTypeFriendlyName")

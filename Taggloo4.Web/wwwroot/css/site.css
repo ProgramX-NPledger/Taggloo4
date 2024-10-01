@@ -53,6 +53,33 @@ div.validation-summary-errors ul { margin: 0; padding: 5px 5px 5px 25px; }
 .taggloo-dark-grey { color: #212529; }
 .color-white { color: #fff; }
 
+/* grids */
+div.filtered-paged-datagrid a { color: #900; text-decoration: none; }
+div.filtered-paged-datagrid a:hover { text-decoration: underline; }
+div.filtered-paged-datagrid form ul.filters { list-style: none; padding: 0 0 10px 0; margin: 0; }
+div.filtered-paged-datagrid form ul.filters li { display: inline-block; padding: 0 10px 0 0; }
+div.filtered-paged-datagrid form ul.filters li input,
+div.filtered-paged-datagrid form ul.filters li select { font-size: 90%; height: 28px; padding: 4px; }
+div.filtered-paged-datagrid form ul.filters li input[type=submit] { height: 28px; padding: 0 5px 0 5px; }
+div.filtered-paged-datagrid form ul.filters li a { color: #212529; text-decoration: none; font-size: 90%; }
+div.filtered-paged-datagrid form ul.filters li a:hover { text-decoration: underline; }
+div.filtered-paged-datagrid table.datagrid { font-size: 85%; width: 100%; }
+div.filtered-paged-datagrid table.datagrid th,
+div.filtered-paged-datagrid table.datagrid td { padding: 2px 5px 2px 2px; }
+div.filtered-paged-datagrid table.datagrid tr:first-child+tr td { padding-top: 10px; }
+div.filtered-paged-datagrid table.datagrid th { font-weight: bold; border-bottom: solid 1px #dedede;  }
+div.filtered-paged-datagrid ol.page-numbers { list-style-type: none; margin: 10px 0 10px 0; padding: 0; text-align: right; }
+div.filtered-paged-datagrid ol.page-numbers li { display: inline-block; margin: 0; padding: 0 5px 0 5px; }
+
+/* detail */
+div.admin div.panel h3 { font-size: 110%; color: #900; margin: 15px 0 0 0;  }
+div.admin div.panel fieldset { font-size: 90%;  }
+div.admin div.panel fieldset legend { font-size: 100%; color: #777;  margin: 15px 0 10px 0; text-transform: uppercase;  }
+div.admin div.panel fieldset p:first-of-type { margin: 20px 0 0 0; }
+div.admin div.panel fieldset p { margin: 5px 0 5px 0; padding: 0; }
+div.admin div.panel fieldset label { width: 20%;  }
+div.admin div.panel fieldset input { width: 79%; }
+
 /* Bootstrap overrides */
 input.btn-primary,
 button.btn-primary { background-color: #900; color: #fff; border: solid 1px #fff; }

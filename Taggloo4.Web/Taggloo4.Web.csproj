@@ -74,6 +74,10 @@
       <Link>wwwroot\css\site.css</Link>
     </Content>
   </ItemGroup>
+  
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Areas\Admin\Views\Shared\_Layout.cshtml" />
+  </ItemGroup>
 
 
 </Project>

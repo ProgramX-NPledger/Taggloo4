@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Taggloo4.Contract;
+using Taggloo4.Contract.Criteria;
 using Taggloo4.Data.EntityFrameworkCore;
 using Taggloo4.Model;
 
@@ -68,8 +70,9 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 	public async Task<Word?> GetByIdAsync(int id)
 	{
 		return await DataContext.Words
-			.Include("Dictionary")
-			.Include("Translations")
+			.Include("Dictionary.Language")
+			.Include("ToTranslations")
+			.Include("FromTranslations")
 			.Include("AppearsInPhrases")
 			.SingleOrDefaultAsync(q => q.Id == id);
 	}
@@ -97,5 +100,68 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 	public void AddPhraseForWord(WordInPhrase wordInPhrase)
 	{
 		DataContext.WordsInPhrases.Add(wordInPhrase);
+	}
+
+	/// <inheritdoc cref="IWordRepository.GetWordsSummaryAsync"/>
+	public async Task<WordsSummary> GetWordsSummaryAsync()
+	{
+		WordsInDictionariesSummary[] wordsInDictionariesSummaries=await DataContext.WordsInDictionariesSummaries.ToArrayAsync();
+		WordsSummary wordsSummary = new WordsSummary()
+		{
+			TotalWords = wordsInDictionariesSummaries.Sum(q=>q.WordCount ?? 0),
+			AcrossDictionariesCount = wordsInDictionariesSummaries.Length,
+			LastWordCreatedTimeStamp = wordsInDictionariesSummaries.Max(q=>q.LatestWordCreatedAt)
+		};
+		return wordsSummary;
+	}
+
+	/// <inheritdoc cref="IWordRepository.GetWordsByCriteriaAsync"/>
+	public async Task<PagedResults<WordInDictionary>> GetWordsByCriteriaAsync(GetWordsCriteria criteria)
+	{
+		var query = DataContext.WordsInDictionaries.AsQueryable();
+		
+		if (criteria.DictionaryId.HasValue) query = query.Where(q => q.DictionaryId == criteria.DictionaryId.Value);
+		
+		if (!string.IsNullOrWhiteSpace(criteria.Query)) query = query.Where(q=>(q.TheWord ?? string.Empty).Contains(criteria.Query));
+
+		if (!string.IsNullOrWhiteSpace(criteria.IetfLanguageTag)) query = query.Where(q => q.IetfLanguageTag==criteria.IetfLanguageTag);
+		
+		if (criteria.DictionaryId.HasValue) query = query.Where(q => q.DictionaryId == criteria.DictionaryId.Value);
+		
+		PagedResults<WordInDictionary> results = new PagedResults<WordInDictionary>()
+		{
+			TotalUnpagedItems = await query.CountAsync()
+		};
+		
+		switch (criteria.SortBy)
+		{
+			case WordsSortColumn.TheWord:
+				if (criteria.SortDirection==SortDirection.Ascending) query = query.OrderBy(q => q.TheWord);
+				else query = query.OrderByDescending(q => q.TheWord);
+				break;
+			case WordsSortColumn.WordId:
+				if (criteria.SortDirection == SortDirection.Ascending) query = query.OrderBy(q => q.WordId);
+				else query = query.OrderByDescending(q => q.WordId);
+				break;
+			case WordsSortColumn.Dictionary:
+				if (criteria.SortDirection == SortDirection.Ascending) query=query.OrderBy(q=>q.DictionaryName);
+				else query = query.OrderByDescending(q=>q.DictionaryName);
+				break;
+			case WordsSortColumn.Language:
+				if (criteria.SortDirection == SortDirection.Ascending) query=query.OrderBy(q=>q.LanguageName);
+				else query = query.OrderByDescending(q=>q.LanguageName);
+				break;
+			case WordsSortColumn.AppearsInPhrases:
+				if (criteria.SortDirection == SortDirection.Ascending) query=query.OrderBy(q=>q.AppearsInPhrasesCount);
+				else query = query.OrderByDescending(q=>q.AppearsInPhrasesCount);
+				break;
+		}
+
+		results.Results = await query
+			.Skip(criteria.OrdinalOfFirstItem)
+			.Take(criteria.ItemsPerPage)
+			.ToArrayAsync();
+		
+		return results;
 	}
 }

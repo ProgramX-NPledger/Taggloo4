@@ -21,7 +21,7 @@ public class Word
 	/// <summary>
 	/// UserName of creator of the Word.
 	/// </summary>
-	public required string? CreatedByUserName { get; set; }
+	public required string CreatedByUserName { get; set; }
 
 	/// <summary>
 	/// Timestamp of creation of the Word.

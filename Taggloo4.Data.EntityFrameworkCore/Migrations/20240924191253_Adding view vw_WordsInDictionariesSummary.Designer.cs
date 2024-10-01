@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taggloo4.Data.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using Taggloo4.Data.EntityFrameworkCore;
 namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240924191253_Adding view vw_WordsInDictionariesSummary")]
+    partial class Addingviewvw_WordsInDictionariesSummary
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -501,51 +504,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                     b.ToTable("Words");
                 });
 
-            modelBuilder.Entity("Taggloo4.Model.WordInDictionary", b =>
-                {
-                    b.Property<int?>("WordId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AppearsInPhrasesCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ContentTypeFriendlyName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedByUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedOn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("DictionaryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DictionaryName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExternalId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IetfLanguageTag")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LanguageName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TheWord")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("WordId");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("vw_WordsInDictionaries", (string)null);
-                });
-
             modelBuilder.Entity("Taggloo4.Model.WordInPhrase", b =>
                 {
                     b.Property<int>("Id")
@@ -618,27 +576,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                     b.HasIndex("ToWordId");
 
                     b.ToTable("WordTranslations");
-                });
-
-            modelBuilder.Entity("Taggloo4.Model.WordsInDictionariesSummary", b =>
-                {
-                    b.Property<int?>("DictionaryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DictionaryName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LatestWordCreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("WordCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("DictionaryId");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("vw_WordsInDictionariesSummary", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
