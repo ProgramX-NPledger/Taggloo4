@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Criteria\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Taggloo4.Contract.Translation\Taggloo4.Contract.Translation.csproj" />
     </ItemGroup>
 
