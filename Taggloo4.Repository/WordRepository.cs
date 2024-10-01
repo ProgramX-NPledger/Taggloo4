@@ -71,8 +71,8 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 	{
 		return await DataContext.Words
 			.Include("Dictionary.Language")
-			.Include("ToTranslations")
-			.Include("FromTranslations")
+			.Include("ToTranslations.FromWord")
+			.Include("FromTranslations.ToWord")
 			.Include("AppearsInPhrases")
 			.SingleOrDefaultAsync(q => q.Id == id);
 	}
