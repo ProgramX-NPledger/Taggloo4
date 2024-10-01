@@ -8,69 +8,98 @@
 
 <div class="admin">
 
-    <h2>@Model.TheWord</h2>
-    <p><a href="@Url.Action("Index","Words")">&lt; Back to Words</a></p>
-
-    <div class="panel">
-        <h3>General</h3>
-        <fieldset>
-            <legend>Primary data</legend>
-            <p>
-                @Html.LabelFor(m=>m.Id)
-                @Html.TextBoxFor(m=>m.Id, new { @readonly= "readonly" })
-            </p>
-            <p>
-                @Html.LabelFor(m=>m.TheWord)
-                @Html.TextBoxFor(m=>m.TheWord, new { @readonly= "readonly" })
-            </p>
-        </fieldset>
-        <fieldset>
-            <legend>Integration</legend>
-            <p>
-                @Html.LabelFor(m=>m.ExternalId)
-                @Html.TextBoxFor(m=>m.ExternalId, new { @readonly= "readonly" })
-            </p>
-        </fieldset>
-        <fieldset>
-            <legend>Meta-data</legend>
-            <p>
-                @Html.LabelFor(m=>m.CreatedAt)
-                @Html.TextBoxFor(m=>m.CreatedAt, new { @readonly= "readonly" })
-            </p>
-            <p>
-                @Html.LabelFor(m=>m.CreatedOn)
-                @Html.TextBoxFor(m=>m.CreatedOn, new { @readonly= "readonly" })
-            </p>
-            <p>
-                @Html.LabelFor(m=>m.CreatedByUserName)
-                @Html.TextBoxFor(m=>m.CreatedByUserName, new { @readonly= "readonly" })
-            </p>
-        </fieldset>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>@Model.TheWord</h2>
+            <p><a href="@Url.Action("Index","Words")">&lt; Back to Words</a></p>
+            <div class="panel">
+                <h3>General</h3>
+            </div>
+        </div>
     </div>
-    <div class="panel">
-        <h3>Dictionary</h3>
-        <fieldset>
-            <legend>Dictionary</legend>
-            <p>
-                @Html.LabelFor(m=>m.DictionaryId)
-                @Html.TextBoxFor(m=>m.DictionaryId, new { @readonly= "readonly" })
-            </p>
-            <p>
-                @Html.LabelFor(m=>m.DictionaryName)
-                @Html.TextBoxFor(m=>m.DictionaryName, new { @readonly= "readonly" })
-            </p>
-        </fieldset>
-        <fieldset>
-            <legend>Language</legend>
-            <p>
-                @Html.LabelFor(m=>m.IetfLanguageTag)
-                @Html.TextBoxFor(m=>m.IetfLanguageTag, new { @readonly= "readonly" })
-            </p>
-            <p>
-                @Html.LabelFor(m=>m.LanguageName)
-                @Html.TextBoxFor(m=>m.LanguageName, new { @readonly= "readonly" })
-            </p>
-        </fieldset>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="panel">
+                <fieldset>
+                    <p>
+                        @Html.LabelFor(m=>m.Id)
+                        @Html.TextBoxFor(m=>m.Id, new { @readonly= "readonly" })
+                    </p>
+                    <p>
+                        @Html.LabelFor(m=>m.TheWord)
+                        @Html.TextBoxFor(m=>m.TheWord, new { @readonly= "readonly" })
+                    </p>
+                </fieldset>
+                <fieldset>
+                    <p>
+                        @Html.LabelFor(m=>m.ExternalId)
+                        @Html.TextBoxFor(m=>m.ExternalId, new { @readonly= "readonly" })
+                    </p>
+                </fieldset>
+            </div>
+        </div>   
+        <div class="col-md-5">
+            <div class="panel">
+                <fieldset>
+                    <p>
+                        @Html.LabelFor(m=>m.CreatedAt)
+                        @Html.TextBoxFor(m=>m.CreatedAt, new { @readonly= "readonly" })
+                    </p>
+                    <p>
+                        @Html.LabelFor(m=>m.CreatedOn)
+                        @Html.TextBoxFor(m=>m.CreatedOn, new { @readonly= "readonly" })
+                    </p>
+                    <p>
+                        @Html.LabelFor(m=>m.CreatedByUserName)
+                        @Html.TextBoxFor(m=>m.CreatedByUserName, new { @readonly= "readonly" })
+                    </p>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="panel">
+                <div class="panel">
+                    <h3>Dictionary</h3>
+                    <fieldset>
+                        <p>
+                            @Html.LabelFor(m=>m.DictionaryId)
+                            @Html.TextBoxFor(m=>m.DictionaryId, new { @readonly= "readonly" })
+                        </p>
+                        <p>
+                            @Html.LabelFor(m=>m.DictionaryName)
+                            @Html.TextBoxFor(m=>m.DictionaryName, new { @readonly= "readonly" })
+                        </p>
+                    </fieldset>
+                </div>
+            
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="panel">
+                <div class="panel">
+                    <h3>Language</h3>
+                    <fieldset>
+                        <p>
+                            @Html.LabelFor(m=>m.IetfLanguageTag)
+                            @Html.TextBoxFor(m=>m.IetfLanguageTag, new { @readonly= "readonly" })
+                        </p>
+                        <p>
+                            @Html.LabelFor(m=>m.LanguageName)
+                            @Html.TextBoxFor(m=>m.LanguageName, new { @readonly= "readonly" })
+                        </p>
+                    </fieldset>
+                </div>
+            </div>
+
+
+        </div>
+
+      
     </div>
     <div class="panel">
         <h3>Translations</h3>
