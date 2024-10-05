@@ -94,13 +94,10 @@ public class DataContext : IdentityDbContext<AppUser,
 	{
 		base.OnModelCreating(builder);
 		
-		// dictionaries
-
-		builder.Entity<Dictionary>()
-			.HasOne(dictionary => dictionary.ContentType)
-			.WithMany(contentType => contentType.Dictionaries)
-			.HasForeignKey(d => d.ContentTypeId);
-			// .IsRequired(); // TODO when made mandatory
+		
+		ConfigureDictionaries(builder);
+		SeedContentTypes(builder);
+	
 		
 		// ASP.NET identity
 
@@ -229,5 +226,50 @@ public class DataContext : IdentityDbContext<AppUser,
 			.ToView("vw_WordsInDictionaries")
 			.HasKey(t => t.WordId);
 
+	}
+
+	private void SeedContentTypes(ModelBuilder builder)
+	{
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 1,
+			Controller = "words",
+			ContentTypeKey = "Word",
+			NamePlural = "Words",
+			NameSingular = "Word",
+		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 2,
+			Controller = "wordTranslations",
+			ContentTypeKey = "WordTranslation",
+			NamePlural = "Word Translations",
+			NameSingular = "Word Translation",
+		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 3,
+			Controller = "phraseTranslations",
+			ContentTypeKey = "PhraseTranslation",
+			NamePlural = "Phrase Translations",
+			NameSingular = "Phrase Translation",
+		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 4,
+			Controller = "phrases",
+			ContentTypeKey = "Phrase",
+			NamePlural = "Phrases",
+			NameSingular = "Phrase",
+		});
+	}
+
+	private void ConfigureDictionaries(ModelBuilder builder)
+	{
+		builder.Entity<Dictionary>()
+			.HasOne(dictionary => dictionary.ContentType)
+			.WithMany(contentType => contentType.Dictionaries)
+			.HasForeignKey(d => d.ContentTypeId);
+		// .IsRequired(); // TODO when made mandatory		
 	}
 }

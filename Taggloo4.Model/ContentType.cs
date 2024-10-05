@@ -19,9 +19,15 @@ public class ContentType
     public required string ContentTypeKey { get; set; }
     
     /// <summary>
-    /// Name of Content Type
+    /// Name of Content Type (singular)
     /// </summary>
-    public string Name { get; set; }
+    [MaxLength(32)]
+    public required string NameSingular { get; set; }
+
+    /// <summary>
+    /// Name of Content Type (plural)
+    /// </summary>
+    public required string NamePlural { get; set; }
 
     /// <summary>
     /// The URL name of the Controller to use to retrieve content.
@@ -32,5 +38,5 @@ public class ContentType
     /// <summary>
     /// <seealso cref="Dictionary"/> items using this Content Type.
     /// </summary>
-    public ICollection<Dictionary> Dictionaries { get; set; }
+    public ICollection<Dictionary> Dictionaries { get; set; } = [];
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taggloo4.Data.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using Taggloo4.Data.EntityFrameworkCore;
 namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241005171710_Adding column and strengthening nullability")]
+    partial class Addingcolumnandstrengtheningnullability
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -262,46 +265,11 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     b.Property<string>("NameSingular")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("ContentTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ContentTypeKey = "Word",
-                            Controller = "words",
-                            NamePlural = "Words",
-                            NameSingular = "Word"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ContentTypeKey = "WordTranslation",
-                            Controller = "wordTranslations",
-                            NamePlural = "Word Translations",
-                            NameSingular = "Word Translation"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ContentTypeKey = "PhraseTranslation",
-                            Controller = "phraseTranslations",
-                            NamePlural = "Phrase Translations",
-                            NameSingular = "Phrase Translation"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ContentTypeKey = "Phrase",
-                            Controller = "phrases",
-                            NamePlural = "Phrases",
-                            NameSingular = "Phrase"
-                        });
                 });
 
             modelBuilder.Entity("Taggloo4.Model.Dictionary", b =>
