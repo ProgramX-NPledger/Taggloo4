@@ -83,32 +83,13 @@ public class Dictionary
 	/// <summary>
 	/// Identifier of Content Type
 	/// </summary>
-	public int? ContentTypeId { get; set; }
+	public int ContentTypeId { get; set; }
 	
 	/// <summary>
 	/// <seealso cref="ContentType"/> for Dictionary.
 	/// </summary>
 	public ContentType? ContentType { get; set; }
 	
-	// TODO: Remove these after migrating to new ConetntType table
-	
-	/// <summary>
-	/// The URL name of the Controller to use to retrieve content.
-	/// </summary>
-	[MaxLength(32)]
-	public required string Controller { get; set; }
-
-	/// <summary>
-	/// Disambiguated identifier for type of content to allow automatic processing.
-	/// </summary>
-	[MaxLength(32)]
-	public required string ContentTypeKey { get; set; }
-
-	/// <summary>
-	/// Human-suitable name of Content Type.
-	/// </summary>
-	[MaxLength(128)]
-	public required string ContentTypeFriendlyName { get; set; }
 	
 }
 	

@@ -1,19 +1,16 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using System.Text;
+﻿using System.Text;
 using System.Text.Encodings.Web;
 using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Taggloo4.Contract;
 using Taggloo4.Dto;
 using Taggloo4.Model;
-using Taggloo4.Web.Contract;
+using Taggloo4.Web.Controllers;
 using Taggloo4.Web.Hangfire.Jobs;
-using Taggloo4.Web.Model;
 
-namespace Taggloo4.Web.Controllers;
+namespace Taggloo4.Web.Areas.Api.Controllers;
 
 /// <summary>
 /// Dictionary operations. All methods require authorisation.
@@ -122,9 +119,10 @@ public class DictionariesController : BaseApiController
 				SourceUrl = d.SourceUrl,
 				IetfLanguageTag = d.IetfLanguageTag,
 				CreatedByUserName = d.CreatedByUserName,
-				Controller = d.Controller,
-				ContentTypeKey = d.ContentTypeKey,
-				ContentTypeFriendlyName = d.ContentTypeFriendlyName,
+				// TODO return content type fields
+				// Controller = d.Controller,
+				// ContentTypeKey = d.ContentTypeKey,
+				// ContentTypeFriendlyName = d.ContentTypeFriendlyName,
 				Links = new[]
 				{
 					new Link()
@@ -146,7 +144,9 @@ public class DictionariesController : BaseApiController
 						Action = "get",
 						Rel = "firstcontent",
 						Types = new[] { JSON_MIME_TYPE },
-						HRef = $"{GetBaseApiPath()}/{d.Controller ?? "null"}?dictionaryId={d.Id}"
+						// TODO: return controller from contenttype
+						HRef = ""
+						//HRef = $"{GetBaseApiPath()}/{d.Controller ?? "null"}?dictionaryId={d.Id}"
 					}
 				}
 			}),
@@ -195,9 +195,10 @@ public class DictionariesController : BaseApiController
 			IetfLanguageTag = language.IetfLanguageTag,
 			Description = createDictionary.Description,
 			SourceUrl = createDictionary.SourceUrl,
-			Controller = createDictionary.Controller,
-			ContentTypeKey = createDictionary.ContentTypeKey,
-			ContentTypeFriendlyName = createDictionary.ContentTypeFriendlyName
+			// TODO: create content type
+			// Controller = createDictionary.Controller,
+			// ContentTypeKey = createDictionary.ContentTypeKey,
+			// ContentTypeFriendlyName = createDictionary.ContentTypeFriendlyName
 		};
 
 		_dictionaryRepository.Create(newDictionary);
