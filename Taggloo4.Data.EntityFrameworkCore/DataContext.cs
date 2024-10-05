@@ -77,6 +77,11 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// Content Types for Dictionaries.
 	/// </summary>
 	public DbSet<ContentType> ContentTypes { get; set; }
+
+	/// <summary>
+	/// Dictionaries with Content Type and Language.
+	/// </summary>
+	public DbSet<DictionaryWithContentTypeAndLanguage> DictionariesWithContentTypeAndLanguage { get; set; }
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -93,7 +98,6 @@ public class DataContext : IdentityDbContext<AppUser,
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
 		base.OnModelCreating(builder);
-		
 		
 		ConfigureDictionaries(builder);
 		SeedContentTypes(builder);
@@ -269,7 +273,11 @@ public class DataContext : IdentityDbContext<AppUser,
 		builder.Entity<Dictionary>()
 			.HasOne(dictionary => dictionary.ContentType)
 			.WithMany(contentType => contentType.Dictionaries)
-			.HasForeignKey(d => d.ContentTypeId);
-		// .IsRequired(); // TODO when made mandatory		
+			.HasForeignKey(d => d.ContentTypeId)
+			.IsRequired(); 
+		
+		builder.Entity<DictionaryWithContentTypeAndLanguage>()
+			.ToView("vw_DictionariesWithContentTypeAndLanguage")
+			.HasKey(t => t.DictionaryId);
 	}
 }
