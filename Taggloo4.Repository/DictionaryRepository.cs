@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Taggloo4.Contract;
+using Taggloo4.Contract.Criteria;
 using Taggloo4.Data.EntityFrameworkCore;
 using Taggloo4.Model;
 
@@ -59,6 +60,49 @@ public class DictionaryRepository : RepositoryBase<Dictionary>, IDictionaryRepos
 		return await query.ToArrayAsync();
 	}
 
+	public async Task<PagedResults<DictionaryWithContentTypeAndLanguage>> GetDictionariesByCriteriaAsync(GetDictionariesCriteria criteria)
+	{
+		IQueryable<DictionaryWithContentTypeAndLanguage>? query = DataContext.DictionariesWithContentTypeAndLanguage.AsQueryable();
+		
+		if (!string.IsNullOrWhiteSpace(criteria.Query)) query = query.Where(q=>(q.Name ?? string.Empty).Contains(criteria.Query));
+
+		if (!string.IsNullOrWhiteSpace(criteria.IetfLanguageTag)) query = query.Where(q => q.IetfLanguageTag==criteria.IetfLanguageTag);
+		
+		if (!string.IsNullOrWhiteSpace(criteria.ContentTypeKey)) query = query.Where(q=>q.ContentTypeKey==criteria.ContentTypeKey);
+		
+		PagedResults<DictionaryWithContentTypeAndLanguage> results = new PagedResults<DictionaryWithContentTypeAndLanguage>()
+		{
+			TotalUnpagedItems = await query.CountAsync()
+		};
+		
+		switch (criteria.SortBy)
+		{
+			case DictionariesSortColumn.Name:
+				if (criteria.SortDirection==SortDirection.Ascending) query = query.OrderBy(q => q.Name);
+				else query = query.OrderByDescending(q => q.Name);
+				break;
+			case DictionariesSortColumn.DictionaryId:
+				if (criteria.SortDirection == SortDirection.Ascending) query = query.OrderBy(q => q.DictionaryId);
+				else query = query.OrderByDescending(q => q.DictionaryId);
+				break;
+			case DictionariesSortColumn.ContentType:
+				if (criteria.SortDirection == SortDirection.Ascending) query=query.OrderBy(q=>q.NameSinguler);
+				else query = query.OrderByDescending(q=>q.NameSinguler);
+				break;
+			case DictionariesSortColumn.Language:
+				if (criteria.SortDirection == SortDirection.Ascending) query=query.OrderBy(q=>q.LanguageName);
+				else query = query.OrderByDescending(q=>q.LanguageName);
+				break;
+		}
+
+		results.Results = await query
+			.Skip(criteria.OrdinalOfFirstItem)
+			.Take(criteria.ItemsPerPage)
+			.ToArrayAsync();
+		
+		return results;
+	}
+
 	/// <summary>
 	/// Deletes the specified Dictionary, and all related content.
 	/// </summary>
@@ -70,5 +114,11 @@ public class DictionaryRepository : RepositoryBase<Dictionary>, IDictionaryRepos
 		Dictionary dictionary = DataContext.Dictionaries.Single(q => q.Id == dictionaryId);
 		DataContext.Dictionaries.Remove(dictionary);
 		await DataContext.SaveChangesAsync();
+	}
+
+	/// <inheritdoc cref="IDictionaryRepository.GetAllContentTypes"/>
+	public async Task<IEnumerable<ContentType>> GetAllContentTypes()
+	{
+		return await DataContext.ContentTypes.OrderBy(q => q.NameSingular).ToArrayAsync();
 	}
 }
