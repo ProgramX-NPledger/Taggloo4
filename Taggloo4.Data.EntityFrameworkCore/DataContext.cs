@@ -63,9 +63,20 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// </summary>
 	public DbSet<TranslatorConfiguration> TranslatorConfigurations { get; set; }
 
+	/// <summary>
+	/// Summary of Words in Dictionaries.
+	/// </summary>
 	public DbSet<WordsInDictionariesSummary> WordsInDictionariesSummaries { get; set; }
 
+	/// <summary>
+	/// Words in Dictionaries.
+	/// </summary>
 	public DbSet<WordInDictionary> WordsInDictionaries { get; set; }
+
+	/// <summary>
+	/// Content Types for Dictionaries.
+	/// </summary>
+	public DbSet<ContentType> ContentTypes { get; set; }
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -82,6 +93,16 @@ public class DataContext : IdentityDbContext<AppUser,
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
 		base.OnModelCreating(builder);
+		
+		// dictionaries
+
+		builder.Entity<Dictionary>()
+			.HasOne(dictionary => dictionary.ContentType)
+			.WithMany(contentType => contentType.Dictionaries)
+			.HasForeignKey(d => d.ContentTypeId);
+			// .IsRequired(); // TODO when made mandatory
+		
+		// ASP.NET identity
 
 		builder.Entity<AppUser>()
 			.HasMany(ur => ur.UserRoles)

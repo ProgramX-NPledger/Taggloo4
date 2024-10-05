@@ -78,6 +78,20 @@ public class Dictionary
 	/// </summary>
 	public ICollection<PhraseTranslation>? PhraseTranslations { get; set; }
 
+	// TODO: Make these not nullable in future migration
+	
+	/// <summary>
+	/// Identifier of Content Type
+	/// </summary>
+	public int? ContentTypeId { get; set; }
+	
+	/// <summary>
+	/// <seealso cref="ContentType"/> for Dictionary.
+	/// </summary>
+	public ContentType? ContentType { get; set; }
+	
+	// TODO: Remove these after migrating to new ConetntType table
+	
 	/// <summary>
 	/// The URL name of the Controller to use to retrieve content.
 	/// </summary>
@@ -95,6 +109,7 @@ public class Dictionary
 	/// </summary>
 	[MaxLength(128)]
 	public required string ContentTypeFriendlyName { get; set; }
+	
 }
 	
 	
