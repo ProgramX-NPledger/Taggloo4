@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taggloo4.Data.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using Taggloo4.Data.EntityFrameworkCore;
 namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241005175355_Create view vw_DictionariesWithContentTypeAndLanguage")]
+    partial class Createviewvw_DictionariesWithContentTypeAndLanguage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -401,7 +404,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NameSingular")
+                    b.Property<string>("NameSinguler")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -414,24 +417,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                     b.ToTable((string)null);
 
                     b.ToView("vw_DictionariesWithContentTypeAndLanguage", (string)null);
-                });
-
-            modelBuilder.Entity("Taggloo4.Model.Exceptions.DictionariesSummary", b =>
-                {
-                    b.Property<int>("NumberOfDictionaries")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumberOfContentTypes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumberOfLanguagesInDictionaries")
-                        .HasColumnType("int");
-
-                    b.HasKey("NumberOfDictionaries", "NumberOfContentTypes", "NumberOfLanguagesInDictionaries");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("vw_DictionariesSummary", (string)null);
                 });
 
             modelBuilder.Entity("Taggloo4.Model.Language", b =>

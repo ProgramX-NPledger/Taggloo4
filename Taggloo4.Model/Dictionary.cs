@@ -79,22 +79,16 @@ public class Dictionary
 	public ICollection<PhraseTranslation>? PhraseTranslations { get; set; }
 
 	/// <summary>
-	/// The URL name of the Controller to use to retrieve content.
+	/// Identifier of Content Type
 	/// </summary>
-	[MaxLength(32)]
-	public required string Controller { get; set; }
-
+	public int ContentTypeId { get; set; }
+	
 	/// <summary>
-	/// Disambiguated identifier for type of content to allow automatic processing.
+	/// <seealso cref="ContentType"/> for Dictionary.
 	/// </summary>
-	[MaxLength(32)]
-	public required string ContentTypeKey { get; set; }
-
-	/// <summary>
-	/// Human-suitable name of Content Type.
-	/// </summary>
-	[MaxLength(128)]
-	public required string ContentTypeFriendlyName { get; set; }
+	public ContentType? ContentType { get; set; }
+	
+	
 }
 	
 	

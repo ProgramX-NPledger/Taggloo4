@@ -1,13 +1,13 @@
 ﻿@using Taggloo4.Contract.Criteria
-@model Taggloo4.Web.Areas.Admin.ViewModels.Words.IndexViewModel
+@model Taggloo4.Web.Areas.Admin.ViewModels.Dictionaries.IndexViewModel
 
 @{
-    ViewBag.Title = "Words";
+    ViewBag.Title = "Dictionaries";
     Layout = "_Layout";
 }
 
 <div class="admin">
-    <h2>Words</h2>
+    <h2>Dictionaries</h2>
     <p>This is the admin area.</p>
     <!-- there should be warnings here -->
 
@@ -19,13 +19,13 @@
                 {
                 placeholder="Filter"
                 })</li>
-            <li>@Html.DropDownListFor(m=>m.DictionaryId,Model.AllDictionariesOptions)</li>
+            <li>@Html.DropDownListFor(m=>m.ContentType,Model.AllContentTypeOptions)</li>
             <li>@Html.DropDownListFor(m=>m.IetfLanguageTag,Model.AllLanguagesOptions)</li>
             <li><input type="submit" value="Search"></li>
-            <li><a href="@Url.Action("Index", "Words", new {
+            <li><a href="@Url.Action("Index", "Dictionaries", new {
                 from = 0,
                 itemsPerPage = Model.ItemsPerPage,
-                sortBy = WordsSortColumn.WordId,
+                sortBy = DictionariesSortColumn.DictionaryId,
                 sortDirection = SortDirection.Ascending})">Clear filters</a></li>
         </ul>
         }
@@ -33,15 +33,15 @@
         <table class="datagrid">
             <tr>
                 <th id="thId">
-                    <a href="@Url.Action("Index", "Words", new {
+                    <a href="@Url.Action("Index", "Dictionaries", new {
                     from = (Model.CurrentPageNumber-1) * Model.ItemsPerPage,
                     itemsPerPage = Model.ItemsPerPage,
-                    sortBy = WordsSortColumn.WordId,
-                    sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.WordId } ? SortDirection.Descending : SortDirection.Ascending,
+                    sortBy = DictionariesSortColumn.DictionaryId,
+                    sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: DictionariesSortColumn.DictionaryId } ? SortDirection.Descending : SortDirection.Ascending,
                     query=Model.Query,
-                    dictionaryId=Model.DictionaryId,
+                    contentType=Model.ContentType,
                     ietfLanguageTag=Model.IetfLanguageTag })">Id
-                        @if (Model.SortBy == WordsSortColumn.WordId)
+                        @if (Model.SortBy == DictionariesSortColumn.DictionaryId)
                         {
                         if (Model.SortDirection == SortDirection.Ascending)
                         {
@@ -54,16 +54,16 @@
                         }
                     </a>
                 </th>
-                <th id="thTheWord">
-                    <a href="@Url.Action("Index", "Words", new {
+                <th id="thName">
+                    <a href="@Url.Action("Index", "Dictionaries", new {
                     from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage,
                     itemsPerPage = Model.ItemsPerPage,
-                    sortBy = WordsSortColumn.TheWord,
-                    sortDirection =  Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.TheWord } ? SortDirection.Descending : SortDirection.Ascending,
+                    sortBy = DictionariesSortColumn.Name,
+                    sortDirection =  Model is { SortDirection: SortDirection.Ascending, SortBy: DictionariesSortColumn.Name } ? SortDirection.Descending : SortDirection.Ascending,
                     query=Model.Query,
-                    dictionaryId=Model.DictionaryId,
-                    ietfLanguageTag=Model.IetfLanguageTag })">Word
-                        @if (Model.SortBy == WordsSortColumn.TheWord)
+                    contentType=Model.ContentType,
+                    ietfLanguageTag=Model.IetfLanguageTag })">Name
+                        @if (Model.SortBy == DictionariesSortColumn.Name)
                         {
                         if (Model.SortDirection == SortDirection.Ascending)
                         {
@@ -76,16 +76,16 @@
                         }
                     </a>
                 </th>
-                <th id="thDictionary">
-                    <a href="@Url.Action("Index", "Words", new {
-                    from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage,
-                    itemsPerPage = Model.ItemsPerPage,
-                    sortBy = WordsSortColumn.Dictionary,
-                    sortDirection =  Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.Dictionary } ? SortDirection.Descending : SortDirection.Ascending,
-                    query=Model.Query,
-                    dictionaryId=Model.DictionaryId,
-                    ietfLanguageTag=Model.IetfLanguageTag })">Dictionary
-                        @if (Model.SortBy == WordsSortColumn.Dictionary)
+                <th id="thContentType">
+                    <a href="@Url.Action("Index", "Dictionaries", new {
+                                 from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage,
+                                 itemsPerPage = Model.ItemsPerPage,
+                                 sortBy = DictionariesSortColumn.ContentType,
+                                 sortDirection =  Model is { SortDirection: SortDirection.Ascending, SortBy: DictionariesSortColumn.ContentType } ? SortDirection.Descending : SortDirection.Ascending,
+                                 query=Model.Query,
+                                 contentType=Model.ContentType,
+                                 ietfLanguageTag=Model.IetfLanguageTag })">Content Type
+                        @if (Model.SortBy == DictionariesSortColumn.ContentType)
                         {
                         if (Model.SortDirection == SortDirection.Ascending)
                         {
@@ -99,36 +99,14 @@
                     </a>
                 </th>
                 <th id="thLanguage">
-                    <a href="@Url.Action("Index", "Words", new {
+                    <a href="@Url.Action("Index", "Dictionaries", new {
                     from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage,
                     itemsPerPage = Model.ItemsPerPage,
-                    sortBy = WordsSortColumn.Language, sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.Language } ? SortDirection.Descending : SortDirection.Ascending,
+                    sortBy = DictionariesSortColumn.Language, sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: DictionariesSortColumn.Language } ? SortDirection.Descending : SortDirection.Ascending,
                     query=Model.Query,
-                    dictionaryId=Model.DictionaryId,
+                    contentType=Model.ContentType,
                     ietfLanguageTag=Model.IetfLanguageTag })">Language
-                        @if (Model.SortBy == WordsSortColumn.Language)
-                        {
-                        if (Model.SortDirection == SortDirection.Ascending)
-                        {
-                        <text><img src="../../img/sort-asc.png"/></text>
-                        }
-                        else
-                        {
-                        <text><img src="../../img/sort-desc.png"/></text>
-                        }
-                        }
-                    </a>
-                </th>
-                <th id="thAppearsInPhrasesCount">
-                    <a href="@Url.Action("Index", "Words", new {
-                    from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage,
-                    itemsPerPage = Model.ItemsPerPage,
-                    sortBy = WordsSortColumn.AppearsInPhrases,
-                    sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.AppearsInPhrases } ? SortDirection.Descending : SortDirection.Ascending,
-                    query=Model.Query,
-                    dictionaryId=Model.DictionaryId,
-                    ietfLanguageTag=Model.IetfLanguageTag })">Appears in Phrases
-                        @if (Model.SortBy == WordsSortColumn.AppearsInPhrases)
+                        @if (Model.SortBy == DictionariesSortColumn.Language)
                         {
                         if (Model.SortDirection == SortDirection.Ascending)
                         {
@@ -147,22 +125,21 @@
             {
             <tr>
                 <td headers="thId">
-                    <a href="@Url.Action("Details","Words",new { id = result.WordId })">
-                        @result.WordId
+                    <a href="@Url.Action("Details","Dictionaries",new { id = result.DictionaryId })">
+                        @result.DictionaryId
                     </a>
                 </td>
-                <td headers="thTheWord">@result.TheWord</td>
-                <td headers="thDictionary">
-                    <a href="@Url.Action("Details","Dictionaries",new { id = result.DictionaryId })">
-                        @result.DictionaryName
-                    </a>
+                <td headers="thName">
+                    @result.Name
+                </td>
+                <td headers="thContentType">
+                    @result.NamePlural
                 </td>
                 <td headers="thLanguage">
                     <a href="@Url.Action("Details","Languages",new { id = result.IetfLanguageTag })">
                         @result.LanguageName
                     </a>
                 </td>
-                <td headers="thAppearsInPhrasesCount">@result.AppearsInPhrasesCount?.ToString("N0")</td>
             </tr>
             }
         </table>
@@ -188,10 +165,10 @@
                 <a href="@Url.Action("Index", "Words", new {
                 from = (i - 1) * Model.ItemsPerPage,
                 itemsPerPage = Model.ItemsPerPage,
-                sortBy = WordsSortColumn.AppearsInPhrases,
-                sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.AppearsInPhrases } ? SortDirection.Descending : SortDirection.Ascending,
+                sortBy = Model.SortBy,
+                sortDirection = Model.SortDirection,
                 query=Model.Query,
-                dictionaryId=Model.DictionaryId,
+                contentType=Model.ContentType,
                 ietfLanguageTag=Model.IetfLanguageTag })">@i</a></li>
             }
             }

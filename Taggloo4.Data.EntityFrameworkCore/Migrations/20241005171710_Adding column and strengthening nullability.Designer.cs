@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taggloo4.Data.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using Taggloo4.Data.EntityFrameworkCore;
 namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241005171710_Adding column and strengthening nullability")]
+    partial class Addingcolumnandstrengtheningnullability
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -262,46 +265,11 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     b.Property<string>("NameSingular")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("ContentTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ContentTypeKey = "Word",
-                            Controller = "words",
-                            NamePlural = "Words",
-                            NameSingular = "Word"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ContentTypeKey = "WordTranslation",
-                            Controller = "wordTranslations",
-                            NamePlural = "Word Translations",
-                            NameSingular = "Word Translation"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ContentTypeKey = "PhraseTranslation",
-                            Controller = "phraseTranslations",
-                            NamePlural = "Phrase Translations",
-                            NameSingular = "Phrase Translation"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ContentTypeKey = "Phrase",
-                            Controller = "phrases",
-                            NamePlural = "Phrases",
-                            NameSingular = "Phrase"
-                        });
                 });
 
             modelBuilder.Entity("Taggloo4.Model.Dictionary", b =>
@@ -312,8 +280,23 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ContentTypeId")
+                    b.Property<string>("ContentTypeFriendlyName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<int?>("ContentTypeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ContentTypeKey")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("Controller")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -353,85 +336,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                     b.HasIndex("IetfLanguageTag");
 
                     b.ToTable("Dictionaries");
-                });
-
-            modelBuilder.Entity("Taggloo4.Model.DictionaryWithContentTypeAndLanguage", b =>
-                {
-                    b.Property<int>("DictionaryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ContentTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ContentTypeKey")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Controller")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedByUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedOn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IetfLanguageTag")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LanguageName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NamePlural")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameSingular")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SourceUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("DictionaryId");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("vw_DictionariesWithContentTypeAndLanguage", (string)null);
-                });
-
-            modelBuilder.Entity("Taggloo4.Model.Exceptions.DictionariesSummary", b =>
-                {
-                    b.Property<int>("NumberOfDictionaries")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumberOfContentTypes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumberOfLanguagesInDictionaries")
-                        .HasColumnType("int");
-
-                    b.HasKey("NumberOfDictionaries", "NumberOfContentTypes", "NumberOfLanguagesInDictionaries");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("vw_DictionariesSummary", (string)null);
                 });
 
             modelBuilder.Entity("Taggloo4.Model.Language", b =>
@@ -851,9 +755,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                 {
                     b.HasOne("Taggloo4.Model.ContentType", "ContentType")
                         .WithMany("Dictionaries")
-                        .HasForeignKey("ContentTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ContentTypeId");
 
                     b.HasOne("Taggloo4.Model.Language", "Language")
                         .WithMany("Dictionaries")

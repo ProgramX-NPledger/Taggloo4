@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Taggloo4.Data.EntityFrameworkCore.Identity;
 using Taggloo4.Model;
+using Taggloo4.Model.Exceptions;
 
 namespace Taggloo4.Data.EntityFrameworkCore;
 
@@ -63,9 +64,30 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// </summary>
 	public DbSet<TranslatorConfiguration> TranslatorConfigurations { get; set; }
 
+	/// <summary>
+	/// Summary of Words in Dictionaries.
+	/// </summary>
 	public DbSet<WordsInDictionariesSummary> WordsInDictionariesSummaries { get; set; }
 
+	/// <summary>
+	/// Words in Dictionaries.
+	/// </summary>
 	public DbSet<WordInDictionary> WordsInDictionaries { get; set; }
+
+	/// <summary>
+	/// Content Types for Dictionaries.
+	/// </summary>
+	public DbSet<ContentType> ContentTypes { get; set; }
+
+	/// <summary>
+	/// Dictionaries with Content Type and Language.
+	/// </summary>
+	public DbSet<DictionaryWithContentTypeAndLanguage> DictionariesWithContentTypeAndLanguage { get; set; }
+	
+	/// <summary>
+	/// Summary of Dictionaries.
+	/// </summary>
+	public DbSet<DictionariesSummary> DictionariesSummaries { get; set; }
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -82,6 +104,12 @@ public class DataContext : IdentityDbContext<AppUser,
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
 		base.OnModelCreating(builder);
+		
+		ConfigureDictionaries(builder);
+		SeedContentTypes(builder);
+	
+		
+		// ASP.NET identity
 
 		builder.Entity<AppUser>()
 			.HasMany(ur => ur.UserRoles)
@@ -208,5 +236,64 @@ public class DataContext : IdentityDbContext<AppUser,
 			.ToView("vw_WordsInDictionaries")
 			.HasKey(t => t.WordId);
 
+	}
+
+	private void SeedContentTypes(ModelBuilder builder)
+	{
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 1,
+			Controller = "words",
+			ContentTypeKey = "Word",
+			NamePlural = "Words",
+			NameSingular = "Word",
+		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 2,
+			Controller = "wordTranslations",
+			ContentTypeKey = "WordTranslation",
+			NamePlural = "Word Translations",
+			NameSingular = "Word Translation",
+		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 3,
+			Controller = "phraseTranslations",
+			ContentTypeKey = "PhraseTranslation",
+			NamePlural = "Phrase Translations",
+			NameSingular = "Phrase Translation",
+		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 4,
+			Controller = "phrases",
+			ContentTypeKey = "Phrase",
+			NamePlural = "Phrases",
+			NameSingular = "Phrase",
+		});
+	}
+
+	private void ConfigureDictionaries(ModelBuilder builder)
+	{
+		builder.Entity<Dictionary>()
+			.HasOne(dictionary => dictionary.ContentType)
+			.WithMany(contentType => contentType.Dictionaries)
+			.HasForeignKey(d => d.ContentTypeId)
+			.IsRequired(); 
+		
+		builder.Entity<DictionaryWithContentTypeAndLanguage>()
+			.ToView("vw_DictionariesWithContentTypeAndLanguage")
+			.HasKey(t => t.DictionaryId);
+		
+		builder.Entity<DictionariesSummary>()
+			.ToView("vw_DictionariesSummary")
+			.HasKey(t => new
+			{
+				t.NumberOfDictionaries,
+				t.NumberOfContentTypes,
+				t.NumberOfLanguagesInDictionaries,
+			});
+		
 	}
 }
