@@ -102,7 +102,7 @@
                     <a href="@Url.Action("Index", "Words", new {
                     from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage,
                     itemsPerPage = Model.ItemsPerPage,
-                    sortBy = WordsSortColumn.Language, sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.Dictionary } ? SortDirection.Descending : SortDirection.Ascending,
+                    sortBy = WordsSortColumn.Language, sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: WordsSortColumn.Language } ? SortDirection.Descending : SortDirection.Ascending,
                     query=Model.Query,
                     dictionaryId=Model.DictionaryId,
                     ietfLanguageTag=Model.IetfLanguageTag })">Language
