@@ -5,7 +5,7 @@ namespace Taggloo4.Web.Areas.Admin.ViewModels.Home;
 /// <summary>
 /// Defines the View Model for the Admin/Home/Index view, including dependent View Models for partial Views.
 /// </summary>
-public class IndexViewModel : ILanguageSummaryViewModel, IDictionarySummaryViewModel, IUserSummaryViewModel, IHangfireSummaryViewModel, IWordSummaryViewModel
+public class IndexViewModel : ILanguageSummaryViewModel, IDictionariesSummaryViewModel, IUserSummaryViewModel, IHangfireSummaryViewModel, IWordSummaryViewModel
 {
     /// <inheritdoc cref="ILanguageSummaryViewModel"/>
     public IEnumerable<LanguageDto>? AllLanguages { get; set; }
@@ -23,4 +23,14 @@ public class IndexViewModel : ILanguageSummaryViewModel, IDictionarySummaryViewM
     public int AcrossDictionariesCount { get; set;  }
     /// <inheritdoc cref="IWordSummaryViewModel"/>
     public DateTime? LastWordCreatedTimeStamp { get; set; }
+    
+    /// <inheritdoc cref="IDictionariesSummaryViewModel.NumberOfLanguagesInDictionaries"/>
+    public int NumberOfLanguagesInDictionaries { get; set; }
+
+    /// <inheritdoc cref="IDictionariesSummaryViewModel.NumberOfDictionaries"/>
+    public int NumberOfDictionaries { get; set; }
+
+    /// <inheritdoc cref="IDictionariesSummaryViewModel.NumberOfContentTypes"/>
+    public int NumberOfContentTypes { get; set; }
+    
 }

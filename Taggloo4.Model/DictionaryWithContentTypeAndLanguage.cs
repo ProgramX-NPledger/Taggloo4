@@ -63,7 +63,7 @@ public class DictionaryWithContentTypeAndLanguage
     /// <summary>
     /// Singular name for Content Type.
     /// </summary>
-    public required string NameSinguler { get; set; }
+    public required string NameSingular { get; set; }
     
     /// <summary>
     /// IETF Language Tag.

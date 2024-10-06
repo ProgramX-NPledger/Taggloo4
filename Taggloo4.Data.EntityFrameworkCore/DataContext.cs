@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Taggloo4.Data.EntityFrameworkCore.Identity;
 using Taggloo4.Model;
+using Taggloo4.Model.Exceptions;
 
 namespace Taggloo4.Data.EntityFrameworkCore;
 
@@ -82,6 +83,11 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// Dictionaries with Content Type and Language.
 	/// </summary>
 	public DbSet<DictionaryWithContentTypeAndLanguage> DictionariesWithContentTypeAndLanguage { get; set; }
+	
+	/// <summary>
+	/// Summary of Dictionaries.
+	/// </summary>
+	public DbSet<DictionariesSummary> DictionariesSummaries { get; set; }
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -279,5 +285,15 @@ public class DataContext : IdentityDbContext<AppUser,
 		builder.Entity<DictionaryWithContentTypeAndLanguage>()
 			.ToView("vw_DictionariesWithContentTypeAndLanguage")
 			.HasKey(t => t.DictionaryId);
+		
+		builder.Entity<DictionariesSummary>()
+			.ToView("vw_DictionariesSummary")
+			.HasKey(t => new
+			{
+				t.NumberOfDictionaries,
+				t.NumberOfContentTypes,
+				t.NumberOfLanguagesInDictionaries,
+			});
+		
 	}
 }

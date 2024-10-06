@@ -66,4 +66,9 @@ public class IndexViewModel
     /// </summary>
     public string? Query { get; set; }
 
+    /// <summary>
+    /// When specified, allows filtering by Content Type.
+    /// </summary>
+    public int? ContentType { get; set; }
+
 }

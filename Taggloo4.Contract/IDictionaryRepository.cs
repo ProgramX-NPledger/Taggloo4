@@ -1,5 +1,6 @@
 ﻿using Taggloo4.Contract.Criteria;
 using Taggloo4.Model;
+using Taggloo4.Model.Exceptions;
 
 namespace Taggloo4.Contract;
 
@@ -53,6 +54,12 @@ public interface IDictionaryRepository : IRepositoryBase<Dictionary>
 	/// Return all Content Types.
 	/// </summary>
 	/// <returns>A collection of <seealso cref="ContentType"/> items which may relate to a Dictionary.</returns>
-	Task<IEnumerable<ContentType>> GetAllContentTypes();
+	Task<IEnumerable<ContentType>> GetAllContentTypesAsync();
+	
+	/// <summary>
+	/// Get Dictionaries summary.
+	/// </summary>
+	/// <returns>A summary of Dictionaries.</returns>
+	Task<DictionariesSummary> GetDictionariesSummaryAsync();
 
 }

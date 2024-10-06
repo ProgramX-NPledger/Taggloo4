@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Taggloo4.Contract;
 using Taggloo4.Contract.Criteria;
 using Taggloo4.Model;
+using Taggloo4.Utility;
 using Taggloo4.Web.Areas.Admin.ViewModels.Dictionaries;
 using Taggloo4.Web.Areas.Admin.ViewModels.Dictionaries.Factory;
 using Taggloo4.Web.Constants;
@@ -50,10 +51,12 @@ public class DictionariesController : Controller
         int maximumItems = itemsPerPage ?? _configuration.GetValue<int?>("DefaultPageSize") ?? SearchAndPages.MaximumItemsPerPage;
         if (itemsPerPage>SearchAndPages.MaximumItemsPerPage) maximumItems = SearchAndPages.MaximumItemsPerPage;
 
+        int? contentTypeId = TypeConverter.ConvertNullableStringToNullableInt(contentType);
+        
         PagedResults<DictionaryWithContentTypeAndLanguage> results = await _dictionaryRepository.GetDictionariesByCriteriaAsync(new GetDictionariesCriteria()
         {
             SortDirection = sortDirection ?? SortDirection.Ascending,
-            ContentTypeKey = contentType,
+            ContentTypeId = contentTypeId,
             Query = query,
             SortBy = sortBy ?? DictionariesSortColumn.DictionaryId,
             ItemsPerPage = maximumItems,
@@ -67,10 +70,10 @@ public class DictionariesController : Controller
         if (results.TotalUnpagedItems % maximumItems>0) numberOfPages++;
 
         IEnumerable<Language> allLanguages = await _languageRepository.GetAllLanguagesAsync();
-        IEnumerable<ContentType> allContentTypes = await _dictionaryRepository.GetAllContentTypes();
+        IEnumerable<ContentType> allContentTypes = await _dictionaryRepository.GetAllContentTypesAsync();
 
         IndexViewModelFactory viewModelFactory = new IndexViewModelFactory(results.Results, currentPageNumber,
-            numberOfPages, results.TotalUnpagedItems, maximumItems, sortBy, sortDirection, query,ietfLanguageTag, contentType, allLanguages, allContentTypes);
+            numberOfPages, results.TotalUnpagedItems, maximumItems, sortBy, sortDirection, query,ietfLanguageTag, contentTypeId, allLanguages, allContentTypes);
         IndexViewModel viewModel = viewModelFactory.Create();
         return View(viewModel);
         

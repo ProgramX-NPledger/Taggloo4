@@ -19,7 +19,7 @@ public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
     private readonly SortDirection? _sortDirection;
     private readonly string? _query;
     private readonly string? _ietfLanguageTag;
-    private readonly string? _contentTypeKey;
+    private readonly int? _contentTypeId;
     private readonly IEnumerable<Language> _allLanguages;
     private readonly IEnumerable<ContentType> _allContentTypes;
 
@@ -29,7 +29,7 @@ public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
     public IndexViewModelFactory(IEnumerable<DictionaryWithContentTypeAndLanguage> dictionariesWithContentTypeAndLanguage, int currentPageNumber,
         int numberOfPages, int totalUnpagedItems, int itemsPerPage, DictionariesSortColumn? sortBy, SortDirection? sortDirection,
         string? query,
-        string? ietfLanguageTag, string? contentTypeKey, IEnumerable<Language> allLanguages, IEnumerable<ContentType> allContentTypes)
+        string? ietfLanguageTag, int? contentTypeId, IEnumerable<Language> allLanguages, IEnumerable<ContentType> allContentTypes)
     {
         _dictionariesWithContentTypeAndLanguage = dictionariesWithContentTypeAndLanguage;
         _currentPageNumber = currentPageNumber;
@@ -40,9 +40,10 @@ public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
         _sortDirection = sortDirection;
         _query = query;
         _ietfLanguageTag = ietfLanguageTag;
-        _contentTypeKey = contentTypeKey;
+        _contentTypeId = contentTypeId;
         _allLanguages = allLanguages;
         _allContentTypes = allContentTypes;
+        
     }
 
     /// <inheritdoc cref="IViewModelFactory{TViewModelType}"/>
@@ -74,5 +75,6 @@ public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
         }.Union(_allLanguages.Select(q=>new SelectListItem(q.Name,q.IetfLanguageTag))).ToArray();
         viewModel.IetfLanguageTag = _ietfLanguageTag;
         viewModel.Query = _query;
+        viewModel.ContentType = _contentTypeId;
     }
 }

@@ -3,6 +3,7 @@ using Taggloo4.Contract;
 using Taggloo4.Contract.Criteria;
 using Taggloo4.Data.EntityFrameworkCore;
 using Taggloo4.Model;
+using Taggloo4.Model.Exceptions;
 
 namespace Taggloo4.Repository;
 
@@ -68,7 +69,7 @@ public class DictionaryRepository : RepositoryBase<Dictionary>, IDictionaryRepos
 
 		if (!string.IsNullOrWhiteSpace(criteria.IetfLanguageTag)) query = query.Where(q => q.IetfLanguageTag==criteria.IetfLanguageTag);
 		
-		if (!string.IsNullOrWhiteSpace(criteria.ContentTypeKey)) query = query.Where(q=>q.ContentTypeKey==criteria.ContentTypeKey);
+		if (criteria.ContentTypeId.HasValue) query = query.Where(q=>q.ContentTypeId==criteria.ContentTypeId.Value);
 		
 		PagedResults<DictionaryWithContentTypeAndLanguage> results = new PagedResults<DictionaryWithContentTypeAndLanguage>()
 		{
@@ -86,8 +87,8 @@ public class DictionaryRepository : RepositoryBase<Dictionary>, IDictionaryRepos
 				else query = query.OrderByDescending(q => q.DictionaryId);
 				break;
 			case DictionariesSortColumn.ContentType:
-				if (criteria.SortDirection == SortDirection.Ascending) query=query.OrderBy(q=>q.NameSinguler);
-				else query = query.OrderByDescending(q=>q.NameSinguler);
+				if (criteria.SortDirection == SortDirection.Ascending) query=query.OrderBy(q=>q.NameSingular);
+				else query = query.OrderByDescending(q=>q.NameSingular);
 				break;
 			case DictionariesSortColumn.Language:
 				if (criteria.SortDirection == SortDirection.Ascending) query=query.OrderBy(q=>q.LanguageName);
@@ -116,9 +117,15 @@ public class DictionaryRepository : RepositoryBase<Dictionary>, IDictionaryRepos
 		await DataContext.SaveChangesAsync();
 	}
 
-	/// <inheritdoc cref="IDictionaryRepository.GetAllContentTypes"/>
-	public async Task<IEnumerable<ContentType>> GetAllContentTypes()
+	/// <inheritdoc cref="IDictionaryRepository.GetAllContentTypesAsync"/>
+	public async Task<IEnumerable<ContentType>> GetAllContentTypesAsync()
 	{
 		return await DataContext.ContentTypes.OrderBy(q => q.NameSingular).ToArrayAsync();
+	}
+
+	/// <inheritdoc cref="IDictionaryRepository.GetDictionariesSummaryAsync"/>
+	public async Task<DictionariesSummary> GetDictionariesSummaryAsync()
+	{
+		return await DataContext.DictionariesSummaries.SingleAsync();
 	}
 }

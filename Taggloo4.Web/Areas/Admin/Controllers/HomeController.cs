@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Taggloo4.Contract;
 using Taggloo4.Model;
+using Taggloo4.Model.Exceptions;
 using Taggloo4.Web.Areas.Admin.ViewModels.Home;
 using Taggloo4.Web.Areas.Admin.ViewModels.Home.Factory;
 using Taggloo4.Web.Contract;
@@ -26,16 +27,19 @@ public class HomeController : Controller
 {
     private readonly ILanguageRepository _languageRepository;
     private readonly IWordRepository _wordRepository;
+    private readonly IDictionaryRepository _dictionaryRepository;
 
     /// <summary>
     /// Default constructor with injected properties.
     /// </summary>
     /// <param name="languageRepository">Implementation of <seealso cref="ILanguageRepository"/>.</param>
     /// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
-    public HomeController(ILanguageRepository languageRepository, IWordRepository wordRepository)
+    /// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
+    public HomeController(ILanguageRepository languageRepository, IWordRepository wordRepository, IDictionaryRepository dictionaryRepository)
     {
         _languageRepository = languageRepository;
         _wordRepository = wordRepository;
+        _dictionaryRepository = dictionaryRepository;
     }
     
     /// <summary>
@@ -46,6 +50,7 @@ public class HomeController : Controller
     {
         IEnumerable<Language> allLanguages = await _languageRepository.GetAllLanguagesAsync();
         WordsSummary wordsSummary = await _wordRepository.GetWordsSummaryAsync();
+        DictionariesSummary dictionariesSummary = await _dictionaryRepository.GetDictionariesSummaryAsync();
         
         int numberOfRecurringHangfireJobs;
         DateTime? latestHangfireJobExecution;
@@ -64,7 +69,12 @@ public class HomeController : Controller
             // }
         }
         
-        IndexViewModelFactory viewModelFactory = new IndexViewModelFactory(allLanguages,numberOfRecurringHangfireJobs,latestHangfireJobExecution,nextHangfireJobExecution,wordsSummary);
+        IndexViewModelFactory viewModelFactory = new IndexViewModelFactory(allLanguages,
+            numberOfRecurringHangfireJobs,
+            latestHangfireJobExecution,
+            nextHangfireJobExecution,
+            wordsSummary,
+            dictionariesSummary);
         IndexViewModel viewModel = viewModelFactory.Create();
         return View(viewModel);
     }
