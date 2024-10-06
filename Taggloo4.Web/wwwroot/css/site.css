@@ -77,8 +77,9 @@ div.admin div.panel fieldset { font-size: 90%;  }
 div.admin div.panel fieldset legend { font-size: 100%; color: #777;  margin: 15px 0 10px 0; text-transform: uppercase;  }
 div.admin div.panel fieldset p:first-of-type { margin: 20px 0 0 0; }
 div.admin div.panel fieldset p { margin: 5px 0 5px 0; padding: 0; }
-div.admin div.panel fieldset label { width: 20%;  }
-div.admin div.panel fieldset input { width: 79%; }
+div.admin div.panel fieldset label { width: 20%; vertical-align: top;  }
+div.admin div.panel fieldset input,
+div.admin div.panel fieldset textarea { width: 79% !important; }
 
 /* Bootstrap overrides */
 input.btn-primary,

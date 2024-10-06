@@ -78,8 +78,6 @@ public class Dictionary
 	/// </summary>
 	public ICollection<PhraseTranslation>? PhraseTranslations { get; set; }
 
-	// TODO: Make these not nullable in future migration
-	
 	/// <summary>
 	/// Identifier of Content Type
 	/// </summary>

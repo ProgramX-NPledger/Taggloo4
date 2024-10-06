@@ -36,7 +36,10 @@ public class DictionaryRepository : RepositoryBase<Dictionary>, IDictionaryRepos
 	/// <returns>The requested <seealso cref="Dictionary"/>, or <c>null</c> if no Dictionary could be found./</returns>
 	public async Task<Dictionary?> GetByIdAsync(int id)
 	{
-		return await DataContext.Dictionaries.SingleOrDefaultAsync(q => q.Id == id);
+		return await DataContext.Dictionaries
+			.Include(m=>m.Language)
+			.Include(m=>m.ContentType)
+			.SingleOrDefaultAsync(q => q.Id == id);
 	}
 
 	/// <summary>
