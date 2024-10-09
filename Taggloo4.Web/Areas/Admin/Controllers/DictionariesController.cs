@@ -89,7 +89,27 @@ public class DictionariesController : Controller
         DetailsViewModelFactory viewModelFactory = new DetailsViewModelFactory(dictionary);
         DetailsViewModel viewModel = viewModelFactory.Create();
         return View(viewModel);
-    
+    }
+
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null) return BadRequest();
+        
+        Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(id.Value);
+        if (dictionary == null) return NotFound();
+        
+        DeleteViewModelFactory viewModelFactory = new DeleteViewModelFactory(dictionary);
+        DeleteViewModel viewModel = viewModelFactory.Create();
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Delete(DeleteViewModel viewModel)
+    {
+        // verify code
+        
+        // add deletion as job for Hangfire
+        
     }
     
 }

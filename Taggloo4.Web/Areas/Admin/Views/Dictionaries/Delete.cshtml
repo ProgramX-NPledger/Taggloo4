@@ -1,0 +1,82 @@
+﻿@using Taggloo4.Contract.Criteria
+@model Taggloo4.Web.Areas.Admin.ViewModels.Dictionaries.DeleteViewModel
+
+@{
+    ViewBag.Title = Model.Name;
+    Layout = "_Layout";
+}
+
+<div class="admin">
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>@Model.Name</h2>
+            <p><a href="@Url.Action("Details","Dictionaries", new { id = Model.Id })">&lt; Back to Dictionary</a></p>
+            <div class="panel">
+                <h3>Delete Dictionary</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="panel">
+                <fieldset>
+                    <p>
+                        @Html.LabelFor(m=>m.Id)
+                        @Html.TextBoxFor(m=>m.Id, new { @readonly= "readonly" })
+                    </p>
+                    <p>
+                        @Html.LabelFor(m=>m.Name)
+                        @Html.TextBoxFor(m=>m.Name, new { @readonly= "readonly" })
+                    </p>
+                </fieldset>
+            </div>
+        </div>   
+        <div class="col-md-5">
+            <div class="panel">
+                <fieldset>
+                    <p>
+                        @Html.LabelFor(m=>m.ContentTypeNamePlural)
+                        @Html.TextBoxFor(m=>m.ContentTypeNamePlural, new { @readonly= "readonly" })
+                    </p>
+                    <p>
+                        @Html.LabelFor(m=>m.LanguageName)
+                        @Html.TextBoxFor(m=>m.LanguageName, new { @readonly= "readonly" })
+                    </p>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (Model.HasValidConfiguredDictionaryManager)
+            {
+                <p><strong>Are you sure you would like to delete this Dictionary?</strong></p>
+                <p>Deleting the Dictionary will result in all items in the Dictionary being deleted and
+                    a re-indexing of associated items will be required.</p>
+                <p>A deletion job will be added for background processing.</p>
+                <p>Enter the verification code <strong>@Model.VerificationCode</strong> to confirm deletion.</p>
+                <div class="panel">
+                    <fieldset>
+                        <p>
+                            @Html.LabelFor(m=>m.ConfirmVerificationCode)
+                            @Html.TextBoxFor(m=>m.ConfirmVerificationCode)
+                        </p>
+                    </fieldset>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger">
+                    <p><strong>There is no Dictionary Manager configured for this Dictionary</strong></p>
+                    <p>A Dictionary Manager is required to perform deletion of Dictionary data.</p>
+                </div>
+            }
+        </div>
+      
+    </div>
+   
+    
+</div>

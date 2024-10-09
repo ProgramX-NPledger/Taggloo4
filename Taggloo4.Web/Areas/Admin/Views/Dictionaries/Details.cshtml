@@ -12,12 +12,19 @@
         <div class="col-md-12">
             <h2>@Model.Name</h2>
             <p><a href="@Url.Action("Index","Dictionaries")">&lt; Back to Dictionaries</a></p>
+
+            <div class="toolbar">
+                <ul>
+                    <li><a href="@Url.Action("Delete","Dictionaries",new { id=Model.Id})">Delete</a></li>
+                </ul>
+            </div>
+            
             <div class="panel">
                 <h3>General</h3>
             </div>
         </div>
     </div>
-
+    
     <div class="row">
         <div class="col-md-7">
             <div class="panel">
@@ -62,44 +69,55 @@
     <div class="row">
         <div class="col-md-7">
             <div class="panel">
-                <div class="panel">
-                    <h3>Content Type</h3>
-                    <fieldset>
-                        <p>
-                            @Html.LabelFor(m=>m.ContentTypeId)
-                            @Html.TextBoxFor(m=>m.ContentTypeId, new { @readonly= "readonly" })
-                        </p>
-                        <p>
-                            @Html.LabelFor(m=>m.ContentTypeNamePlural)
-                            @Html.TextBoxFor(m=>m.ContentTypeNamePlural, new { @readonly= "readonly" })
-                        </p>
-                    </fieldset>
-                </div>
-            
+                <h3>Content Type</h3>
+                <fieldset>
+                    <p>
+                        @Html.LabelFor(m=>m.ContentTypeId)
+                        @Html.TextBoxFor(m=>m.ContentTypeId, new { @readonly= "readonly" })
+                    </p>
+                    <p>
+                        @Html.LabelFor(m=>m.ContentTypeNamePlural)
+                        @Html.TextBoxFor(m=>m.ContentTypeNamePlural, new { @readonly= "readonly" })
+                    </p>
+                </fieldset>
             </div>
         </div>
 
         <div class="col-md-5">
             <div class="panel">
-                <div class="panel">
-                    <h3>Language</h3>
-                    <fieldset>
-                        <p>
-                            @Html.LabelFor(m=>m.IetfLanguageTag)
-                            @Html.TextBoxFor(m=>m.IetfLanguageTag, new { @readonly= "readonly" })
-                        </p>
-                        <p>
-                            @Html.LabelFor(m=>m.LanguageName)
-                            @Html.TextBoxFor(m=>m.LanguageName, new { @readonly= "readonly" })
-                        </p>
-                    </fieldset>
-                </div>
+                <h3>Language</h3>
+                <fieldset>
+                    <p>
+                        @Html.LabelFor(m=>m.IetfLanguageTag)
+                        @Html.TextBoxFor(m=>m.IetfLanguageTag, new { @readonly= "readonly" })
+                    </p>
+                    <p>
+                        @Html.LabelFor(m=>m.LanguageName)
+                        @Html.TextBoxFor(m=>m.LanguageName, new { @readonly= "readonly" })
+                    </p>
+                </fieldset>
             </div>
-
-
         </div>
+    </div>
 
-      
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="panel">
+                <h3>Dictionary Manager</h3>
+                <p>A Dictionary Manager provides additional management functions for a Dictionary and its contents.</p>
+                <fieldset>
+                    <p>
+                        @Html.LabelFor(m=>m.DictionaryManagerDotNetAssemblyName)
+                        @Html.TextBoxFor(m=>m.DictionaryManagerDotNetAssemblyName, new { @readonly= "readonly" })
+                    </p>
+                    <p>
+                        @Html.LabelFor(m=>m.DictionaryManagerDotNetTypeName)
+                        @Html.TextBoxFor(m=>m.DictionaryManagerDotNetTypeName, new { @readonly= "readonly" })
+                    </p>
+                </fieldset>
+            </div>
+        </div>
     </div>
    
     

@@ -94,7 +94,18 @@ public class DetailsViewModel
     /// </summary>
     [Display(Name="ASP.NET API Controller")]
     public string? ContentTypeController { get; set; }
-    
+
+    /// <summary>
+    /// Name of .NET assembly with implementation of <seealso cref="IDictionaryManagerFactory"/>.
+    /// </summary>
+    [Display(Name="Assembly")]
+    public string? DictionaryManagerDotNetAssemblyName { get; set; }
+
+    /// <summary>
+    /// Name of .NET type for implementation of <seealso cref="IDicitonaryManagerFactory"/>.
+    /// </summary>
+    [Display(Name="Type")]
+    public string? DictionaryManagerDotNetTypeName { get; set; }
     
     
 }

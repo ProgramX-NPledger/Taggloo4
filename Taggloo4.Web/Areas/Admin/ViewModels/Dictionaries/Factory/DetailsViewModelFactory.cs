@@ -57,5 +57,7 @@ public class DetailsViewModelFactory : IViewModelFactory<DetailsViewModel>
         viewModel.ContentTypeController = _dictionary.ContentType?.Controller ?? "(no controller)";
         viewModel.ContentTypeNameSingular = _dictionary.ContentType?.NameSingular ?? "(no name)";
         viewModel.ContentTypeNamePlural = _dictionary.ContentType?.NamePlural ?? "(no name)";
+        viewModel.DictionaryManagerDotNetAssemblyName = _dictionary?.DictionaryManagerDotNetAssemblyName ?? "(no dictionary manager)";
+        viewModel.DictionaryManagerDotNetTypeName = _dictionary?.DictionaryManagerDotNetTypeName ?? "(no dictionary manager)";
     }
 }
