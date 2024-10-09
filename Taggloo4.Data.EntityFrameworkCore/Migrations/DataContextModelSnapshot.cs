@@ -332,6 +332,14 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
+                    b.Property<string>("DictionaryManagerDotNetAssemblyName")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("DictionaryManagerDotNetTypeName")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
                     b.Property<string>("IetfLanguageTag")
                         .IsRequired()
                         .HasColumnType("nvarchar(16)");
