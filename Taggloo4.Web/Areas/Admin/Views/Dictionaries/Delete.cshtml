@@ -68,6 +68,9 @@
                     @using(Html.BeginForm())
                     {
                         @Html.HiddenFor(m=>m.VerificationCode)
+                        @Html.HiddenFor(m=>m.Name)
+            @Html.HiddenFor(m=>m.LanguageName)
+            
                         <p><strong>Are you sure you would like to delete this Dictionary?</strong></p>
                         <p>Deleting the Dictionary will result in all items in the Dictionary being deleted and
                             a re-indexing of associated items will be required.</p>
