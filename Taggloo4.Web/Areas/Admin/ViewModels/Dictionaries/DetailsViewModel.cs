@@ -102,10 +102,14 @@ public class DetailsViewModel
     public string? DictionaryManagerDotNetAssemblyName { get; set; }
 
     /// <summary>
-    /// Name of .NET type for implementation of <seealso cref="IDicitonaryManagerFactory"/>.
+    /// Name of .NET type for implementation of <seealso cref="IDictionaryManagerFactory"/>.
     /// </summary>
     [Display(Name="Type")]
     public string? DictionaryManagerDotNetTypeName { get; set; }
-    
-    
+
+    /// <summary>
+    /// Whether the user is permitted to Delete this Dictionary.
+    /// </summary>
+    public bool IsPermittedToDelete { get; set; } = false;
+
 }

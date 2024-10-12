@@ -35,12 +35,27 @@ public class DeleteViewModel
     [Display(Name = "Content Type")]
     public string? ContentTypeNamePlural { get; set; }
 
+    /// <summary>
+    /// Whether the Dictionary has a correctly configured Dictionary Manager, which is required for deletion operations.
+    /// </summary>
     public bool HasValidConfiguredDictionaryManager { get; set; }
 
-    public string VerificationCode { get; set; }
+    /// <summary>
+    /// Random verification code generated to require users to re-enter and avoid erroneously deleting data.
+    /// </summary>
+    public string? VerificationCode { get; set; }
     
+    /// <summary>
+    /// Confirmed verification code by user.
+    /// </summary>
     [Required]
     [MaxLength(32)]
     [Display(Name = "Verification Code")]
-    public string ConfirmVerificationCode { get; set; }
+    public string? ConfirmVerificationCode { get; set; }
+
+    /// <summary>
+    /// Whether the deletion job was successfully submitted.
+    /// </summary>
+    public bool DeleteJobSubmittedSuccessfully { get; set; }
+    
 }

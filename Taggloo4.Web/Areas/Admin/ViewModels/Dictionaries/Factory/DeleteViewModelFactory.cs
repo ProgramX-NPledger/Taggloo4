@@ -27,6 +27,7 @@ public class DeleteViewModelFactory : IViewModelFactory<DeleteViewModel>
         {
             Id = _dictionary.Id,
             Name = _dictionary.Name,
+            VerificationCode = Guid.NewGuid().ToString().Substring(0, 7),
             LanguageName = _dictionary.Language?.Name ?? "(no name)",
             ContentTypeNamePlural = _dictionary.ContentType?.NamePlural,
             HasValidConfiguredDictionaryManager = !string.IsNullOrEmpty(_dictionary.DictionaryManagerDotNetAssemblyName) && !string.IsNullOrWhiteSpace(_dictionary.DictionaryManagerDotNetTypeName)
@@ -46,7 +47,6 @@ public class DeleteViewModelFactory : IViewModelFactory<DeleteViewModel>
         viewModel.HasValidConfiguredDictionaryManager =
             !string.IsNullOrEmpty(_dictionary.DictionaryManagerDotNetAssemblyName) &&
             !string.IsNullOrWhiteSpace(_dictionary.DictionaryManagerDotNetTypeName);
-        viewModel.VerificationCode = Guid.NewGuid().ToString().Substring(0, 7);
 
     }
 }

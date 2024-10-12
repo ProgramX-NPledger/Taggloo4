@@ -51,29 +51,53 @@
 
     <div class="row">
         <div class="col-md-12">
-            @if (Model.HasValidConfiguredDictionaryManager)
+            @if (Model.DeleteJobSubmittedSuccessfully)
             {
-                <p><strong>Are you sure you would like to delete this Dictionary?</strong></p>
-                <p>Deleting the Dictionary will result in all items in the Dictionary being deleted and
-                    a re-indexing of associated items will be required.</p>
-                <p>A deletion job will be added for background processing.</p>
-                <p>Enter the verification code <strong>@Model.VerificationCode</strong> to confirm deletion.</p>
-                <div class="panel">
-                    <fieldset>
-                        <p>
-                            @Html.LabelFor(m=>m.ConfirmVerificationCode)
-                            @Html.TextBoxFor(m=>m.ConfirmVerificationCode)
-                        </p>
-                    </fieldset>
+                <div class="alert alert-success">
+                    <p><strong>Dictionary deletion submitted for processing</strong></p>
+                    <p>The deletion of the Dictionary has been successfully submitted for processing. 
+                        This will be a long-running process and may require re-indexing. Monitor the Hangfire
+                        Dashboard to check the status of the job.</p>
+                    <p><a href="@Url.Action("Index","Dictionaries")">&lt; Back to Dictionaries</a></p>
                 </div>
             }
             else
             {
-                <div class="alert alert-danger">
-                    <p><strong>There is no Dictionary Manager configured for this Dictionary</strong></p>
-                    <p>A Dictionary Manager is required to perform deletion of Dictionary data.</p>
-                </div>
+                if (Model.HasValidConfiguredDictionaryManager)
+                {
+                    @using(Html.BeginForm())
+                    {
+                        @Html.HiddenFor(m=>m.VerificationCode)
+                        <p><strong>Are you sure you would like to delete this Dictionary?</strong></p>
+                        <p>Deleting the Dictionary will result in all items in the Dictionary being deleted and
+                            a re-indexing of associated items will be required.</p>
+                        <p>A deletion job will be added for background processing.</p>
+                        <p>Enter the verification code <strong>@Model.VerificationCode</strong> to confirm deletion.</p>
+                        <div class="panel">
+                            <fieldset>
+                                <p>
+                                    @Html.LabelFor(m => m.ConfirmVerificationCode)
+                                    @Html.TextBoxFor(m => m.ConfirmVerificationCode)
+                                    @Html.ValidationMessageFor(m=>m.ConfirmVerificationCode)
+                                </p>
+                                <p>
+                                    <input type="submit" value="Delete" />
+                                </p>
+                            </fieldset>
+                        </div>
+
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        <p><strong>There is no Dictionary Manager configured for this Dictionary</strong></p>
+                        <p>A Dictionary Manager is required to perform deletion of Dictionary data.</p>
+                    </div>
+                }
             }
+                
+         
         </div>
       
     </div>

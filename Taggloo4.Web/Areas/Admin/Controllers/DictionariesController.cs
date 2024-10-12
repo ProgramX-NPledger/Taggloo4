@@ -86,7 +86,9 @@ public class DictionariesController : Controller
         Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(id.Value);
         if (dictionary == null) return NotFound();
     
-        DetailsViewModelFactory viewModelFactory = new DetailsViewModelFactory(dictionary);
+        bool isPermittedToDelete = User.IsInRole("administrator");
+        
+        DetailsViewModelFactory viewModelFactory = new DetailsViewModelFactory(dictionary,isPermittedToDelete);
         DetailsViewModel viewModel = viewModelFactory.Create();
         return View(viewModel);
     }
@@ -106,10 +108,24 @@ public class DictionariesController : Controller
     [HttpPost]
     public async Task<IActionResult> Delete(DeleteViewModel viewModel)
     {
-        // verify code
+        Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(viewModel.Id);
+        if (dictionary == null) return NotFound();
         
-        // add deletion as job for Hangfire
+        DeleteViewModelFactory viewModelFactory = new DeleteViewModelFactory(dictionary);
+        viewModelFactory.Configure(ref viewModel);
+
+        bool isPermittedToDelete = User.IsInRole("administrator");
+        if (!isPermittedToDelete) ModelState.AddModelError("", "You are not permitted to delete this item.");
         
+        if (viewModel.VerificationCode != viewModel.ConfirmVerificationCode) ModelState.AddModelError("ConfirmVerificationCode", "Verification code does not match");
+
+        if (ModelState.IsValid)
+        {
+            // add deletion as job for Hangfire
+            viewModel.DeleteJobSubmittedSuccessfully = true;
+        }
+        
+        return View(viewModel);
     }
     
 }
