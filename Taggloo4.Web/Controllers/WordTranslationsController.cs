@@ -47,6 +47,53 @@ public class WordTranslationsController : BaseApiController
 		WordTranslation? wordTranslation = await _translationRepository.GetWordTranslationByIdAsync(id);
 		if (wordTranslation == null) return NotFound();
 
+		List<Link> links = new List<Link>()
+		{
+			new Link()
+			{
+				Action = "get",
+				Rel = "self",
+				HRef = $"{GetBaseApiPath()}/wordtranslations/{wordTranslation.Id}",
+				Types = new[] { JSON_MIME_TYPE }
+			},
+			new Link()
+			{
+				Action = "get",
+				Rel = "dictionary",
+				HRef = $"{GetBaseApiPath()}/dictionaries/{wordTranslation.DictionaryId}",
+				Types = new[] { JSON_MIME_TYPE }
+			},
+			new Link()
+			{
+				Action = "get",
+				Rel = "fromWord",
+				HRef = $"{GetBaseApiPath()}/words/{wordTranslation.FromWordId}",
+				Types = new[] { JSON_MIME_TYPE }
+			},
+			new Link()
+			{
+				Action = "get",
+				Rel = "toWord",
+				HRef = $"{GetBaseApiPath()}/words/{wordTranslation.ToWordId}",
+				Types = new[] { JSON_MIME_TYPE }
+			}
+		};
+
+		if (wordTranslation.FromWord != null && wordTranslation.FromWord.Dictionaries!=null)
+		{
+			foreach (Dictionary dictionary in wordTranslation.FromWord.Dictionaries)
+			{
+				links.Add(new Link()
+				{
+					Action = "get",
+					Rel = "wordDictionary",
+					HRef = $"{GetBaseApiPath()}/dictionaries/{dictionary.Id}",
+					Types = new[] { JSON_MIME_TYPE }
+				});
+			}
+			
+		}
+		
 		return Ok(new GetWordTranslationResultItem()
 		{
 			Id = wordTranslation.Id,
@@ -56,40 +103,8 @@ public class WordTranslationsController : BaseApiController
 			DictionaryId = wordTranslation.DictionaryId,
 			FromWord = wordTranslation.FromWord?.TheWord,
 			FromWordId = wordTranslation.FromWordId,
-			// TODO: Multiple Dictionaries
-			//FromIetfLanguageTag = wordTranslation.FromWord?.Dictionary?.IetfLanguageTag,
 			ToWordId = wordTranslation.ToWordId,
-			Links = new[]
-			{
-				new Link()
-				{
-					Action = "get",
-					Rel = "self",
-					HRef = $"{GetBaseApiPath()}/wordtranslations/{wordTranslation.Id}",
-					Types = new[] { JSON_MIME_TYPE }
-				},
-				new Link()
-				{
-					Action = "get",
-					Rel = "dictionary",
-					HRef = $"{GetBaseApiPath()}/dictionaries/{wordTranslation.DictionaryId}",
-					Types = new[] { JSON_MIME_TYPE }
-				},
-				new Link()
-				{
-					Action = "get",
-					Rel = "fromWord",
-					HRef = $"{GetBaseApiPath()}/words/{wordTranslation.FromWordId}",
-					Types = new[] { JSON_MIME_TYPE }
-				},
-				new Link()
-				{
-					Action="get",
-					Rel = "toWord",
-					HRef = $"{GetBaseApiPath()}/words/{wordTranslation.ToWordId}",
-					Types = new[] { JSON_MIME_TYPE }
-				}
-			}
+			Links = links
 		});
 	}
 
