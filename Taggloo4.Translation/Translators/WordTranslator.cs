@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Taggloo4.Contract.Translation;
 using Taggloo4.Data.EntityFrameworkCore;
 using Taggloo4.Model;
@@ -34,13 +35,13 @@ public class WordTranslator : ITranslator
     public TranslationResults Translate(TranslationRequest translationRequest)
     {
         WordTranslation[] wordTranslations = _entityFrameworkCoreDatabaseContext.WordTranslations
-            .Include(m => m.FromWord!.Dictionary)
-            .Include(m => m.ToWord!.Dictionary)
+            .Include(m => m.FromWord!.Dictionaries)
+            .Include(m => m.ToWord!.Dictionaries)
             .AsNoTracking()
             .Where(q =>
                 q.FromWord!.TheWord==translationRequest.Query &&
-                q.FromWord!.Dictionary!.IetfLanguageTag==translationRequest.FromLanguageCode &&
-                q.ToWord!.Dictionary!.IetfLanguageTag==translationRequest.ToLanguageCode
+                q.FromWord!.Dictionaries!.Select(q=>q.IetfLanguageTag).Contains(translationRequest.FromLanguageCode) &&
+                q.ToWord!.Dictionaries!.Select(q=>q.IetfLanguageTag).Contains(translationRequest.ToLanguageCode)
             ).OrderBy(q => q.ToWord!.TheWord)
             .Skip(translationRequest.OrdinalOfFirstResult)
             .Take(translationRequest.MaximumNumberOfResults)
@@ -69,12 +70,14 @@ public class WordTranslator : ITranslator
         {
             // get count of available items to allow paging
             translationResults.NumberOfAvailableItemsBeforePaging = _entityFrameworkCoreDatabaseContext.WordTranslations
-                .Include(m => m.FromWord!.Dictionary)
-                .Include(m => m.ToWord!.Dictionary)
+                .Include(m => m.FromWord!.Dictionaries)
+                .Include(m => m.ToWord!.Dictionaries)
                 .AsNoTracking()
-                .Count(q => q.FromWord!.TheWord==translationRequest.Query &&
-                                           q.FromWord!.Dictionary!.IetfLanguageTag==translationRequest.FromLanguageCode &&
-                                           q.ToWord!.Dictionary!.IetfLanguageTag==translationRequest.ToLanguageCode);
+                .Count(q => q.FromWord!.TheWord == translationRequest.Query &&
+                            q.FromWord!.Dictionaries!.Select(q => q.IetfLanguageTag)
+                                .Contains(translationRequest.FromLanguageCode) &&
+                            q.ToWord!.Dictionaries!.Select(q => q.IetfLanguageTag)
+                                .Contains(translationRequest.ToLanguageCode));
         }
 
         return translationResults;

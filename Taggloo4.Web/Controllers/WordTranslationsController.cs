@@ -56,7 +56,8 @@ public class WordTranslationsController : BaseApiController
 			DictionaryId = wordTranslation.DictionaryId,
 			FromWord = wordTranslation.FromWord?.TheWord,
 			FromWordId = wordTranslation.FromWordId,
-			FromIetfLanguageTag = wordTranslation.FromWord?.Dictionary?.IetfLanguageTag,
+			// TODO: Multiple Dictionaries
+			//FromIetfLanguageTag = wordTranslation.FromWord?.Dictionary?.IetfLanguageTag,
 			ToWordId = wordTranslation.ToWordId,
 			Links = new[]
 			{

@@ -38,6 +38,7 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 	/// <returns>A collection of matching <seealso cref="Word"/>s within the <seealso cref="Dictionary"/>.</returns>
 	public async Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId, string? externalId)
 	{
+		// TODO: consider Dictionaries
 		IQueryable<Word> query = DataContext.Words
 			.Include("Translations")
 			.Include("AppearsInPhrases")
@@ -49,10 +50,10 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 			query = query.Where(q => q.TheWord == word);
 		}
 
-		if (dictionaryId.HasValue)
-		{
-			query = query.Where(q => q.DictionaryId == dictionaryId.Value);
-		}
+		// if (dictionaryId.HasValue)
+		// {
+		// 	query = query.Where(q => q.DictionaryId == dictionaryId.Value);
+		// }
 
 		if (!string.IsNullOrWhiteSpace(externalId))
 		{
