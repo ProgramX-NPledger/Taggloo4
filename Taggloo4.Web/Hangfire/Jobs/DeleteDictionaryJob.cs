@@ -1,5 +1,6 @@
 ﻿using Taggloo4.Contract;
 using Taggloo4.Model;
+using Taggloo4.Translation;
 
 namespace Taggloo4.Web.Hangfire.Jobs;
 
@@ -32,7 +33,11 @@ public class DeleteDictionaryJob
 
         try
         {
-            _dictionaryRepository.Delete(dictionaryId).Wait();
+            // get the Dictionary Manager for the Dictionary
+            IDictionaryManager dictionaryManager = DictionaryManagerFactory.CreateDictionaryManager(dictionary);
+            
+            // have the Dictionary Manager delete the Dictionary
+            dictionaryManager.DeleteDictionaryAndContentsAsync().Wait();
         }
         catch (Exception e)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Taggloo4.Contract;
 using Taggloo4.Contract.Criteria;
@@ -7,6 +8,7 @@ using Taggloo4.Utility;
 using Taggloo4.Web.Areas.Admin.ViewModels.Dictionaries;
 using Taggloo4.Web.Areas.Admin.ViewModels.Dictionaries.Factory;
 using Taggloo4.Web.Constants;
+using Taggloo4.Web.Hangfire.Jobs;
 
 namespace Taggloo4.Web.Areas.Admin.Controllers;
 
@@ -25,6 +27,7 @@ public class DictionariesController : Controller
     private readonly IDictionaryRepository _dictionaryRepository;
     private readonly ILanguageRepository _languageRepository;
     private readonly IConfiguration _configuration;
+    private readonly IBackgroundJobClient _backgroundJobClient;
 
     /// <summary>
     /// Default constructor with injected properties.
@@ -33,12 +36,18 @@ public class DictionariesController : Controller
     /// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
     /// <param name="languageRepository">Implementation of <seealso cref="ILanguageRepository"/>.</param>
     /// <param name="configuration">Implementation of ASP.NET configuration API.</param>
-    public DictionariesController(IWordRepository wordRepository, IDictionaryRepository dictionaryRepository, ILanguageRepository languageRepository, IConfiguration configuration)
+    /// <param name="backgroundJobClient">Implementation of <seealso cref="IBackgroundJobClient"/>.</param>
+    public DictionariesController(IWordRepository wordRepository, 
+        IDictionaryRepository dictionaryRepository, 
+        ILanguageRepository languageRepository, 
+        IConfiguration configuration,
+        IBackgroundJobClient backgroundJobClient)
     {
         _wordRepository = wordRepository;
         _dictionaryRepository = dictionaryRepository;
         _languageRepository = languageRepository;
         _configuration = configuration;
+        _backgroundJobClient = backgroundJobClient;
     }
     
     /// <summary>
@@ -123,6 +132,11 @@ public class DictionariesController : Controller
         {
             // add deletion as job for Hangfire
             viewModel.DeleteJobSubmittedSuccessfully = true;
+            
+            _backgroundJobClient.Enqueue<DeleteDictionaryJob>(job =>
+                job.DeleteDictionary(dictionary.Id)
+            );
+            
         }
         
         return View(viewModel);

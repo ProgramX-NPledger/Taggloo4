@@ -12,7 +12,7 @@ public class DictionaryManagerFactory
     /// </summary>
     /// <param name="dictionary">The Dictionary to create a manager for.</param>
     /// <returns>An implementation of <seealso cref="IDictionaryManager"/></returns>
-    IDictionaryManager CreateDictionaryManager(Dictionary dictionary)
+    public static IDictionaryManager CreateDictionaryManager(Dictionary dictionary)
     {
         if (dictionary is null) throw new ArgumentNullException(nameof(dictionary));
         if (string.IsNullOrEmpty(dictionary.DictionaryManagerDotNetAssemblyName))
@@ -34,12 +34,12 @@ public class DictionaryManagerFactory
         object? instance = Activator.CreateInstance(type);
         if (instance is null) throw new InvalidOperationException($"Failed to create instance of type '{type}'.");
 
-        if (instance is IDictionary)
+        if (instance is IDictionaryManager)
         {
             IDictionaryManager dictionaryManager = (IDictionaryManager)instance;
             return dictionaryManager;
         }
         
-        throw new InvalidOperationException($"Type '{type}' does not implement IDictionary");
+        throw new InvalidOperationException($"Type '{type}' does not implement {nameof(IDictionaryManager)}");
     }
 }
