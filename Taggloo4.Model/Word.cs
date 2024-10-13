@@ -34,18 +34,6 @@ public class Word
 	/// </summary>
 	public required string CreatedOn { get; set; }
 
-	// /// <summary>
-	// /// The owning <seealso cref="Dictionary"/>.
-	// /// </summary>
-	// public Dictionary? Dictionary { get; set; }
-	
-	// TODO: Remove this after migration
-	/// <summary>
-	/// Identifier of owning <seealso cref="Dictionary"/>.
-	/// </summary>
-	public int DictionaryId { get; set; }
-
-	
 	/// <summary>
 	/// The owning <seealso cref="Dictionary"/>.
 	/// </summary>

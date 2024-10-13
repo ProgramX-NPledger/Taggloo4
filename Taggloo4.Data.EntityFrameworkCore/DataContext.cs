@@ -218,18 +218,10 @@ public class DataContext : IdentityDbContext<AppUser,
 
 	private void ConfigreWords(ModelBuilder builder)
 	{
-		// TODO: Remove one:many relationship following migration
-		// builder.Entity<Dictionary>()
-		// 	.HasMany(d => d.Words)
-		// 	.WithOne(w => w.Dictionary)
-		// 	.HasForeignKey(w => w.DictionaryId)
-		// 	.IsRequired();
-
 		builder.Entity<Word>()
 			.HasMany(word => word.Dictionaries)
 			.WithMany(dictionary => dictionary.Words)
 			.RightNavigation.ForeignKey!.DeleteBehavior = DeleteBehavior.Restrict; // do not delete dictionary if word is deleted
-			
 	}
 
 	private void ConfigureLanguages(ModelBuilder builder)
