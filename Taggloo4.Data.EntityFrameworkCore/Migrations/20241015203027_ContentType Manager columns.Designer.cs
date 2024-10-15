@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taggloo4.Data.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using Taggloo4.Data.EntityFrameworkCore;
 namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241015203027_ContentType Manager columns")]
+    partial class ContentTypeManagercolumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -297,8 +300,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         {
                             Id = 1,
                             ContentTypeKey = "Word",
-                            ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
-                            ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.WordsContentTypeManager",
                             Controller = "words",
                             NamePlural = "Words",
                             NameSingular = "Word"
@@ -307,8 +308,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         {
                             Id = 2,
                             ContentTypeKey = "WordTranslation",
-                            ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
-                            ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.WordTranslationsContentTypeManager",
                             Controller = "wordTranslations",
                             NamePlural = "Word Translations",
                             NameSingular = "Word Translation"
@@ -317,8 +316,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         {
                             Id = 3,
                             ContentTypeKey = "PhraseTranslation",
-                            ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
-                            ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhraseTranslationsContentTypeManager",
                             Controller = "phraseTranslations",
                             NamePlural = "Phrase Translations",
                             NameSingular = "Phrase Translation"
@@ -327,8 +324,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         {
                             Id = 4,
                             ContentTypeKey = "Phrase",
-                            ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
-                            ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhrasesContentTypeManager",
                             Controller = "phrases",
                             NamePlural = "Phrases",
                             NameSingular = "Phrase"
@@ -362,6 +357,14 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
+
+                    b.Property<string>("DictionaryManagerDotNetAssemblyName")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("DictionaryManagerDotNetTypeName")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("IetfLanguageTag")
                         .IsRequired()

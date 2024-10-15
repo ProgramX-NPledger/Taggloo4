@@ -59,8 +59,16 @@ public class DetailsViewModelFactory : IViewModelFactory<DetailsViewModel>
         viewModel.ContentTypeController = _dictionary.ContentType?.Controller ?? "(no controller)";
         viewModel.ContentTypeNameSingular = _dictionary.ContentType?.NameSingular ?? "(no name)";
         viewModel.ContentTypeNamePlural = _dictionary.ContentType?.NamePlural ?? "(no name)";
-        viewModel.DictionaryManagerDotNetAssemblyName = _dictionary?.DictionaryManagerDotNetAssemblyName ?? "(no dictionary manager)";
-        viewModel.DictionaryManagerDotNetTypeName = _dictionary?.DictionaryManagerDotNetTypeName ?? "(no dictionary manager)";
+        if (_dictionary.ContentType == null)
+        {
+            viewModel.ContentTypeManagerDotNetAssemblyName = "(no Content Type manager)";
+            viewModel.ContentTypeManagerDotNetTypeName = "(no Content Type manager)";
+        }
+        else
+        {
+            viewModel.ContentTypeManagerDotNetAssemblyName = _dictionary.ContentType.ContentTypeManagerDotNetAssemblyName ?? "(no Content Type manager)";
+            viewModel.ContentTypeManagerDotNetTypeName = _dictionary.ContentType.ContentTypeManagerDotNetTypeName ?? "(no Content Type manager)";
+        }
         viewModel.IsPermittedToDelete = _isPermittedToDelete;
     }
 }

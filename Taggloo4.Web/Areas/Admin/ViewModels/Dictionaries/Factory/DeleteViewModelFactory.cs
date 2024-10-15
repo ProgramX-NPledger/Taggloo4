@@ -30,7 +30,9 @@ public class DeleteViewModelFactory : IViewModelFactory<DeleteViewModel>
             VerificationCode = Guid.NewGuid().ToString().Substring(0, 7),
             LanguageName = _dictionary.Language?.Name ?? "(no name)",
             ContentTypeNamePlural = _dictionary.ContentType?.NamePlural,
-            HasValidConfiguredDictionaryManager = !string.IsNullOrEmpty(_dictionary.DictionaryManagerDotNetAssemblyName) && !string.IsNullOrWhiteSpace(_dictionary.DictionaryManagerDotNetTypeName)
+            HasValidConfiguredContentTypeManager = _dictionary.ContentType!=null && 
+                                                   !string.IsNullOrEmpty(_dictionary.ContentType.ContentTypeManagerDotNetAssemblyName) && 
+                                                   !string.IsNullOrWhiteSpace(_dictionary.ContentType.ContentTypeManagerDotNetTypeName)
         };
         Configure(ref viewModel);
 
@@ -44,9 +46,10 @@ public class DeleteViewModelFactory : IViewModelFactory<DeleteViewModel>
         viewModel.Name = _dictionary.Name;
         viewModel.LanguageName = _dictionary.Language?.Name ?? "(no name)";
         viewModel.ContentTypeNamePlural = _dictionary.ContentType?.NamePlural ?? "(no name)";
-        viewModel.HasValidConfiguredDictionaryManager =
-            !string.IsNullOrEmpty(_dictionary.DictionaryManagerDotNetAssemblyName) &&
-            !string.IsNullOrWhiteSpace(_dictionary.DictionaryManagerDotNetTypeName);
+        viewModel.HasValidConfiguredContentTypeManager =
+            _dictionary.ContentType!=null &&
+            !string.IsNullOrEmpty(_dictionary.ContentType.ContentTypeManagerDotNetAssemblyName) &&
+            !string.IsNullOrWhiteSpace(_dictionary.ContentType.ContentTypeManagerDotNetTypeName);
 
     }
 }

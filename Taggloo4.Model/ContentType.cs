@@ -39,4 +39,17 @@ public class ContentType
     /// <seealso cref="Dictionary"/> items using this Content Type.
     /// </summary>
     public ICollection<Dictionary> Dictionaries { get; set; } = [];
+    
+    
+    /// <summary>
+    /// Name of .NET assembly with implementation of <seealso cref="IContentTypeManagerFactory"/>.
+    /// </summary>
+    [MaxLength(128)]
+    public string? ContentTypeManagerDotNetAssemblyName { get; set; }
+
+    /// <summary>
+    /// Name of .NET type for implementation of <seealso cref="IContentTypeManagerFactory"/>.
+    /// </summary>
+    [MaxLength(128)]
+    public string? ContentTypeManagerDotNetTypeName { get; set; }
 }

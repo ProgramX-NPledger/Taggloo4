@@ -88,17 +88,6 @@ public class Dictionary
 	/// </summary>
 	public ContentType? ContentType { get; set; }
 
-	/// <summary>
-	/// Name of .NET assembly with implementation of <seealso cref="IDictionaryManagerFactory"/>.
-	/// </summary>
-	[MaxLength(128)]
-	public string? DictionaryManagerDotNetAssemblyName { get; set; }
-
-	/// <summary>
-	/// Name of .NET type for implementation of <seealso cref="IDicitonaryManagerFactory"/>.
-	/// </summary>
-	[MaxLength(128)]
-	public string? DictionaryManagerDotNetTypeName { get; set; }
 	
 	
 }

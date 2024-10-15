@@ -38,7 +38,7 @@ public class DeleteViewModel
     /// <summary>
     /// Whether the Dictionary has a correctly configured Dictionary Manager, which is required for deletion operations.
     /// </summary>
-    public bool HasValidConfiguredDictionaryManager { get; set; }
+    public bool HasValidConfiguredContentTypeManager { get; set; }
 
     /// <summary>
     /// Random verification code generated to require users to re-enter and avoid erroneously deleting data.

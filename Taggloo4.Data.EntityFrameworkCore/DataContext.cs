@@ -258,6 +258,8 @@ public class DataContext : IdentityDbContext<AppUser,
 			ContentTypeKey = "Word",
 			NamePlural = "Words",
 			NameSingular = "Word",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.WordsContentTypeManager",
 		});
 		builder.Entity<ContentType>().HasData(new ContentType()
 		{
@@ -266,6 +268,8 @@ public class DataContext : IdentityDbContext<AppUser,
 			ContentTypeKey = "WordTranslation",
 			NamePlural = "Word Translations",
 			NameSingular = "Word Translation",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.WordTranslationsContentTypeManager",
 		});
 		builder.Entity<ContentType>().HasData(new ContentType()
 		{
@@ -274,6 +278,8 @@ public class DataContext : IdentityDbContext<AppUser,
 			ContentTypeKey = "PhraseTranslation",
 			NamePlural = "Phrase Translations",
 			NameSingular = "Phrase Translation",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhraseTranslationsContentTypeManager",
 		});
 		builder.Entity<ContentType>().HasData(new ContentType()
 		{
@@ -282,6 +288,8 @@ public class DataContext : IdentityDbContext<AppUser,
 			ContentTypeKey = "Phrase",
 			NamePlural = "Phrases",
 			NameSingular = "Phrase",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhrasesContentTypeManager",
 		});
 	}
 

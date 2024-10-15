@@ -99,13 +99,13 @@ public class DetailsViewModel
     /// Name of .NET assembly with implementation of <seealso cref="IDictionaryManagerFactory"/>.
     /// </summary>
     [Display(Name="Assembly")]
-    public string? DictionaryManagerDotNetAssemblyName { get; set; }
+    public string? ContentTypeManagerDotNetAssemblyName { get; set; }
 
     /// <summary>
     /// Name of .NET type for implementation of <seealso cref="IDictionaryManagerFactory"/>.
     /// </summary>
     [Display(Name="Type")]
-    public string? DictionaryManagerDotNetTypeName { get; set; }
+    public string? ContentTypeManagerDotNetTypeName { get; set; }
 
     /// <summary>
     /// Whether the user is permitted to Delete this Dictionary.
