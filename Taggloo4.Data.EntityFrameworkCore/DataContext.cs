@@ -107,34 +107,12 @@ public class DataContext : IdentityDbContext<AppUser,
 		
 		ConfigureDictionaries(builder);
 		SeedContentTypes(builder);
-	
+		ConfigureIdentity(builder);
+		ConfigureLanguages(builder);
+		ConfigureWords(builder);
 		
-		// ASP.NET identity
-
-		builder.Entity<AppUser>()
-			.HasMany(ur => ur.UserRoles)
-			.WithOne(u => u.User)
-			.HasForeignKey(ur => ur.UserId)
-			.IsRequired();
-
-		builder.Entity<AppRole>()
-			.HasMany(ur => ur.UserRoles)
-			.WithOne(r => r.Role)
-			.HasForeignKey(ur => ur.RoleId)
-			.IsRequired();
-
-		builder.Entity<Language>()
-			.HasMany(l => l.Dictionaries)
-			.WithOne(d => d.Language)
-			.HasForeignKey(d => d.IetfLanguageTag)
-			.IsRequired();
 
 		// words
-		builder.Entity<Dictionary>()
-			.HasMany(d => d.Words)
-			.WithOne(w => w.Dictionary)
-			.HasForeignKey(w => w.DictionaryId)
-			.IsRequired();
 
 		builder.Entity<Dictionary>()
 			.HasMany(d => d.WordTranslations)
@@ -142,13 +120,13 @@ public class DataContext : IdentityDbContext<AppUser,
 			.HasForeignKey(wt => wt.DictionaryId)
 			.IsRequired();
 		
-		builder.Entity<Word>()
-			.HasIndex(a =>
-				new
-				{
-					a.DictionaryId,
-					a.TheWord
-				}).IsUnique();
+		// builder.Entity<Word>()
+		// 	.HasIndex(a =>
+		// 		new
+		// 		{
+		// 			a.DictionaryId,
+		// 			a.TheWord
+		// 		}).IsUnique();
 
 		// phrases
 		builder.Entity<Dictionary>()
@@ -238,6 +216,39 @@ public class DataContext : IdentityDbContext<AppUser,
 
 	}
 
+	private void ConfigureWords(ModelBuilder builder)
+	{
+		builder.Entity<Word>()
+			.HasMany(word => word.Dictionaries)
+			.WithMany(dictionary => dictionary.Words)
+			.LeftNavigation.ForeignKey!.DeleteBehavior = DeleteBehavior.Restrict; // do not delete dictionary if word is deleted
+	}
+
+	private void ConfigureLanguages(ModelBuilder builder)
+	{
+		builder.Entity<Language>()
+			.HasMany(l => l.Dictionaries)
+			.WithOne(d => d.Language)
+			.HasForeignKey(d => d.IetfLanguageTag)
+			.IsRequired();
+	}
+
+	private void ConfigureIdentity(ModelBuilder builder)
+	{
+		builder.Entity<AppUser>()
+			.HasMany(ur => ur.UserRoles)
+			.WithOne(u => u.User)
+			.HasForeignKey(ur => ur.UserId)
+			.IsRequired();
+
+		builder.Entity<AppRole>()
+			.HasMany(ur => ur.UserRoles)
+			.WithOne(r => r.Role)
+			.HasForeignKey(ur => ur.RoleId)
+			.IsRequired();
+
+	}
+
 	private void SeedContentTypes(ModelBuilder builder)
 	{
 		builder.Entity<ContentType>().HasData(new ContentType()
@@ -247,6 +258,8 @@ public class DataContext : IdentityDbContext<AppUser,
 			ContentTypeKey = "Word",
 			NamePlural = "Words",
 			NameSingular = "Word",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.WordsContentTypeManager",
 		});
 		builder.Entity<ContentType>().HasData(new ContentType()
 		{
@@ -255,6 +268,8 @@ public class DataContext : IdentityDbContext<AppUser,
 			ContentTypeKey = "WordTranslation",
 			NamePlural = "Word Translations",
 			NameSingular = "Word Translation",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.WordTranslationsContentTypeManager",
 		});
 		builder.Entity<ContentType>().HasData(new ContentType()
 		{
@@ -263,6 +278,8 @@ public class DataContext : IdentityDbContext<AppUser,
 			ContentTypeKey = "PhraseTranslation",
 			NamePlural = "Phrase Translations",
 			NameSingular = "Phrase Translation",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhraseTranslationsContentTypeManager",
 		});
 		builder.Entity<ContentType>().HasData(new ContentType()
 		{
@@ -271,6 +288,8 @@ public class DataContext : IdentityDbContext<AppUser,
 			ContentTypeKey = "Phrase",
 			NamePlural = "Phrases",
 			NameSingular = "Phrase",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhrasesContentTypeManager",
 		});
 	}
 

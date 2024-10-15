@@ -87,7 +87,7 @@ public class TranslationRepository : ITranslationRepository
 	public async Task<WordTranslation?> GetWordTranslationByIdAsync(int id)
 	{
 		return await _dataContext.WordTranslations
-			.Include("FromWord")
+			.Include("FromWord.Dictionaries")
 			.SingleOrDefaultAsync(q => q.Id == id);
 	}
 

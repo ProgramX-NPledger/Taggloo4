@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Taggloo4.Contract;
 using Taggloo4.Contract.Criteria;
@@ -7,6 +8,7 @@ using Taggloo4.Utility;
 using Taggloo4.Web.Areas.Admin.ViewModels.Dictionaries;
 using Taggloo4.Web.Areas.Admin.ViewModels.Dictionaries.Factory;
 using Taggloo4.Web.Constants;
+using Taggloo4.Web.Hangfire.Jobs;
 
 namespace Taggloo4.Web.Areas.Admin.Controllers;
 
@@ -25,6 +27,7 @@ public class DictionariesController : Controller
     private readonly IDictionaryRepository _dictionaryRepository;
     private readonly ILanguageRepository _languageRepository;
     private readonly IConfiguration _configuration;
+    private readonly IBackgroundJobClient _backgroundJobClient;
 
     /// <summary>
     /// Default constructor with injected properties.
@@ -33,12 +36,18 @@ public class DictionariesController : Controller
     /// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
     /// <param name="languageRepository">Implementation of <seealso cref="ILanguageRepository"/>.</param>
     /// <param name="configuration">Implementation of ASP.NET configuration API.</param>
-    public DictionariesController(IWordRepository wordRepository, IDictionaryRepository dictionaryRepository, ILanguageRepository languageRepository, IConfiguration configuration)
+    /// <param name="backgroundJobClient">Implementation of <seealso cref="IBackgroundJobClient"/>.</param>
+    public DictionariesController(IWordRepository wordRepository, 
+        IDictionaryRepository dictionaryRepository, 
+        ILanguageRepository languageRepository, 
+        IConfiguration configuration,
+        IBackgroundJobClient backgroundJobClient)
     {
         _wordRepository = wordRepository;
         _dictionaryRepository = dictionaryRepository;
         _languageRepository = languageRepository;
         _configuration = configuration;
+        _backgroundJobClient = backgroundJobClient;
     }
     
     /// <summary>
@@ -79,6 +88,11 @@ public class DictionariesController : Controller
         
     }
 
+    /// <summary>
+    /// Dictionary Details view.
+    /// </summary>
+    /// <param name="id">Identifier of Dictionary.</param>
+    /// <returns>View containing details of Dictionary.</returns>
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null) return BadRequest();
@@ -86,10 +100,61 @@ public class DictionariesController : Controller
         Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(id.Value);
         if (dictionary == null) return NotFound();
     
-        DetailsViewModelFactory viewModelFactory = new DetailsViewModelFactory(dictionary);
+        bool isPermittedToDelete = User.IsInRole("administrator");
+        
+        DetailsViewModelFactory viewModelFactory = new DetailsViewModelFactory(dictionary,isPermittedToDelete);
         DetailsViewModel viewModel = viewModelFactory.Create();
         return View(viewModel);
-    
+    }
+
+    /// <summary>
+    /// Page for confirmation of deleting a Dictionary.
+    /// </summary>
+    /// <param name="id">Identifier of Dictionary.</param>
+    /// <returns>View containing confirmation fields.</returns>
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null) return BadRequest();
+        
+        Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(id.Value);
+        if (dictionary == null) return NotFound();
+        
+        DeleteViewModelFactory viewModelFactory = new DeleteViewModelFactory(dictionary);
+        DeleteViewModel viewModel = viewModelFactory.Create();
+        return View(viewModel);
+    }
+
+    /// <summary>
+    /// Submits a Dictionary deletion job for processing.
+    /// </summary>
+    /// <param name="viewModel">View Model for Dictionary deletion.</param>
+    /// <returns>View including status of deletion submission.</returns>
+    [HttpPost]
+    public async Task<IActionResult> Delete(DeleteViewModel viewModel)
+    {
+        Dictionary? dictionary = await _dictionaryRepository.GetByIdAsync(viewModel.Id);
+        if (dictionary == null) return NotFound();
+        
+        DeleteViewModelFactory viewModelFactory = new DeleteViewModelFactory(dictionary);
+        viewModelFactory.Configure(ref viewModel);
+
+        bool isPermittedToDelete = User.IsInRole("administrator");
+        if (!isPermittedToDelete) ModelState.AddModelError("", "You are not permitted to delete this item.");
+        
+        if (viewModel.VerificationCode != viewModel.ConfirmVerificationCode) ModelState.AddModelError("ConfirmVerificationCode", "Verification code does not match");
+
+        if (ModelState.IsValid)
+        {
+            // add deletion as job for Hangfire
+            viewModel.DeleteJobSubmittedSuccessfully = true;
+            
+            _backgroundJobClient.Enqueue<DeleteDictionaryJob>(job =>
+                job.DeleteDictionary(dictionary.Id)
+            );
+            
+        }
+        
+        return View(viewModel);
     }
     
 }

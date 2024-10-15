@@ -16,6 +16,7 @@ public class Word
 	/// The Word.
 	/// </summary>
 	[Required] 
+	[MaxLength(450)]
 	public required string TheWord { get; set; }
 	
 	/// <summary>
@@ -36,12 +37,8 @@ public class Word
 	/// <summary>
 	/// The owning <seealso cref="Dictionary"/>.
 	/// </summary>
-	public Dictionary? Dictionary { get; set; }
-	
-	/// <summary>
-	/// Identifier of owning <seealso cref="Dictionary"/>.
-	/// </summary>
-	public int DictionaryId { get; set; }
+	public ICollection<Dictionary>? Dictionaries { get; set; }
+
 
 	/// <summary>
 	/// Translations of the Word.

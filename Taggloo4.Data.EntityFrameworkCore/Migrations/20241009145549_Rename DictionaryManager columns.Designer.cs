@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taggloo4.Data.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using Taggloo4.Data.EntityFrameworkCore;
 namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241009145549_Rename DictionaryManager columns")]
+    partial class RenameDictionaryManagercolumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("DictionaryWord", b =>
-                {
-                    b.Property<int>("DictionariesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WordsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DictionariesId", "WordsId");
-
-                    b.HasIndex("WordsId");
-
-                    b.ToTable("DictionaryWord");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
@@ -266,14 +254,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
-                    b.Property<string>("ContentTypeManagerDotNetAssemblyName")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("ContentTypeManagerDotNetTypeName")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
                     b.Property<string>("Controller")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -297,8 +277,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         {
                             Id = 1,
                             ContentTypeKey = "Word",
-                            ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
-                            ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.WordsContentTypeManager",
                             Controller = "words",
                             NamePlural = "Words",
                             NameSingular = "Word"
@@ -307,8 +285,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         {
                             Id = 2,
                             ContentTypeKey = "WordTranslation",
-                            ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
-                            ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.WordTranslationsContentTypeManager",
                             Controller = "wordTranslations",
                             NamePlural = "Word Translations",
                             NameSingular = "Word Translation"
@@ -317,8 +293,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         {
                             Id = 3,
                             ContentTypeKey = "PhraseTranslation",
-                            ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
-                            ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhraseTranslationsContentTypeManager",
                             Controller = "phraseTranslations",
                             NamePlural = "Phrase Translations",
                             NameSingular = "Phrase Translation"
@@ -327,8 +301,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         {
                             Id = 4,
                             ContentTypeKey = "Phrase",
-                            ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
-                            ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhrasesContentTypeManager",
                             Controller = "phrases",
                             NamePlural = "Phrases",
                             NameSingular = "Phrase"
@@ -362,6 +334,14 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
+
+                    b.Property<string>("DictionaryManagerDotNetAssemblyName")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("DictionaryManagerDotNetTypeName")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("IetfLanguageTag")
                         .IsRequired()
@@ -649,16 +629,21 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("DictionaryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ExternalId")
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("TheWord")
                         .IsRequired()
-                        .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DictionaryId", "TheWord")
+                        .IsUnique();
 
                     b.ToTable("Words");
                 });
@@ -803,21 +788,6 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                     b.ToView("vw_WordsInDictionariesSummary", (string)null);
                 });
 
-            modelBuilder.Entity("DictionaryWord", b =>
-                {
-                    b.HasOne("Taggloo4.Model.Dictionary", null)
-                        .WithMany()
-                        .HasForeignKey("DictionariesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Taggloo4.Model.Word", null)
-                        .WithMany()
-                        .HasForeignKey("WordsId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Taggloo4.Data.EntityFrameworkCore.Identity.AppRole", null)
@@ -945,6 +915,17 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                     b.Navigation("ToPhrase");
                 });
 
+            modelBuilder.Entity("Taggloo4.Model.Word", b =>
+                {
+                    b.HasOne("Taggloo4.Model.Dictionary", "Dictionary")
+                        .WithMany("Words")
+                        .HasForeignKey("DictionaryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dictionary");
+                });
+
             modelBuilder.Entity("Taggloo4.Model.WordInPhrase", b =>
                 {
                     b.HasOne("Taggloo4.Model.Phrase", "InPhrase")
@@ -1013,6 +994,8 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
                     b.Navigation("Phrases");
 
                     b.Navigation("WordTranslations");
+
+                    b.Navigation("Words");
                 });
 
             modelBuilder.Entity("Taggloo4.Model.Language", b =>

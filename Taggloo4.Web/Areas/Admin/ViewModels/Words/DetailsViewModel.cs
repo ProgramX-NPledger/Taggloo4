@@ -47,28 +47,9 @@ public class DetailsViewModel
     public string? ExternalId { get; set; }
 
     /// <summary>
-    /// Identifier of Dictionary.
+    /// Dictionaries that the Word appears in.
     /// </summary>
-    [Display(Name="Dictionary ID")]
-    public int DictionaryId { get; set; }
-    
-    /// <summary>
-    /// Name of Dictionary.
-    /// </summary>
-    [Display(Name="Dictionary Name")]
-    public required string DictionaryName { get; set; }
-    
-    /// <summary>
-    /// IETF Language Tag.
-    /// </summary>
-    [Display(Name="IETF Language Tag")]
-    public required string IetfLanguageTag { get; set; }
-    
-    /// <summary>
-    /// Language Name.
-    /// </summary>
-    [Display(Name="Language")]
-    public required string LanguageName { get; set; }
-    
-    
+    public IEnumerable<DictionaryViewModel> Dictionaries { get; set; } = [];
+
+
 }

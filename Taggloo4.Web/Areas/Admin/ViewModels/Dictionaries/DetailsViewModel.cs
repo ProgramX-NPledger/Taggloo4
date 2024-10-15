@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Taggloo4.Contract.Criteria;
 using Taggloo4.Model;
+using Taggloo4.Translation;
 
 namespace Taggloo4.Web.Areas.Admin.ViewModels.Dictionaries;
 
@@ -21,7 +22,7 @@ public class DetailsViewModel
     /// </summary>
     [Required]
     [MaxLength(128)]
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
     /// <summary>
     /// Description of Dictionary
@@ -94,7 +95,22 @@ public class DetailsViewModel
     /// </summary>
     [Display(Name="ASP.NET API Controller")]
     public string? ContentTypeController { get; set; }
-    
-    
-    
+
+    /// <summary>
+    /// Name of .NET assembly with implementation of <seealso cref="IContentTypeManager"/>.
+    /// </summary>
+    [Display(Name="Assembly")]
+    public string? ContentTypeManagerDotNetAssemblyName { get; set; }
+
+    /// <summary>
+    /// Name of .NET type for implementation of <seealso cref="IContentTypeManager"/>.
+    /// </summary>
+    [Display(Name="Type")]
+    public string? ContentTypeManagerDotNetTypeName { get; set; }
+
+    /// <summary>
+    /// Whether the user is permitted to Delete this Dictionary.
+    /// </summary>
+    public bool IsPermittedToDelete { get; set; } = false;
+
 }

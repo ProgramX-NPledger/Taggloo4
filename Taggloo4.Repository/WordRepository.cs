@@ -41,7 +41,7 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 		IQueryable<Word> query = DataContext.Words
 			.Include("Translations")
 			.Include("AppearsInPhrases")
-			.Include("Dictionary")
+			.Include(m=>m.Dictionaries)
 			.AsQueryable();
 		
 		if (!string.IsNullOrWhiteSpace(word))
@@ -51,7 +51,7 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 
 		if (dictionaryId.HasValue)
 		{
-			query = query.Where(q => q.DictionaryId == dictionaryId.Value);
+			query = query.Where(q => q.Dictionaries!=null && q.Dictionaries.Select(qq=>qq.Id).Contains(dictionaryId.Value));
 		}
 
 		if (!string.IsNullOrWhiteSpace(externalId))

@@ -153,7 +153,10 @@ public class ReindexJob
 							    CreatedOn =Environment.MachineName,
 							    TheWord = wordString,
 							    CreatedByUserName = $"{Environment.UserDomainName}\\{Environment.UserName}",
-							    Dictionary = dictionary
+							    Dictionaries = new List<Dictionary>()
+							    {
+								    dictionary
+							    }
 						    };
 						    _wordRepository.Create(newWord);
 						    _wordRepository.SaveAllAsync().Wait();

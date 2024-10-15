@@ -11,13 +11,15 @@ namespace Taggloo4.Web.Areas.Admin.ViewModels.Dictionaries.Factory;
 public class DetailsViewModelFactory : IViewModelFactory<DetailsViewModel>
 {
     private readonly Dictionary _dictionary;
+    private readonly bool _isPermittedToDelete;
 
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public DetailsViewModelFactory(Dictionary dictionary)
+    public DetailsViewModelFactory(Dictionary dictionary, bool isPermittedToDelete)
     {
         _dictionary = dictionary;
+        _isPermittedToDelete = isPermittedToDelete;
     }
 
     /// <inheritdoc cref="IViewModelFactory{TViewModelType}"/>
@@ -57,5 +59,16 @@ public class DetailsViewModelFactory : IViewModelFactory<DetailsViewModel>
         viewModel.ContentTypeController = _dictionary.ContentType?.Controller ?? "(no controller)";
         viewModel.ContentTypeNameSingular = _dictionary.ContentType?.NameSingular ?? "(no name)";
         viewModel.ContentTypeNamePlural = _dictionary.ContentType?.NamePlural ?? "(no name)";
+        if (_dictionary.ContentType == null)
+        {
+            viewModel.ContentTypeManagerDotNetAssemblyName = "(no Content Type manager)";
+            viewModel.ContentTypeManagerDotNetTypeName = "(no Content Type manager)";
+        }
+        else
+        {
+            viewModel.ContentTypeManagerDotNetAssemblyName = _dictionary.ContentType.ContentTypeManagerDotNetAssemblyName ?? "(no Content Type manager)";
+            viewModel.ContentTypeManagerDotNetTypeName = _dictionary.ContentType.ContentTypeManagerDotNetTypeName ?? "(no Content Type manager)";
+        }
+        viewModel.IsPermittedToDelete = _isPermittedToDelete;
     }
 }

@@ -28,6 +28,6 @@ public class WordTranslatorFactory : ITranslatorFactory
         return nameof(WordTranslator);
     }
 
-    /// <inheritdoc cref="System.Configuration.Configuration"/>
+    /// <inheritdoc cref="ITranslatorFactory.Configuration"/>
     public ITranslatorConfiguration Configuration { get; set; }
 }

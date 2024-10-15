@@ -84,6 +84,11 @@ public class WordsController : Controller
         
     }
 
+    /// <summary>
+    /// Dictionary details.
+    /// </summary>
+    /// <param name="id">ID of Dictionary.</param>
+    /// <returns>View with Dictionary View Model.</returns>
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null) return BadRequest();

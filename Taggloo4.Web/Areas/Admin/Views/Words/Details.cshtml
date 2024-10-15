@@ -63,17 +63,22 @@
         <div class="col-md-7">
             <div class="panel">
                 <div class="panel">
-                    <h3>Dictionary</h3>
-                    <fieldset>
-                        <p>
-                            @Html.LabelFor(m=>m.DictionaryId)
-                            @Html.TextBoxFor(m=>m.DictionaryId, new { @readonly= "readonly" })
-                        </p>
-                        <p>
-                            @Html.LabelFor(m=>m.DictionaryName)
-                            @Html.TextBoxFor(m=>m.DictionaryName, new { @readonly= "readonly" })
-                        </p>
-                    </fieldset>
+                    <h3>Dictionaries</h3>
+                    <table>
+                        <tr>
+                            <th id="thDictionaryName">Name</th>
+                            <th id="thIetfLanguageTag">IETF Language Tag</th>
+                            <th id="thLanguageNme">Language</th>
+                        </tr>
+                        @foreach (var dictionaryViewModel in Model.Dictionaries)
+                        {
+                            <tr>
+                                <td headers="thDictionaryName"><a href="@Url.Action("Details","Dictionaries",new { id=dictionaryViewModel.Id})">@dictionaryViewModel.Name</a></td>
+                                <td headers="thIetfLanguageTag">@dictionaryViewModel.IetfLanguageTag</td>
+                                <td headers="thLanguageName"><a href="@Url.Action("Details","Languages",new { id=dictionaryViewModel.IetfLanguageTag})">@dictionaryViewModel.LanguageName</a></td>
+                            </tr>
+                        }
+                    </table>
                 </div>
             
             </div>
@@ -82,17 +87,6 @@
         <div class="col-md-5">
             <div class="panel">
                 <div class="panel">
-                    <h3>Language</h3>
-                    <fieldset>
-                        <p>
-                            @Html.LabelFor(m=>m.IetfLanguageTag)
-                            @Html.TextBoxFor(m=>m.IetfLanguageTag, new { @readonly= "readonly" })
-                        </p>
-                        <p>
-                            @Html.LabelFor(m=>m.LanguageName)
-                            @Html.TextBoxFor(m=>m.LanguageName, new { @readonly= "readonly" })
-                        </p>
-                    </fieldset>
                 </div>
             </div>
 
