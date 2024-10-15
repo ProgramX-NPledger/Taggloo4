@@ -109,7 +109,7 @@ public class DataContext : IdentityDbContext<AppUser,
 		SeedContentTypes(builder);
 		ConfigureIdentity(builder);
 		ConfigureLanguages(builder);
-		ConfigreWords(builder);
+		ConfigureWords(builder);
 		
 
 		// words
@@ -216,12 +216,12 @@ public class DataContext : IdentityDbContext<AppUser,
 
 	}
 
-	private void ConfigreWords(ModelBuilder builder)
+	private void ConfigureWords(ModelBuilder builder)
 	{
 		builder.Entity<Word>()
 			.HasMany(word => word.Dictionaries)
 			.WithMany(dictionary => dictionary.Words)
-			.RightNavigation.ForeignKey!.DeleteBehavior = DeleteBehavior.Restrict; // do not delete dictionary if word is deleted
+			.LeftNavigation.ForeignKey!.DeleteBehavior = DeleteBehavior.Restrict; // do not delete dictionary if word is deleted
 	}
 
 	private void ConfigureLanguages(ModelBuilder builder)

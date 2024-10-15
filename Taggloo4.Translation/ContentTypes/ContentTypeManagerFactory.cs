@@ -13,7 +13,7 @@ public class ContentTypeManagerFactory
     /// </summary>
     /// <param name="dictionary">The Dictionary to create a manager for.</param>
     /// <returns>An implementation of <seealso cref="IDictionaryManager"/></returns>
-    public static async Task<IContentTypeManager> CreateContentTypeManager(DataContext dataContext, Dictionary dictionary)
+    public static IContentTypeManager CreateContentTypeManager(DataContext dataContext, Dictionary dictionary)
     {
         if (dictionary is null) throw new ArgumentNullException(nameof(dictionary));
         if (dictionary.ContentType==null) throw new InvalidOperationException($"Dictionary ID {dictionary.Id} has no {nameof(dictionary.ContentType)}");
@@ -40,7 +40,7 @@ public class ContentTypeManagerFactory
         if (instance is IContentTypeManager)
         {
             IContentTypeManager contentTypeManager = (IContentTypeManager)instance;
-            await contentTypeManager.InitialiseAsync(dataContext);
+            contentTypeManager.Initialise(dataContext, dictionary);
             
             return contentTypeManager;
         }

@@ -37,7 +37,7 @@ public class DeleteDictionaryJob
         try
         {
             // get the Content Type Manager for the Dictionary
-            IContentTypeManager contentTypeManager = ContentTypeManagerFactory.CreateContentTypeManager(_dataContext,dictionary).Result;
+            IContentTypeManager contentTypeManager = ContentTypeManagerFactory.CreateContentTypeManager(_dataContext,dictionary);
             
             // have the Content Type Manager delete the Dictionary
             contentTypeManager.DeleteDictionaryAndContentsAsync().Wait();
