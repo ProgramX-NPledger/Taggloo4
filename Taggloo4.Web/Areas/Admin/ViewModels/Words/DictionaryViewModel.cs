@@ -13,16 +13,16 @@ public class DictionaryViewModel
     /// <summary>
     /// Name of Dictionary.
     /// </summary>
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
     /// <summary>
     /// IETF Language Tag of Language of Dictionary.
     /// </summary>
-    public string IetfLanguageTag { get; set; }
+    public required string IetfLanguageTag { get; set; }
     
     /// <summary>
     /// Name of Language of Dictionary.
     /// </summary>
-    public string LanguageName { get; set; }
+    public required string LanguageName { get; set; }
     
 }

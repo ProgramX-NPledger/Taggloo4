@@ -21,7 +21,7 @@ public class DeleteViewModel
     /// </summary>
     [Required]
     [MaxLength(128)]
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
     /// <summary>
     /// Name of the Language within the Dictionary.

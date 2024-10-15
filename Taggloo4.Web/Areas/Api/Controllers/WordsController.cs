@@ -245,7 +245,7 @@ public class WordsController : BaseApiController
 		{
 			CreatedAt = createWord.CreatedAt ?? DateTime.Now,
 			CreatedOn = createWord.CreatedOn ?? GetRemoteHostAddress(),
-			CreatedByUserName = createWord.CreatedByUserName ?? GetCurrentUserName(),
+			CreatedByUserName = (createWord.CreatedByUserName ?? GetCurrentUserName()) ?? string.Empty,
 			TheWord = createWord.Word,
 			//DictionaryId = createWord.DictionaryId,
 			ExternalId = createWord.ExternalId ?? Guid.NewGuid().ToString(),

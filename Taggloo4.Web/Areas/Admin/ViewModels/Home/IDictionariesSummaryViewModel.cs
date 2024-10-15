@@ -10,7 +10,7 @@ public interface IDictionariesSummaryViewModel
     /// </summary>
     /// <remarks>
     /// This should be 2.
-    /// </reamrks>
+    /// </remarks>
     public int NumberOfLanguagesInDictionaries { get; set; }
 
     /// <summary>

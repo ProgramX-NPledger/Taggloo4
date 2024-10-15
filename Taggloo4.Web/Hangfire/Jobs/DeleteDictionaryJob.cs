@@ -17,6 +17,8 @@ public class DeleteDictionaryJob
     /// Constructor with injected parameters.
     /// </summary>
     /// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
+    /// <param name="dataContext">Entity Framework Data Context providing full access to the datastore without requiring a
+    /// Repository interface.</param>
     public DeleteDictionaryJob(IDictionaryRepository dictionaryRepository, DataContext dataContext)
     {
         _dictionaryRepository = dictionaryRepository;

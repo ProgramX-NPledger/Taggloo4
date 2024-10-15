@@ -88,6 +88,11 @@ public class DictionariesController : Controller
         
     }
 
+    /// <summary>
+    /// Dictionary Details view.
+    /// </summary>
+    /// <param name="id">Identifier of Dictionary.</param>
+    /// <returns>View containing details of Dictionary.</returns>
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null) return BadRequest();
@@ -102,6 +107,11 @@ public class DictionariesController : Controller
         return View(viewModel);
     }
 
+    /// <summary>
+    /// Page for confirmation of deleting a Dictionary.
+    /// </summary>
+    /// <param name="id">Identifier of Dictionary.</param>
+    /// <returns>View containing confirmation fields.</returns>
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null) return BadRequest();
@@ -114,6 +124,11 @@ public class DictionariesController : Controller
         return View(viewModel);
     }
 
+    /// <summary>
+    /// Submits a Dictionary deletion job for processing.
+    /// </summary>
+    /// <param name="viewModel">View Model for Dictionary deletion.</param>
+    /// <returns>View including status of deletion submission.</returns>
     [HttpPost]
     public async Task<IActionResult> Delete(DeleteViewModel viewModel)
     {
