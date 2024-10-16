@@ -22,8 +22,9 @@ public interface IWordRepository : IRepositoryBase<Word>
 	/// <param name="word">Word to match within the <seealso cref="Dictionary"/>.</param>
 	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
 	/// <param name="externalId">An externally determined identifier.</param>
+	/// <param name="ietfLanguageTag">If specified, filters by the IETF Language Tag.</param>
 	/// <returns>A collection of matching <seealso cref="Word"/>s within the <seealso cref="Dictionary"/>.</returns>
-	Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId, string? externalId);
+	Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId, string? externalId, string? ietfLanguageTag);
 	
 	/// <summary>
 	/// Retrieves a <seealso cref="Word"/> by its ID.

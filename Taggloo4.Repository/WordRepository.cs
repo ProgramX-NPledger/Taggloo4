@@ -29,17 +29,13 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 		return await DataContext.SaveChangesAsync() > 0;
 	}
 
-	/// <summary>
-	/// Retrieves all matching <seealso cref="Word"/>s within a <seealso cref="Dictionary"/>.
-	/// </summary>
-	/// <param name="word">Word to match within the <seealso cref="Dictionary"/>.</param>
-	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
-	/// <param name="externalId">An externally determined identifier.</param>
-	/// <returns>A collection of matching <seealso cref="Word"/>s within the <seealso cref="Dictionary"/>.</returns>
-	public async Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId, string? externalId)
+
+	/// <inheritdoc cref="GetWordsAsync"/>
+	public async Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId, string? externalId, string? ietfLanguageTag)
 	{
 		IQueryable<Word> query = DataContext.Words
 			.Include("Translations")
+			.Include("Dictionaries.Language")
 			.Include("AppearsInPhrases")
 			.Include(m=>m.Dictionaries)
 			.AsQueryable();
@@ -59,6 +55,10 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 			query = query.Where(q => q.ExternalId == externalId);
 		}
 
+		if (!string.IsNullOrWhiteSpace(ietfLanguageTag))
+		{
+			query = query.Where(q=>q.Dictionaries!=null && q.Dictionaries.Any(qq => qq.IetfLanguageTag == ietfLanguageTag));
+		}
 		return await query.ToArrayAsync();
 	}
 
@@ -70,7 +70,7 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 	public async Task<Word?> GetByIdAsync(int id)
 	{
 		return await DataContext.Words
-			.Include("Dictionary.Language")
+			.Include("Dictionaries.Language")
 			.Include("ToTranslations.FromWord")
 			.Include("FromTranslations.ToWord")
 			.Include("AppearsInPhrases")

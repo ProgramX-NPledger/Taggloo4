@@ -78,13 +78,14 @@ public class WordsController : BaseApiController
 		});
 	}
 
-	
+
 	/// <summary>
 	/// Retrieve matching Words from an optional Dictionary.
 	/// </summary>
 	/// <param name="word">The word to search for.</param>
 	/// <param name="dictionaryId">If specified, searches within the Dictionary represented by the ID.</param>
 	/// <param name="externalId">If specified, searches for the specified external ID to allow relationship with existing IDs in other systems.</param>
+	/// <param name="ietfLanguageTag">If specified, searches within the Language represented by the IETF Language Tag.</param>
 	/// <param name="offsetIndex">If specified, returns results starting at the specified offset position (starting index 0) Default is defined by <see cref="Defaults.OffsetIndex"/>.</param>
 	/// <param name="pageSize">If specified, limits the number of results to the specified limit. Default is defined by <see cref="Defaults.MaxItems" />.</param>
 	/// <response code="200">Results prepared.</response>
@@ -94,6 +95,7 @@ public class WordsController : BaseApiController
 	public async Task<ActionResult<GetWordsResult>> GetWords(string? word, 
 		int? dictionaryId, 
 		string? externalId,
+		string? ietfLanguageTag,
 		int offsetIndex=Defaults.OffsetIndex, 
 		int pageSize = Defaults.MaxItems)
 	{
@@ -101,7 +103,7 @@ public class WordsController : BaseApiController
 
 		DateTime start = DateTime.Now;
 		
-		IEnumerable<Word> words = (await _wordRepository.GetWordsAsync(word, dictionaryId, externalId)).ToArray();
+		IEnumerable<Word> words = (await _wordRepository.GetWordsAsync(word, dictionaryId, externalId, ietfLanguageTag)).ToArray();
 
 		List<Link> links = new List<Link>();
 		links.Add(new Link()
@@ -163,8 +165,6 @@ public class WordsController : BaseApiController
 				CreatedAt = w.CreatedAt,
 				CreatedOn = w.CreatedOn,
 				CreatedByUserName = w.CreatedByUserName,
-				// TODO: consider Dictionaries
-				//DictionaryId = w.DictionaryId,
 				ExternalId = w.ExternalId,
 				//IetfLanguageTag = w.Dictionary?.IetfLanguageTag, // need this but all LanguageTags should be the same
 				Links = new[]
@@ -176,14 +176,6 @@ public class WordsController : BaseApiController
 						Types = new[] { JSON_MIME_TYPE },
 						HRef = $"{GetBaseApiPath()}/words/{w.Id}"
 					},
-					// TODO: consider dictionaries
-					// new Link()
-					// {
-					// 	Action = "get",
-					// 	Rel = "dictionary",
-					// 	Types = new[] { JSON_MIME_TYPE },
-					// 	HRef = $"{GetBaseApiPath()}/dictionaries/{w.DictionaryId}"
-					// },
 					new Link()
 					{
 						Action = "get",
@@ -197,6 +189,12 @@ public class WordsController : BaseApiController
 					Rel = "translation",
 					HRef = $"{GetBaseApiPath()}/words/{t.ToWordId}",
 					Types = new []{ JSON_MIME_TYPE}
+				})).Union((w.Dictionaries ?? Enumerable.Empty<Dictionary>()).Select(dictionary => new Link()
+				{
+					Action = "get",
+					Rel = "dictionary",
+					HRef = $"{GetBaseApiPath()}/dictionaries/{dictionary.Id}",
+					Types = new[] { JSON_MIME_TYPE }
 				}))
 			}),
 			Links = links.ToArray(),
@@ -237,7 +235,7 @@ public class WordsController : BaseApiController
 		if (dictionary == null) return BadRequest("Invalid Dictionary");
 
 		IEnumerable<Word> existingWords =
-			await _wordRepository.GetWordsAsync(createWord.Word, createWord.DictionaryId, null);
+			await _wordRepository.GetWordsAsync(createWord.Word, createWord.DictionaryId, null, null);
 		if (existingWords.Any()) return BadRequest("Word already exists in Dictionary");
 
 		// TODO: consider Dictionaries
@@ -247,7 +245,10 @@ public class WordsController : BaseApiController
 			CreatedOn = createWord.CreatedOn ?? GetRemoteHostAddress(),
 			CreatedByUserName = (createWord.CreatedByUserName ?? GetCurrentUserName()) ?? string.Empty,
 			TheWord = createWord.Word,
-			//DictionaryId = createWord.DictionaryId,
+			Dictionaries = new List<Dictionary>()
+			{
+				dictionary
+			},
 			ExternalId = createWord.ExternalId ?? Guid.NewGuid().ToString(),
 			Phrases = new Collection<Phrase>(),
 			ToTranslations = new Collection<WordTranslation>()
@@ -301,25 +302,23 @@ public class WordsController : BaseApiController
 
 		};
 
-		// TODO: consider Dictionaries
-		// if (updateWord.MoveWordToDictionaryId.HasValue &&
-		//     word.DictionaryId != updateWord.MoveWordToDictionaryId.Value)
-		// {
-		// 	// does the new dictionary exist?
-		// 	Dictionary? newDictionary = await _dictionaryRepository.GetByIdAsync(updateWord.MoveWordToDictionaryId.Value);
-		// 	if (newDictionary == null) return BadRequest("Invalid attempt to move Word into non-existent Dictionary");
-		// 	
-		// 	// is the new dictionary the same language as the previous?
-		// 	Dictionary? oldDictionary = await _dictionaryRepository.GetByIdAsync(word.DictionaryId);
-		//
-		// 	if (!newDictionary.IetfLanguageTag.Equals(oldDictionary!.IetfLanguageTag))
-		// 	{
-		// 		return BadRequest("Invalid attempt to move Word into Dictionary of another Language");
-		// 	}
-		//
-		// 	word.DictionaryId = updateWord.MoveWordToDictionaryId.Value;
-		// 	updateWordResult.RequiresDictionaryReindexing = true;
-		// }
+		if (updateWord.AddWordToDictionaryId.HasValue &&
+		    word.Dictionaries!=null && word.Dictionaries.All(q => q.Id != updateWord.AddWordToDictionaryId.Value))
+		{
+			// does the new dictionary exist?
+			Dictionary? newDictionary = await _dictionaryRepository.GetByIdAsync(updateWord.AddWordToDictionaryId.Value);
+			if (newDictionary == null) return BadRequest("Invalid attempt to move Word into non-existent Dictionary");
+			
+			// is the new dictionary the same language as the previous?
+			bool allOldDictionariesAreInSameLanguage = word.Dictionaries.All(q => q.IetfLanguageTag == newDictionary.IetfLanguageTag);
+			if (!allOldDictionariesAreInSameLanguage)
+			{
+				return BadRequest("Invalid attempt to move Word into Dictionary of another Language");
+			}
+		
+			word.Dictionaries.Add(newDictionary);
+			updateWordResult.RequiresDictionaryReindexing = true;
+		}
 
 		if (updateWord.CreatedOn != null) word.CreatedOn = updateWord.CreatedOn;
 		if (updateWord.CreatedByUserName != null) word.CreatedByUserName = updateWord.CreatedByUserName;
@@ -340,14 +339,13 @@ public class WordsController : BaseApiController
 				Types = new string[] { JSON_MIME_TYPE },
 				HRef = url
 			},
-			// new Link()
-			// {
-			// 	Action = "get",
-			// 	Rel = "dictionary",
-			// 	Types = new[] { JSON_MIME_TYPE },
-			// 	HRef = $"{GetBaseApiPath()}/dictionaries/{word.DictionaryId}"
-			// }
-		};
+		}.Union((word.Dictionaries ?? Enumerable.Empty<Dictionary>()).Select(dictionary=>new Link()
+		{
+			Action = "get",
+			Rel = "dictionary",
+			HRef = $"{GetBaseApiPath()}/dictionaries/{dictionary.Id}",
+			Types = new[] { JSON_MIME_TYPE }
+		}));
 		
 		return Ok(updateWordResult);
 		

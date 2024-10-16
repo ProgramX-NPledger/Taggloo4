@@ -60,9 +60,11 @@ public class WordImportSession : IImportSession
 			try
 			{
 				// verify that word doesn't already exist
-				bool wordAlreadyExists = await IsWordExtant(httpClient, wordInLanguage, dictionaryId);
-				if (!wordAlreadyExists)
+				
+				int? wordId=await GetWord(httpClient, wordInLanguage, languageCode);
+				if (wordId.HasValue)
 				{
+					// new word
 					CreateWordResult createWordResult = await PostWordToTarget(httpClient, wordInLanguage, dictionaryId);
 					Imported?.Invoke(this,new ImportedEventArgs()
 					{
@@ -75,8 +77,8 @@ public class WordImportSession : IImportSession
 				}
 				else
 				{
-					throw new ImportException(
-						$"Word '{wordInLanguage.TheWord}' already exists in Dictionary ID {dictionaryId}");
+					// existing word, add to dictionary
+					await AddWordToDictionary(httpClient, wordInLanguage, dictionaryId);
 				}
 			}
 			catch (Exception ex)
@@ -122,19 +124,22 @@ public class WordImportSession : IImportSession
 
     
 
-    private async Task<bool> IsWordExtant(HttpClient httpClient, Word word, int dictionaryId)
+    private async Task<int?> GetWord(HttpClient httpClient, Word word, string ietfLanguageTag)
     {
-	    string url = $"/api/v4/words?word={word}&dictionaryId={dictionaryId}";
+	    string url = $"/api/v4/words?word={word}&ietfLanguageTag={ietfLanguageTag}";
 	    HttpResponseMessage response = await httpClient.GetAsync(url);
 	    response.EnsureSuccessStatusCode();
 	    
 	    GetWordsResult? getWordsResult = await response.Content.ReadFromJsonAsync<GetWordsResult>();
 	    if (getWordsResult == null) throw new NullReferenceException("getWordsResult");
 
-	    IEnumerable<GetWordResultItem> matchingDictionary=getWordsResult.Results.Where(q =>
-		    q.DictionaryId==dictionaryId).ToArray();
-
-	    return matchingDictionary.Any();
+	    // there should only one or zero results
+	    if (!getWordsResult.Results.Any()) return null;
+	    if (getWordsResult.Results.Count() == 1)
+	    {
+		    return getWordsResult.Results.First().Id;
+	    }
+	    throw new InvalidOperationException($"Ambiguous results for word '{word.TheWord}' for Language {ietfLanguageTag}. Expected 0 or 1 but got '{getWordsResult.Results.Count()}'");
 	    
     }
 
@@ -164,5 +169,31 @@ public class WordImportSession : IImportSession
 		return createWordResult; 
 	}
 	
+    
+	private async Task<UpdateWordResult> AddWordToDictionary(HttpClient httpClient, Word word,
+		int dictionaryId)
+	{
+		string url = "/api/v4/words";
+		UpdateWord updateWord = new UpdateWord()
+		{
+			WordId = word.ID,
+			AddWordToDictionaryId = dictionaryId
+		};
+		
+		HttpResponseMessage response = await httpClient.PatchAsJsonAsync(url, updateWord);
+		if (!response.IsSuccessStatusCode)
+		{
+			throw new InvalidOperationException($"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
+		}
+		
+		UpdateWordResult? updateWordResult =
+			await response.Content.ReadFromJsonAsync<UpdateWordResult>();
+		if (updateWordResult == null) throw new NullReferenceException("updateWordResult");
+		return updateWordResult; 
+	}
+
+
+	
+    
 	
 }

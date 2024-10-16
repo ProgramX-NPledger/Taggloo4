@@ -296,7 +296,7 @@ public class Importer : ApiClientBase
 		string url = "/api/v4/dictionaries";
 		CreateDictionary createDictionary = new CreateDictionary()
 		{
-			Name = $"Imported from Taggloo2 by {importSession.GetType().Name}",
+			Name = $"Imported from Taggloo2 by {importSession.GetType().Name} for Language {languageCode}",
 			IetfLanguageTag = languageCode,
 			SourceUrl = "https://taggloo.im",
 			Description = "Imported from SQL Server Taggloo2 database",
