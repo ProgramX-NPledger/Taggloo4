@@ -36,7 +36,7 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 		IQueryable<Word> query = DataContext.Words
 			// .Include(m=>m.FromTranslations)
 			// .Include(m=>m.ToTranslations)
-			.Include("Dictionaries.Language")
+			.Include(m=>m.Dictionaries).ThenInclude(m=>m.Language)
 			.Include("AppearsInPhrases")
 			.Include(m=>m.Dictionaries)
 			.AsQueryable();
@@ -55,12 +55,17 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 		{
 			query = query.Where(q => q.ExternalId == externalId);
 		}
+		
+		// the many:many to dictionaries is too complex for the EFCore LINQ->Sql transpilation so execute and perform
+		// filter client-side
+		List<Word> results = await query.ToListAsync();
 
 		if (!string.IsNullOrWhiteSpace(ietfLanguageTag))
 		{
-			query = query.Where(q=>q.Dictionaries!=null && q.Dictionaries.Any(qq => qq.IetfLanguageTag == ietfLanguageTag));
+			results = results.Where(q=>q.Dictionaries.Any(qq => qq.IetfLanguageTag == ietfLanguageTag)).ToList();
 		}
-		return await query.ToArrayAsync();
+		
+		return results;
 	}
 
 	/// <summary>

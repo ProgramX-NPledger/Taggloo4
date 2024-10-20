@@ -54,10 +54,8 @@ public class WordsController : BaseApiController
 			CreatedAt = word.CreatedAt,
 			CreatedOn = word.CreatedOn,
 			CreatedByUserName = word.CreatedByUserName,
-			// TODO: consider Dictionaries
-			//DictionaryId = word.DictionaryId,
-			
-			//IetfLanguageTag = word.Dictionary?.IetfLanguageTag, // TODO: need this, but all LanguageTags should be the same
+			DictionaryIds = word.Dictionaries.Select(q=>q.Id).ToList(),
+			IetfLanguageTag = word.Dictionaries.FirstOrDefault()?.IetfLanguageTag, // assumes all attached dictionaries have same language
 			Links = new[]
 			{
 				new Link()
@@ -166,7 +164,8 @@ public class WordsController : BaseApiController
 				CreatedOn = w.CreatedOn,
 				CreatedByUserName = w.CreatedByUserName,
 				ExternalId = w.ExternalId,
-				//IetfLanguageTag = w.Dictionary?.IetfLanguageTag, // need this but all LanguageTags should be the same
+				DictionaryIds = w.Dictionaries.Select(q => q.Id).ToList(),
+				IetfLanguageTag = w.Dictionaries.FirstOrDefault()?.IetfLanguageTag, // assumes all LanguageTags should be the same
 				Links = new[]
 				{
 					new Link()

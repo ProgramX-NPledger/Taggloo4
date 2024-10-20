@@ -59,7 +59,7 @@ public class WordImportSession : IImportSession
 				// verify that word doesn't already exist
 				
 				int? wordId=await GetWord(httpClient, wordInLanguage, languageCode);
-				if (wordId.HasValue)
+				if (!wordId.HasValue)
 				{
 					// new word
 					CreateWordResult createWordResult = await PostWordToTarget(httpClient, wordInLanguage, dictionaryId);
@@ -75,7 +75,7 @@ public class WordImportSession : IImportSession
 				else
 				{
 					// existing word, add to dictionary
-					await AddWordToDictionary(httpClient, wordInLanguage, dictionaryId);
+					await AddWordToDictionary(httpClient, wordId.Value, dictionaryId);
 				}
 			}
 			catch (Exception ex)
@@ -167,13 +167,13 @@ public class WordImportSession : IImportSession
 	}
 	
     
-	private async Task<UpdateWordResult> AddWordToDictionary(HttpClient httpClient, Word word,
+	private async Task<UpdateWordResult> AddWordToDictionary(HttpClient httpClient, int wordId,
 		int dictionaryId)
 	{
 		string url = "/api/v4/words";
 		UpdateWord updateWord = new UpdateWord()
 		{
-			WordId = word.ID,
+			WordId = wordId,
 			AddWordToDictionaryId = dictionaryId
 		};
 		
