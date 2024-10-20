@@ -300,8 +300,6 @@ public class Importer : ApiClientBase
 			IetfLanguageTag = languageCode,
 			SourceUrl = "https://taggloo.im",
 			Description = "Imported from SQL Server Taggloo2 database",
-			ContentTypeFriendlyName = importSession.ContentTypeFriendlyName,
-			Controller = importSession.ContentTypeController,
 			ContentTypeKey = importSession.ContentTypeKey
 		};
 		

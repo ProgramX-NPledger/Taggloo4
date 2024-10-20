@@ -18,9 +18,6 @@ public class WordImportSession : IImportSession
     }
 
     public string ContentTypeKey { get; } = "Word";
-    public string ContentTypeFriendlyName { get; } = "Word";
-    public string ContentTypeController { get; } = "words";
-
     
     public event EventHandler<ImportMetricsEventArgs>? UpdateMetrics;
     public event EventHandler<ImportedEventArgs>? Imported;
@@ -126,7 +123,7 @@ public class WordImportSession : IImportSession
 
     private async Task<int?> GetWord(HttpClient httpClient, Word word, string ietfLanguageTag)
     {
-	    string url = $"/api/v4/words?word={word}&ietfLanguageTag={ietfLanguageTag}";
+	    string url = $"/api/v4/words?word={word.TheWord}&ietfLanguageTag={ietfLanguageTag}";
 	    HttpResponseMessage response = await httpClient.GetAsync(url);
 	    response.EnsureSuccessStatusCode();
 	    

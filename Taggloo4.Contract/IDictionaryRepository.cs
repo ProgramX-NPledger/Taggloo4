@@ -48,13 +48,6 @@ public interface IDictionaryRepository : IRepositoryBase<Dictionary>
 	/// <returns></returns>
 	/// <exception cref="InvalidOperationException">Thrown if deletion fails.</exception>
 	Task Delete(int dictionaryId);
-
-
-	/// <summary>
-	/// Return all Content Types.
-	/// </summary>
-	/// <returns>A collection of <seealso cref="ContentType"/> items which may relate to a Dictionary.</returns>
-	Task<IEnumerable<ContentType>> GetAllContentTypesAsync();
 	
 	/// <summary>
 	/// Get Dictionaries summary.

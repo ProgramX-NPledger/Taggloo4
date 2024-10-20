@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Common;
 using Taggloo4.Contract;
 using Taggloo4.Contract.Criteria;
 using Taggloo4.Model;
@@ -25,6 +26,7 @@ public class DictionariesController : Controller
 {
     private readonly IWordRepository _wordRepository;
     private readonly IDictionaryRepository _dictionaryRepository;
+    private readonly IContentTypeRepository _contentTypeRepository;
     private readonly ILanguageRepository _languageRepository;
     private readonly IConfiguration _configuration;
     private readonly IBackgroundJobClient _backgroundJobClient;
@@ -34,17 +36,20 @@ public class DictionariesController : Controller
     /// </summary>
     /// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
     /// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
+    /// <param name="contentTypeRepository">Implementation of <seealso cref="IContentTypeRepository"/>.</param>
     /// <param name="languageRepository">Implementation of <seealso cref="ILanguageRepository"/>.</param>
     /// <param name="configuration">Implementation of ASP.NET configuration API.</param>
     /// <param name="backgroundJobClient">Implementation of <seealso cref="IBackgroundJobClient"/>.</param>
     public DictionariesController(IWordRepository wordRepository, 
         IDictionaryRepository dictionaryRepository, 
+        IContentTypeRepository contentTypeRepository,
         ILanguageRepository languageRepository, 
         IConfiguration configuration,
         IBackgroundJobClient backgroundJobClient)
     {
         _wordRepository = wordRepository;
         _dictionaryRepository = dictionaryRepository;
+        _contentTypeRepository = contentTypeRepository;
         _languageRepository = languageRepository;
         _configuration = configuration;
         _backgroundJobClient = backgroundJobClient;
@@ -79,7 +84,8 @@ public class DictionariesController : Controller
         if (results.TotalUnpagedItems % maximumItems>0) numberOfPages++;
 
         IEnumerable<Language> allLanguages = await _languageRepository.GetAllLanguagesAsync();
-        IEnumerable<ContentType> allContentTypes = await _dictionaryRepository.GetAllContentTypesAsync();
+        IEnumerable<ContentType> allContentTypes =
+            await _contentTypeRepository.GetContentTypesAsync(null, null, null, null, null);
 
         IndexViewModelFactory viewModelFactory = new IndexViewModelFactory(results.Results, currentPageNumber,
             numberOfPages, results.TotalUnpagedItems, maximumItems, sortBy, sortDirection, query,ietfLanguageTag, contentTypeId, allLanguages, allContentTypes);
