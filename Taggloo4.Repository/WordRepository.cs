@@ -34,7 +34,8 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 	public async Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId, string? externalId, string? ietfLanguageTag)
 	{
 		IQueryable<Word> query = DataContext.Words
-			.Include("Translations")
+			// .Include(m=>m.FromTranslations)
+			// .Include(m=>m.ToTranslations)
 			.Include("Dictionaries.Language")
 			.Include("AppearsInPhrases")
 			.Include(m=>m.Dictionaries)
