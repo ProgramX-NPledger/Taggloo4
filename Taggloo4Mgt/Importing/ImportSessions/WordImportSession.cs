@@ -170,10 +170,9 @@ public class WordImportSession : IImportSession
 	private async Task<UpdateWordResult> AddWordToDictionary(HttpClient httpClient, int wordId,
 		int dictionaryId)
 	{
-		string url = "/api/v4/words";
+		string url = $"/api/v4/words/{wordId}";
 		UpdateWord updateWord = new UpdateWord()
 		{
-			WordId = wordId,
 			AddWordToDictionaryId = dictionaryId
 		};
 		

@@ -288,11 +288,11 @@ public class WordsController : BaseApiController
 	/// <response code="400">One or more validation errors prevented successful updating.</response>
 	/// <response code="403">Not permitted.</response>
 	/// <response code="404">Word not found.</response>
-	[HttpPatch]
+	[HttpPatch("{id}")]
 	[Authorize(Roles="administrator, dataImporter")]
-	public async Task<ActionResult> UpdateWord(UpdateWord updateWord)
+	public async Task<ActionResult> UpdateWord(int id, UpdateWord updateWord)
 	{
-		Word? word= await _wordRepository.GetByIdAsync(updateWord.WordId);
+		Word? word= await _wordRepository.GetByIdAsync(id);
 		if (word == null) return NotFound();
 		
 		// update word
@@ -328,7 +328,7 @@ public class WordsController : BaseApiController
 		
 		string url = $"{GetBaseApiPath()}/words/{word.Id}";
 		updateWordResult.Id = word.Id;
-		// TODO: consider Dictionaries
+		
 		updateWordResult.Links = new[]
 		{
 			new Link()

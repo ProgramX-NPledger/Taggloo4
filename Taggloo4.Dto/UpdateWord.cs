@@ -10,7 +10,7 @@ public class UpdateWord
 
 
 	/// <summary>
-	/// If specified, causes the Word to ve moved to another Dictionary. Identifier of the Dictionary that will contain the Word
+	/// If specified, causes the Word to be added to another Dictionary. Identifier of the Dictionary that will contain the Word
 	/// </summary>
 	public int? AddWordToDictionaryId { get; set; }
 
@@ -28,12 +28,7 @@ public class UpdateWord
 	/// If specified, updates the CreatedAt field.
 	/// </summary>
 	public DateTime? CreatedAt { get; set; }
-	
 
-	/// <summary>
-	/// The ID of the Word to update.
-	/// </summary>
-	public int WordId { get; set; }
 
 	
 	
