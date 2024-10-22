@@ -72,10 +72,17 @@ public class AccountController : Controller
                 var signInResult = await _signInManager.PasswordSignInAsync(appUser, loginViewModel.Password, loginViewModel.RememberMe, false);
                 if (signInResult.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home", new
+                    if (Request.Query.ContainsKey("ReturnUrl"))
                     {
-                        m = 1
-                    });
+                        return Redirect(Request.Query["ReturnUrl"]!);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home", new
+                        {
+                            m = 1
+                        });
+                    }
                 }
                 ModelState.AddModelError(string.Empty, "Invalid login attempt");                    
             }
