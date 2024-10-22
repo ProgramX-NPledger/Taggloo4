@@ -32,5 +32,10 @@ public class IndexViewModel : ILanguageSummaryViewModel, IDictionariesSummaryVie
 
     /// <inheritdoc cref="IDictionariesSummaryViewModel.NumberOfContentTypes"/>
     public int NumberOfContentTypes { get; set; }
+
+    /// <summary>
+    /// Whether the User has the Administrator role.
+    /// </summary>
+    public bool IsAdministrator { get; set; }
     
 }
