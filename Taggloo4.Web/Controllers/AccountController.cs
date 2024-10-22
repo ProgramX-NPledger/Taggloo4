@@ -13,7 +13,7 @@ namespace Taggloo4.Web.Controllers;
 /// <summary>
 /// Controller for login/log out and user registration functionality.
 /// </summary>
-[Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}")]
+[Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme},Identity.Application")]
 public class AccountController : Controller
 {
     private readonly UserManager<AppUser> _userManager;
@@ -39,7 +39,14 @@ public class AccountController : Controller
     [AllowAnonymous]
     public IActionResult Login()
     {
-        return View();
+        LoginViewModel model = new LoginViewModel()
+        {
+            Password = string.Empty,
+            EmailOrUserName = User.Identity?.Name ?? string.Empty,
+            RememberMe = false,
+            LogoutSuccessful = Request.Query["m"] == "2"
+        };
+        return View(model);
     }
 
     /// <summary>
