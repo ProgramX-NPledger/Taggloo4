@@ -50,7 +50,7 @@ public class DictionaryRepository : RepositoryBase<Dictionary>, IDictionaryRepos
 	/// <returns>A collection of matching <seealso cref="Dictionary"/> items.</returns>
 	public async Task<IEnumerable<Dictionary>> GetDictionariesAsync(int? id, string? ietfLanguageTag)
 	{
-		IQueryable<Dictionary> query = DataContext.Dictionaries.AsQueryable();
+		IQueryable<Dictionary> query = DataContext.Dictionaries.Include(m=>m.ContentType).AsQueryable();
 		if (id.HasValue)
 		{
 			query = query.Where(q => q.Id == id.Value);
@@ -119,12 +119,7 @@ public class DictionaryRepository : RepositoryBase<Dictionary>, IDictionaryRepos
 		DataContext.Dictionaries.Remove(dictionary);
 		await DataContext.SaveChangesAsync();
 	}
-
-	/// <inheritdoc cref="IDictionaryRepository.GetAllContentTypesAsync"/>
-	public async Task<IEnumerable<ContentType>> GetAllContentTypesAsync()
-	{
-		return await DataContext.ContentTypes.OrderBy(q => q.NameSingular).ToArrayAsync();
-	}
+	
 
 	/// <inheritdoc cref="IDictionaryRepository.GetDictionariesSummaryAsync"/>
 	public async Task<DictionariesSummary> GetDictionariesSummaryAsync()

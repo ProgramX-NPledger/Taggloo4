@@ -38,7 +38,7 @@ public class GetWordResultItem
 	/// <summary>
 	/// Identifier of owning <seealso cref="Dictionary"/>.
 	/// </summary>
-	public int DictionaryId { get; set; }
+	public IEnumerable<int> DictionaryIds { get; set; }
 
 	/// <summary>
 	/// Externally created identifier.

@@ -37,7 +37,7 @@ public class Word
 	/// <summary>
 	/// The owning <seealso cref="Dictionary"/>.
 	/// </summary>
-	public ICollection<Dictionary>? Dictionaries { get; set; }
+	public required ICollection<Dictionary> Dictionaries { get; set; } = [];
 
 
 	/// <summary>

@@ -22,8 +22,6 @@ public class PhraseImportSession : IImportSession
     }
 
     public string ContentTypeKey { get; } = "Phrase";
-    public string ContentTypeFriendlyName { get; } = "Phrase";
-    public string ContentTypeController { get; } = "phrases";
 
 
     public event EventHandler<ImportEventArgs>? LogMessage;

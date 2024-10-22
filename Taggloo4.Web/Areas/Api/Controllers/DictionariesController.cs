@@ -20,6 +20,7 @@ public class DictionariesController : BaseApiController
 {
 	private readonly IDictionaryRepository _dictionaryRepository;
 	private readonly ILanguageRepository _languageRepository;
+	private readonly IContentTypeRepository _contentTypeRepository;
 	private readonly IBackgroundJobClient _backgroundJobClient;
 
 
@@ -28,13 +29,16 @@ public class DictionariesController : BaseApiController
 	/// </summary>
 	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
 	/// <param name="languageRepository">Implementation of <seealso cref="ILanguageRepository"/>.</param>
-	/// <param name="backgroundJobClient"></param>
+	/// <param name="contentTypeRepository">Implementation of <seealso cref="IContentTypeRepository"/>.</param>
+	/// <param name="backgroundJobClient">Used to schedule long-running jobs.</param>
 	public DictionariesController(IDictionaryRepository dictionaryRepository,
 		ILanguageRepository languageRepository,
+		IContentTypeRepository contentTypeRepository,
 		IBackgroundJobClient backgroundJobClient)
 	{
 		_dictionaryRepository = dictionaryRepository;
 		_languageRepository = languageRepository;
+		_contentTypeRepository = contentTypeRepository;
 		_backgroundJobClient = backgroundJobClient;
 	}
 
@@ -119,10 +123,10 @@ public class DictionariesController : BaseApiController
 				SourceUrl = d.SourceUrl,
 				IetfLanguageTag = d.IetfLanguageTag,
 				CreatedByUserName = d.CreatedByUserName,
-				// TODO return content type fields
-				// Controller = d.Controller,
-				// ContentTypeKey = d.ContentTypeKey,
-				// ContentTypeFriendlyName = d.ContentTypeFriendlyName,
+				NameSingular = d.ContentType?.NameSingular,
+				Controller = d.ContentType?.Controller,
+				ContentTypeKey = d.ContentType?.ContentTypeKey,
+				NamePlural = d.ContentType?.ContentTypeKey,
 				Links = new[]
 				{
 					new Link()
@@ -144,9 +148,7 @@ public class DictionariesController : BaseApiController
 						Action = "get",
 						Rel = "firstcontent",
 						Types = new[] { JSON_MIME_TYPE },
-						// TODO: return controller from contenttype
-						HRef = ""
-						//HRef = $"{GetBaseApiPath()}/{d.Controller ?? "null"}?dictionaryId={d.Id}"
+						HRef = $"{GetBaseApiPath()}/{d.ContentType?.Controller ?? "null"}?dictionaryId={d.Id}"
 					}
 				}
 			}),
@@ -186,6 +188,10 @@ public class DictionariesController : BaseApiController
 		Language? language = await _languageRepository.GetLanguageByIetfLanguageTagAsync(createDictionary.IetfLanguageTag);
 		if (language == null) return BadRequest("Invalid Language");
 		
+		// get content type
+		ContentType? contentType = await _contentTypeRepository.GetContentTypeAsync(createDictionary.ContentTypeKey);
+		if (contentType==null) return BadRequest("Invalid ContentType");
+		
 		Dictionary newDictionary = new Dictionary()
 		{
 			CreatedAt = DateTime.Now,
@@ -195,10 +201,7 @@ public class DictionariesController : BaseApiController
 			IetfLanguageTag = language.IetfLanguageTag,
 			Description = createDictionary.Description,
 			SourceUrl = createDictionary.SourceUrl,
-			// TODO: create content type
-			// Controller = createDictionary.Controller,
-			// ContentTypeKey = createDictionary.ContentTypeKey,
-			// ContentTypeFriendlyName = createDictionary.ContentTypeFriendlyName
+			ContentType = contentType 
 		};
 
 		_dictionaryRepository.Create(newDictionary);

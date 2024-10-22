@@ -29,19 +29,15 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 		return await DataContext.SaveChangesAsync() > 0;
 	}
 
-	/// <summary>
-	/// Retrieves all matching <seealso cref="Word"/>s within a <seealso cref="Dictionary"/>.
-	/// </summary>
-	/// <param name="word">Word to match within the <seealso cref="Dictionary"/>.</param>
-	/// <param name="dictionaryId">The ID of the <seealso cref="Dictionary"/> to search.</param>
-	/// <param name="externalId">An externally determined identifier.</param>
-	/// <returns>A collection of matching <seealso cref="Word"/>s within the <seealso cref="Dictionary"/>.</returns>
-	public async Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId, string? externalId)
+
+	/// <inheritdoc cref="GetWordsAsync"/>
+	public async Task<IEnumerable<Word>> GetWordsAsync(string? word, int? dictionaryId, string? externalId, string? ietfLanguageTag)
 	{
 		IQueryable<Word> query = DataContext.Words
-			.Include("Translations")
+			// .Include(m=>m.FromTranslations)
+			// .Include(m=>m.ToTranslations)
+			.Include(m=>m.Dictionaries).ThenInclude(m=>m.Language)
 			.Include("AppearsInPhrases")
-			.Include(m=>m.Dictionaries)
 			.AsQueryable();
 		
 		if (!string.IsNullOrWhiteSpace(word))
@@ -49,17 +45,37 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 			query = query.Where(q => q.TheWord == word);
 		}
 
-		if (dictionaryId.HasValue)
-		{
-			query = query.Where(q => q.Dictionaries!=null && q.Dictionaries.Select(qq=>qq.Id).Contains(dictionaryId.Value));
-		}
+	
 
 		if (!string.IsNullOrWhiteSpace(externalId))
 		{
 			query = query.Where(q => q.ExternalId == externalId);
 		}
+		
+		// the many:many to dictionaries is too complex for the EFCore LINQ->Sql transpilation so execute and perform
+		// filter client-side
+		try
+		{
+			List<Word> results = await query.ToListAsync();
 
-		return await query.ToArrayAsync();
+			if (dictionaryId.HasValue)
+			{
+				results=results.Where(q => q.Dictionaries!=null && q.Dictionaries.Select(qq=>qq.Id).Contains(dictionaryId.Value)).ToList();
+			}
+			
+			if (!string.IsNullOrWhiteSpace(ietfLanguageTag))
+			{
+				results = results.Where(q=>q.Dictionaries.Any(qq => qq.IetfLanguageTag == ietfLanguageTag)).ToList();
+			}
+		
+			return results;
+
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+			throw;
+		}
 	}
 
 	/// <summary>
@@ -70,7 +86,7 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 	public async Task<Word?> GetByIdAsync(int id)
 	{
 		return await DataContext.Words
-			.Include("Dictionary.Language")
+			.Include("Dictionaries.Language")
 			.Include("ToTranslations.FromWord")
 			.Include("FromTranslations.ToWord")
 			.Include("AppearsInPhrases")
