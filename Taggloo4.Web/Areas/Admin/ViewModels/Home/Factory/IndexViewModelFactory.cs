@@ -13,6 +13,7 @@ namespace Taggloo4.Web.Areas.Admin.ViewModels.Home.Factory;
 /// </summary>
 public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
 {
+    private readonly bool _isAdministrator;
     private readonly LanguageSummaryViewModelFactory _languageSummaryViewModelFactory;
     private readonly HangfireSummaryViewModelFactory _hangfireSummaryViewModelFactory;
     private readonly WordSummaryViewModelFactory _wordSummaryViewModelFactory;
@@ -24,8 +25,9 @@ public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
     public IndexViewModelFactory(IEnumerable<Language> allLanguages,
         int numberOfRecurringHangfireJobs, DateTime? lastHangfireJobExecution, DateTime? nextHangfireJobExecution,
         WordsSummary wordsSummary,
-        DictionariesSummary dictionariesSummary)
+        DictionariesSummary dictionariesSummary, bool isAdministrator)
     {
+        _isAdministrator = isAdministrator;
         _languageSummaryViewModelFactory = new LanguageSummaryViewModelFactory(allLanguages);
         _hangfireSummaryViewModelFactory = new HangfireSummaryViewModelFactory(numberOfRecurringHangfireJobs,
             lastHangfireJobExecution, nextHangfireJobExecution);
@@ -56,6 +58,8 @@ public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
         
         IDictionariesSummaryViewModel iDictionariesSummaryViewModel = (IDictionariesSummaryViewModel)viewModel;
         _dictionariesSummaryViewModelFactory.Configure(ref iDictionariesSummaryViewModel);
+        
+        viewModel.IsAdministrator = _isAdministrator;
         
     }
 }

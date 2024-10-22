@@ -22,7 +22,7 @@ namespace Taggloo4.Web.Controllers.Admin;
 /// </remarks>
 [Authorize(AuthenticationSchemes = "Identity.Application")]
 [Area("Admin")]
-[Authorize(Roles = "administrator")]
+[Authorize(Roles = "administrator,dataExporter,dataImporter")]
 public class HomeController : Controller
 {
     private readonly ILanguageRepository _languageRepository;
@@ -69,12 +69,15 @@ public class HomeController : Controller
             // }
         }
         
+        bool isAdministrator = User.IsInRole("administrator");
+        
         IndexViewModelFactory viewModelFactory = new IndexViewModelFactory(allLanguages,
             numberOfRecurringHangfireJobs,
             latestHangfireJobExecution,
             nextHangfireJobExecution,
             wordsSummary,
-            dictionariesSummary);
+            dictionariesSummary,
+            isAdministrator);
         IndexViewModel viewModel = viewModelFactory.Create();
         return View(viewModel);
     }

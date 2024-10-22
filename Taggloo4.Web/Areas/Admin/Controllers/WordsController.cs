@@ -25,7 +25,7 @@ namespace Taggloo4.Web.Controllers.Admin;
 /// </remarks>
 [Authorize(AuthenticationSchemes = "Identity.Application")]
 [Area("Admin")]
-[Authorize(Roles = "administrator")]
+[Authorize(Roles = "administrator,dataExporter,dataImporter")]
 public class WordsController : Controller
 {
     private readonly IWordRepository _wordRepository;
