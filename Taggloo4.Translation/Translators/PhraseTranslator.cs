@@ -41,11 +41,11 @@ public class PhraseTranslator : ITranslator
         {
             WordInPhrase[] untranslatedWordInPhrases = _entityFrameworkCoreDatabaseContext.WordsInPhrases
                 .Include(m => m.Word.Dictionaries)
-                .Include(m => m.InPhrase.Dictionary)
+                .Include(m => m.InPhrase.Dictionaries)
                 .AsNoTracking()
                 .Where(q => q.Word.TheWord == wordToMatch &&
                             q.Word.Dictionaries!.Select(q=>q.IetfLanguageTag).Contains(translationRequest.FromLanguageCode) &&
-                            q.InPhrase.Dictionary!.IetfLanguageTag == translationRequest.FromLanguageCode)
+                            q.InPhrase.Dictionaries!.Select(q=>q.IetfLanguageTag).Contains(translationRequest.FromLanguageCode)) 
                 .ToArray();
             // add to collection of phrases the word appears in (we're processing in phrases not words)
             untranslatedWordAppearsInPhrases.AddRange(untranslatedWordInPhrases.Select(q=>q.InPhrase));

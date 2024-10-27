@@ -5,13 +5,13 @@
 namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 {
     /// <inheritdoc />
-    public partial class MigratetoMMWordsDictionaries : Migration
+    public partial class MigratetoMMPhrasesDictionaries : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(@"insert into DictionaryWord (WordsID,DictionariesID)
-                select id,DictionaryId from Words");
+            migrationBuilder.Sql(@"insert into DictionaryPhrase (PhrasesID,DictionariesID)
+                select id,DictionaryId from Phrases");
         }
 
         /// <inheritdoc />

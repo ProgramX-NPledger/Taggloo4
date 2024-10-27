@@ -36,9 +36,9 @@ public class GetPhraseResultItem
 	public required string CreatedOn { get; set; }
 	
 	/// <summary>
-	/// Identifier of owning <see cref="Dictionary"/>.
+	/// Identifiers of owning <see cref="Dictionary"/> items.
 	/// </summary>
-	public int DictionaryId { get; set; }
+	public IEnumerable<int> DictionaryIds { get; set; }
 	
 	/// <summary>
 	/// Externally created identifier.

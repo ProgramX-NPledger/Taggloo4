@@ -40,7 +40,7 @@ public class PhraseRepository : RepositoryBase<Phrase>, IPhraseRepository
 	{
 		IQueryable<Phrase> query = DataContext.Phrases
 			.Include("Translations")
-			.Include("Dictionary")
+			.Include(m=>m.Dictionaries).ThenInclude(m=>m.Language)
 			.AsQueryable();
 		
 		if (!string.IsNullOrWhiteSpace(phrase))
@@ -57,18 +57,28 @@ public class PhraseRepository : RepositoryBase<Phrase>, IPhraseRepository
 		{
 			query = query.Where(q => q.ThePhrase.Contains(containingText));
 		}
-
-		if (!string.IsNullOrWhiteSpace(languageCode))
-		{
-			query = query.Where(q => (q.Dictionary!=null && q.Dictionary.IetfLanguageTag == languageCode));
-		}
-
+		
 		if (!string.IsNullOrWhiteSpace(externalId))
 		{
 			query = query.Where(q => q.ExternalId == externalId);
 		}
 		
-		return await query.Include("Dictionary").ToArrayAsync();
+		// the many:many to dictionaries is too complex for the EFCore LINQ->Sql transpilation so execute and perform
+		// filter client-side
+		List<Phrase> results = await query.ToListAsync();
+
+		if (dictionaryId.HasValue)
+		{
+			results=results.Where(q =>q.Dictionaries.Select(qq=>qq.Id).Contains(dictionaryId.Value)).ToList();
+		}
+		
+		if (!string.IsNullOrWhiteSpace(languageCode))
+		{
+			results = results.Where(q=>q.Dictionaries.Any(qq => qq.IetfLanguageTag == languageCode)).ToList();
+		}
+	
+		return results;
+		
 	}
 
 	/// <summary>

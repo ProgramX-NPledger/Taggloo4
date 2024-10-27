@@ -277,11 +277,11 @@ public class WordsController : BaseApiController
 		
 	}
 
-    
 
 	/// <summary>
 	/// Update an existing Word with meta-data.
 	/// </summary>
+	/// <param name="id">Identifier of Word to update.</param>
 	/// <param name="updateWord">A <see cref="UpdateWord"/> representing the Word to update.</param>
 	/// <returns>The updated Word.</returns>
 	/// <response code="200">Word was updated.</response>
