@@ -9,35 +9,94 @@ using Taggloo4.Web.Controllers;
 namespace Taggloo4.Web.Areas.Api.Controllers;
 
 /// <summary>
-/// Translation operations. All methods require authorisation.
+/// Phrase Translation operations. All methods require authorisation.
 /// </summary>
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class TranslationsController : BaseApiController
+public class PhraseTranslationsController : BaseApiController
 {
 	private readonly IWordRepository _wordRepository;
 	private readonly IPhraseRepository _phraseRepository;
-	private readonly IDictionaryRepository _dictionaryRepository;
 	private readonly ITranslationRepository _translationRepository;
+	private readonly IDictionaryRepository _dictionaryRepository;
 
 	/// <summary>
 	/// Constructor with injected parameters.
 	/// </summary>
-	/// <param name="wordRepository">Implementation of <see cref="IWordRepository"/>.</param>
-	/// <param name="phraseRepository">Implementation of <see cref="IPhraseRepository"/>.</param>
-	/// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
-	/// <param name="translationRepository">Implementation of <see cref="ITranslationRepository"/>.</param>
-	public TranslationsController(IWordRepository wordRepository, 
+	/// <param name="phraseRepository">Implementation of <seealso cref="IPhraseRepository"/>.</param>
+	/// <param name="translationRepository">Implementation of <seealso cref="ITranslationRepository"/>.</param>
+	/// <param name="dictionaryRepository">Implementation of <seealso cref="IDictionaryRepository"/>.</param>
+	/// <param name="wordRepository">Implementation of <seealso cref="IWordRepository"/>.</param>
+	public PhraseTranslationsController(
+		IWordRepository wordRepository,
 		IPhraseRepository phraseRepository,
-		IDictionaryRepository dictionaryRepository,
-		ITranslationRepository translationRepository)
+		ITranslationRepository translationRepository,
+		IDictionaryRepository dictionaryRepository)
 	{
 		_wordRepository = wordRepository;
 		_phraseRepository = phraseRepository;
-		_dictionaryRepository = dictionaryRepository;
 		_translationRepository = translationRepository;
+		_dictionaryRepository = dictionaryRepository;
 	}
-	
-	// TODO: Look at deprecating this controller nad moving into WordTranslationsController
+
+
+	/// <summary>
+	/// Retrieves the specified Phrase Translation.
+	/// </summary>
+	/// <param name="id">ID of the Phrase Translation.</param>
+	/// <response code="200">Phrase Translation found.</response>
+	/// <response code="404">Phrase Translation not found.</response>
+	[HttpGet("{id}")]
+	[Authorize(Roles = "administrator,dataExporter")]
+	public async Task<ActionResult<GetPhraseTranslationResultItem>> GetPhraseTranslationById(int id)
+	{
+		PhraseTranslation? phraseTranslation = await _translationRepository.GetPhraseTranslationByIdAsync(id);
+		if (phraseTranslation == null) return NotFound();
+
+		return Ok(new GetPhraseTranslationResultItem()
+		{
+			Id = phraseTranslation.Id,
+			CreatedAt = phraseTranslation.CreatedAt,
+			CreatedOn = phraseTranslation.CreatedOn,
+			CreatedByUserName = phraseTranslation.CreatedByUserName,
+			DictionaryId = phraseTranslation.DictionaryId,
+			FromPhrase = phraseTranslation.FromPhrase?.ThePhrase,
+			FromPhraseId = phraseTranslation.FromPhraseId,
+			FromIetfLanguageTag = phraseTranslation.FromPhrase?.Dictionaries.FirstOrDefault()!.IetfLanguageTag, // assumes all languages are the same, which they should be
+			ToPhraseId = phraseTranslation.ToPhraseId,
+			Links = new[]
+			{
+				new Link()
+				{
+					Action = "get",
+					Rel = "self",
+					HRef = $"{GetBaseApiPath()}/phrasetranslations/{phraseTranslation.Id}",
+					Types = new[] { JSON_MIME_TYPE }
+				},
+				new Link()
+				{
+					Action = "get",
+					Rel = "dictionary",
+					HRef = $"{GetBaseApiPath()}/dictionaries/{phraseTranslation.DictionaryId}",
+					Types = new[] { JSON_MIME_TYPE }
+				},
+				new Link()
+				{
+					Action = "get",
+					Rel = "fromWord",
+					HRef = $"{GetBaseApiPath()}/phrases/{phraseTranslation.FromPhraseId}",
+					Types = new[] { JSON_MIME_TYPE }
+				},
+				new Link()
+				{
+					Action="get",
+					Rel = "toWord",
+					HRef = $"{GetBaseApiPath()}/phrases/{phraseTranslation.ToPhraseId}",
+					Types = new[] { JSON_MIME_TYPE }
+				}
+			}
+		});
+	}
+
 	
 	
     /// <summary>
@@ -48,7 +107,7 @@ public class TranslationsController : BaseApiController
 	/// <response code="201">Phrase Translation was created.</response>
 	/// <response code="400">One or more validation errors prevented successful creation.</response>
 	/// <response code="403">Not permitted.</response>
-	[HttpPost("phrase")] // /api/v4/translations/phrase
+	[HttpPost()] // /api/v4/phrasetranslations
 	[Authorize(Roles="administrator, dataImporter")]
 	public async Task<ActionResult<CreatePhraseTranslationResult>> CreatePhraseTranslation(CreatePhraseTranslation createPhraseTranslation)
 	{
@@ -126,7 +185,7 @@ public class TranslationsController : BaseApiController
 	/// <response code="200">Word was updated.</response>
 	/// <response code="400">One or more validation errors prevented successful updating.</response>
 	/// <response code="403">Not permitted.</response>
-	[HttpPatch("phrase/{phraseTranslationId}")] // /api/v4/translations/word
+	[HttpPatch("{phraseTranslationId}")] // /api/v4/phrasetranslations
 	[Authorize(Roles="administrator, dataImporter")]
 	public async Task<ActionResult> UpdatePhraseTranslation(int phraseTranslationId, UpdatePhraseTranslation updatePhraseTranslation)
 	{
@@ -209,6 +268,5 @@ public class TranslationsController : BaseApiController
 	}
 
 	
-
 	
 }

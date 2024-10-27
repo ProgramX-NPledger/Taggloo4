@@ -34,11 +34,11 @@ public class GetPhraseResultItem
 	/// Host from which the Phrase was created.
 	/// </summary>
 	public required string CreatedOn { get; set; }
-	
+
 	/// <summary>
 	/// Identifiers of owning <see cref="Dictionary"/> items.
 	/// </summary>
-	public IEnumerable<int> DictionaryIds { get; set; }
+	public required IEnumerable<int> DictionaryIds { get; set; } = [];
 	
 	/// <summary>
 	/// Externally created identifier.

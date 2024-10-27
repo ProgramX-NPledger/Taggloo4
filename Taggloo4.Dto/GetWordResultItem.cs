@@ -34,11 +34,11 @@ public class GetWordResultItem
 	/// Host from which the Word was created.
 	/// </summary>
 	public required string CreatedOn { get; set; }
-	
+
 	/// <summary>
 	/// Identifier of owning <seealso cref="Dictionary"/>.
 	/// </summary>
-	public IEnumerable<int> DictionaryIds { get; set; }
+	public required IEnumerable<int> DictionaryIds { get; set; } = [];
 
 	/// <summary>
 	/// Externally created identifier.
