@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using Taggloo4.Dto;
+using Taggloo4.ImportFromTaggloo2.Helpers;
 using Taggloo4.Model.Exceptions;
 using Taggloo4Mgt.Importing.Importers;
 using Taggloo4Mgt.Importing.Model;
@@ -30,11 +31,16 @@ public class PhraseTranslationImportSession : IImportSession
 	public async Task ImportAcrossDictionariesAsync(HttpClient httpClient, string languageCode1, int dictionary1Id, string languageCode2,
 		int dictionary2Id)
 	{
-		await ImportWithinDictionaryAsync(httpClient, languageCode1, dictionary1Id, languageCode2, dictionary2Id);
-		await ImportWithinDictionaryAsync(httpClient, languageCode2, dictionary2Id, languageCode1, dictionary1Id);
+		CreateDictionaryResult newPhrasesFromDictionary = await ImporterHelper.CreateDictionaryForLanguage(httpClient,"New Phrases",
+			languageCode1, this);
+		CreateDictionaryResult newPhrasesToDictionary = await ImporterHelper.CreateDictionaryForLanguage(httpClient,"New Phrases",
+			languageCode2, this);
+		
+		await ImportWithinDictionaryAsync(httpClient, languageCode1, dictionary1Id, languageCode2, dictionary2Id, newPhrasesFromDictionary.Id, newPhrasesFromDictionary.Id);
+		await ImportWithinDictionaryAsync(httpClient, languageCode2, dictionary2Id, languageCode1, dictionary1Id, newPhrasesToDictionary.Id, newPhrasesToDictionary.Id);
 	}
 
-	private async Task ImportWithinDictionaryAsync(HttpClient httpClient, string fromLanguageCode, int fromDictionaryId, string toLanguageCode, int toDictionaryId)
+	private async Task ImportWithinDictionaryAsync(HttpClient httpClient, string fromLanguageCode, int fromDictionaryId, string toLanguageCode, int toDictionaryId, int newPhrasesInFromDictionaryId, int newPhrasesInToDictionaryId)
 	{
 		PhraseTranslation[] phraseTranslationsInLanguage = _phraseTranslations
 			.Where(q => q.LanguageCode.Equals(toLanguageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
@@ -62,7 +68,7 @@ public class PhraseTranslationImportSession : IImportSession
 
 				// try and get ID of Phrase using alternative lookup method
 				int? fromPhraseId = await GetPhraseInDictionary(httpClient, translation.FromPhrase.Trim(), fromLanguageCode,
-					fromDictionaryId);
+					newPhrasesInFromDictionaryId);
 
 				if (!fromPhraseId.HasValue)
 				{
@@ -72,7 +78,7 @@ public class PhraseTranslationImportSession : IImportSession
 					fromPhraseId = postPhraseToTargetResult.PhraseId;
 					LogMessage?.Invoke(this, new ImportEventArgs()
 					{
-						LogMessage = $"New Phrase ID {fromPhraseId} created for Dictionary ID {fromDictionaryId}",
+						LogMessage = $"New Phrase ID {fromPhraseId} created for Dictionary ID {newPhrasesInFromDictionaryId}",
 						Indentation = 6
 					});
 				}
@@ -81,12 +87,12 @@ public class PhraseTranslationImportSession : IImportSession
 				if (!toPhraseId.HasValue)
 				{
 					// phrase not already imported, so create it
-					CreatePhraseResult createPhraseResult = await PostPhraseToTarget(httpClient, translation.Translation, translation.CreatedAt, translation.CreatedByUserName, fromDictionaryId,
+					CreatePhraseResult createPhraseResult = await PostPhraseToTarget(httpClient, translation.Translation, translation.CreatedAt, translation.CreatedByUserName, newPhrasesInToDictionaryId,
 						translation.Id,translation.LanguageCode);
 					toPhraseId = createPhraseResult.PhraseId;
 					LogMessage?.Invoke(this,new ImportEventArgs()
 					{
-						LogMessage = $"New Phrase ID {fromPhraseId} created for Dictionary ID {toDictionaryId}",
+						LogMessage = $"New Phrase ID {fromPhraseId} created for Dictionary ID {newPhrasesInToDictionaryId}",
 						Indentation = 6
 					});
 				}
