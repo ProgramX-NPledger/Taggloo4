@@ -56,7 +56,7 @@ public class PhraseTranslationsController : BaseApiController
 			DictionaryId = phraseTranslation.DictionaryId,
 			FromPhrase = phraseTranslation.FromPhrase?.ThePhrase,
 			FromPhraseId = phraseTranslation.FromPhraseId,
-			FromIetfLanguageTag = phraseTranslation.FromPhrase?.Dictionary?.IetfLanguageTag,
+			FromIetfLanguageTag = phraseTranslation.FromPhrase?.Dictionaries.FirstOrDefault()!.IetfLanguageTag, // assumes all languages are the same, which they should be
 			ToPhraseId = phraseTranslation.ToPhraseId,
 			Links = new[]
 			{

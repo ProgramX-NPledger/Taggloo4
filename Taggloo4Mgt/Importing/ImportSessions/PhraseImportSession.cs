@@ -123,7 +123,7 @@ public class PhraseImportSession : IImportSession
 	    if (getPhrasesResult == null) throw new NullReferenceException("getPhrasesResult");
 
 	    IEnumerable<GetPhraseResultItem> matchingDictionary=getPhrasesResult.Results.Where(q =>
-		    q.DictionaryId==dictionaryId).ToArray();
+		    q.DictionaryIds.Contains(dictionaryId)).ToArray();
 
 	    return matchingDictionary.Any();
     }

@@ -45,8 +45,6 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 			query = query.Where(q => q.TheWord == word);
 		}
 
-	
-
 		if (!string.IsNullOrWhiteSpace(externalId))
 		{
 			query = query.Where(q => q.ExternalId == externalId);
@@ -54,28 +52,19 @@ public class WordRepository : RepositoryBase<Word>, IWordRepository
 		
 		// the many:many to dictionaries is too complex for the EFCore LINQ->Sql transpilation so execute and perform
 		// filter client-side
-		try
-		{
-			List<Word> results = await query.ToListAsync();
+		List<Word> results = await query.ToListAsync();
 
-			if (dictionaryId.HasValue)
-			{
-				results=results.Where(q => q.Dictionaries!=null && q.Dictionaries.Select(qq=>qq.Id).Contains(dictionaryId.Value)).ToList();
-			}
-			
-			if (!string.IsNullOrWhiteSpace(ietfLanguageTag))
-			{
-				results = results.Where(q=>q.Dictionaries.Any(qq => qq.IetfLanguageTag == ietfLanguageTag)).ToList();
-			}
+		if (dictionaryId.HasValue)
+		{
+			results=results.Where(q => q.Dictionaries!=null && q.Dictionaries.Select(qq=>qq.Id).Contains(dictionaryId.Value)).ToList();
+		}
 		
-			return results;
-
-		}
-		catch (Exception e)
+		if (!string.IsNullOrWhiteSpace(ietfLanguageTag))
 		{
-			Console.WriteLine(e);
-			throw;
+			results = results.Where(q=>q.Dictionaries.Any(qq => qq.IetfLanguageTag == ietfLanguageTag)).ToList();
 		}
+	
+		return results;
 	}
 
 	/// <summary>

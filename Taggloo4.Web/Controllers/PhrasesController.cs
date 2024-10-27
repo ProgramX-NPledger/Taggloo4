@@ -55,9 +55,9 @@ public class PhrasesController : BaseApiController
 			CreatedAt = phrase.CreatedAt,
 			CreatedOn = phrase.CreatedOn,
 			CreatedByUserName = phrase.CreatedByUserName,
-			DictionaryId = phrase.DictionaryId,
 			ExternalId = phrase.ExternalId,
-			IetfLanguageTag = phrase.Dictionary?.IetfLanguageTag,
+			DictionaryIds = phrase.Dictionaries.Select(q=>q.Id).ToList(),
+			IetfLanguageTag = phrase.Dictionaries.FirstOrDefault()?.IetfLanguageTag, // assumes all attached dictionaries have same language
 			Links = new[]
 			{
 				new Link()
@@ -164,9 +164,9 @@ public class PhrasesController : BaseApiController
 				CreatedAt = p.CreatedAt,
 				CreatedOn = p.CreatedOn,
 				CreatedByUserName = p.CreatedByUserName,
-				DictionaryId = p.DictionaryId,
+				DictionaryIds = p.Dictionaries.Select(q=>q.Id).ToList(),
 				ExternalId = p.ExternalId,
-				IetfLanguageTag = p.Dictionary?.IetfLanguageTag,
+				IetfLanguageTag = p.Dictionaries.FirstOrDefault()!.IetfLanguageTag, // assumes all dictionaries are in same language, which they should be
 				Links = new[]
 				{
 					new Link()
