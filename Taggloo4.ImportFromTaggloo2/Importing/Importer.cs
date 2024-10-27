@@ -7,6 +7,7 @@ using System.Runtime.Loader;
 using System.Text;
 using Dapper;
 using Taggloo4.Dto;
+using Taggloo4.ImportFromTaggloo2.Helpers;
 using Taggloo4Mgt.Importing.Importers;
 using Taggloo4Mgt.Importing.Model;
 
@@ -126,9 +127,9 @@ public class Importer : ApiClientBase
 			foreach (IImportSession importSession in importSessions)
 			{
 				// create a Dictionary for each language code
-				CreateDictionaryResult dictionary1 = await CreateDictionaryForLanguage(httpClient,
+				CreateDictionaryResult dictionary1 = await ImporterHelper.CreateDictionaryForLanguage(httpClient,importSession.ContentTypeKey,
 					sourceLanguageCodes.ElementAt(0), importSession);
-				CreateDictionaryResult dictionary2 = await CreateDictionaryForLanguage(httpClient,
+				CreateDictionaryResult dictionary2 = await ImporterHelper.CreateDictionaryForLanguage(httpClient,importSession.ContentTypeKey,
 					sourceLanguageCodes.ElementAt(1), importSession);
 				await importSession.ImportAcrossDictionariesAsync(httpClient, sourceLanguageCodes.ElementAt(0), dictionary1.Id,
 					sourceLanguageCodes.ElementAt(1), dictionary2.Id);
@@ -268,51 +269,6 @@ public class Importer : ApiClientBase
 		}
 	}
 
-	//
-	//
-	// private async Task<CreatePhraseTranslationResult?> PostTranslationBetweenPhrases(HttpClient httpClient, int fromPhraseId, int toPhraseId, int dictionaryId)
-	// {
-	// 	string url = "/api/v4/translations/phrase";
-	// 	CreatePhraseTranslation createPhraseTranslation = new CreatePhraseTranslation()
-	// 	{
-	// 		DictionaryId = dictionaryId,
-	// 		FromPhraseId = fromPhraseId,
-	// 		ToPhraseId = toPhraseId
-	// 	};
-	//
-	// 	HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createPhraseTranslation);
-	// 	if (!response.IsSuccessStatusCode)
-	// 	{
-	// 		throw new InvalidOperationException($"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
-	// 	}
-	//
-	// 	CreatePhraseTranslationResult? createPhraseTranslationResult =
-	// 		await response.Content.ReadFromJsonAsync<CreatePhraseTranslationResult>();
-	// 	return createPhraseTranslationResult;
-	// }
-
-	private async Task<CreateDictionaryResult> CreateDictionaryForLanguage(HttpClient httpClient, string languageCode, IImportSession importSession)
-	{
-		string url = "/api/v4/dictionaries";
-		CreateDictionary createDictionary = new CreateDictionary()
-		{
-			Name = $"Imported from Taggloo2 by {importSession.GetType().Name} for Language {languageCode}",
-			IetfLanguageTag = languageCode,
-			SourceUrl = "https://taggloo.im",
-			Description = "Imported from SQL Server Taggloo2 database",
-			ContentTypeKey = importSession.ContentTypeKey
-		};
-		
-		HttpResponseMessage response = await httpClient.PostAsJsonAsync(url, createDictionary);
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException($"{response.StatusCode}: {response.Content.ReadAsStringAsync().Result}");
-		}
-
-		CreateDictionaryResult? createDictionaryResult =
-			await response.Content.ReadFromJsonAsync<CreateDictionaryResult>();
-		return createDictionaryResult!;
-	}
 	
 	
 	public async Task<CreateLanguageResult> CreateLanguage(HttpClient httpClient, string languageCode)
