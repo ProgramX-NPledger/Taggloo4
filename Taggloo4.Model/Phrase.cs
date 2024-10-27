@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Taggloo4.Model;
 
@@ -34,11 +35,19 @@ public class Phrase
 	/// </summary>
 	public required string CreatedOn { get; set; }
 
+	// TODO: for removal
 	/// <summary>
 	/// The owning Dictionary.
 	/// </summary>
 	/// <seealso cref="Dictionary"/>.
+	[NotMapped]
 	public Dictionary? Dictionary { get; set; }
+	
+	
+	/// <summary>
+	/// The owning <seealso cref="Dictionary"/>.
+	/// </summary>
+	public required ICollection<Dictionary> Dictionaries { get; set; } = [];
 	
 	/// <summary>
 	/// Identifier of owning Dictionary.

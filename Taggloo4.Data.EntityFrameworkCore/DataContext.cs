@@ -110,44 +110,10 @@ public class DataContext : IdentityDbContext<AppUser,
 		ConfigureIdentity(builder);
 		ConfigureLanguages(builder);
 		ConfigureWords(builder);
-		
+		ConfigureWordTranslations(builder);
+		ConfigurePhrases(builder);
+		ConfigurePhraseTranslations(builder);
 
-		// words
-
-		builder.Entity<Dictionary>()
-			.HasMany(d => d.WordTranslations)
-			.WithOne(wt => wt.Dictionary)
-			.HasForeignKey(wt => wt.DictionaryId)
-			.IsRequired();
-		
-		// builder.Entity<Word>()
-		// 	.HasIndex(a =>
-		// 		new
-		// 		{
-		// 			a.DictionaryId,
-		// 			a.TheWord
-		// 		}).IsUnique();
-
-		// phrases
-		builder.Entity<Dictionary>()
-			.HasMany(d => d.Phrases)
-			.WithOne(w => w.Dictionary)
-			.HasForeignKey(w => w.DictionaryId)
-			.IsRequired();
-
-		builder.Entity<Phrase>()
-			.HasIndex(a =>
-				new
-				{
-					a.DictionaryId,
-					a.ThePhrase
-				}).IsUnique();
-		
-		builder.Entity<Dictionary>()
-			.HasMany(d => d.PhraseTranslations)
-			.WithOne(pt => pt.Dictionary)
-			.HasForeignKey(wt => wt.DictionaryId)
-			.IsRequired();
 
 		// builder.Entity<Phrase>()
 		// 	.HasMany(p => p.Words)
@@ -214,6 +180,32 @@ public class DataContext : IdentityDbContext<AppUser,
 			.ToView("vw_WordsInDictionaries")
 			.HasKey(t => t.WordId);
 
+	}
+
+	private void ConfigurePhraseTranslations(ModelBuilder builder)
+	{
+		builder.Entity<Dictionary>()
+			.HasMany(d => d.PhraseTranslations)
+			.WithOne(pt => pt.Dictionary)
+			.HasForeignKey(wt => wt.DictionaryId)
+			.IsRequired();
+	}
+
+	private void ConfigurePhrases(ModelBuilder builder)
+	{
+		builder.Entity<Phrase>()
+			.HasMany(word => word.Dictionaries)
+			.WithMany(dictionary => dictionary.Phrases)
+			.LeftNavigation.ForeignKey!.DeleteBehavior = DeleteBehavior.Restrict; // do not delete dictionary if word is deleted
+	}
+
+	private void ConfigureWordTranslations(ModelBuilder builder)
+	{
+		builder.Entity<Dictionary>()
+			.HasMany(d => d.WordTranslations)
+			.WithOne(wt => wt.Dictionary)
+			.HasForeignKey(wt => wt.DictionaryId)
+			.IsRequired();
 	}
 
 	private void ConfigureWords(ModelBuilder builder)

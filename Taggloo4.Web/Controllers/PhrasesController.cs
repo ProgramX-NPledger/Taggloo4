@@ -268,7 +268,8 @@ public class PhrasesController : BaseApiController
 				ThePhrase = createPhrase.Phrase,
 				DictionaryId = createPhrase.DictionaryId,
 				ExternalId = createPhrase.ExternalId,
-				Words = new Collection<Word>()
+				Words = new Collection<Word>(),
+				Dictionaries = new Collection<Dictionary>(),
 			};
 
 			_phraseRepository.Create(newPhrase);
