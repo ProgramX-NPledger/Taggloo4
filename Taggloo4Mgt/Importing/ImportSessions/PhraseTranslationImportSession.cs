@@ -37,7 +37,7 @@ public class PhraseTranslationImportSession : IImportSession
 	private async Task ImportWithinDictionaryAsync(HttpClient httpClient, string fromLanguageCode, int fromDictionaryId, string toLanguageCode, int toDictionaryId)
 	{
 		PhraseTranslation[] phraseTranslationsInLanguage = _phraseTranslations
-			.Where(q => q.LanguageCode.Equals(fromLanguageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
+			.Where(q => q.LanguageCode.Equals(toLanguageCode, StringComparison.OrdinalIgnoreCase)).ToArray();
 
 		LogMessage?.Invoke(this, new ImportEventArgs()
 		{
@@ -59,32 +59,23 @@ public class PhraseTranslationImportSession : IImportSession
 
 			try
 			{
-				// if phrase is already present, get the existing ID, otherwise, create new for language
-				int? fromPhraseId = await GetPhraseByOriginalId(httpClient, translation.FromPhraseId, fromLanguageCode);
+
+				// try and get ID of Phrase using alternative lookup method
+				int? fromPhraseId = await GetPhraseInDictionary(httpClient, translation.FromPhrase.Trim(), fromLanguageCode,
+					fromDictionaryId);
+
 				if (!fromPhraseId.HasValue)
 				{
-					// try and get ID of Phrase using alternative lookup method
-					fromPhraseId = await GetPhraseInDictionary(httpClient, translation.FromPhrase.Trim(), fromLanguageCode,
-						fromDictionaryId);
-
-					if (!fromPhraseId.HasValue)
+					CreatePhraseResult postPhraseToTargetResult = await PostPhraseToTarget(httpClient,
+						translation.FromPhrase,
+						translation.CreatedAt, translation.CreatedByUserName, fromDictionaryId, translation.Id,fromLanguageCode);
+					fromPhraseId = postPhraseToTargetResult.PhraseId;
+					LogMessage?.Invoke(this, new ImportEventArgs()
 					{
-						CreatePhraseResult postPhraseToTargetResult = await PostPhraseToTarget(httpClient,
-							translation.FromPhrase,
-							translation.CreatedAt, translation.CreatedByUserName, fromDictionaryId, translation.Id,fromLanguageCode);
-						fromPhraseId = postPhraseToTargetResult.PhraseId;
-						LogMessage?.Invoke(this, new ImportEventArgs()
-						{
-							LogMessage = $"New Phrase ID {fromPhraseId} created for Dictionary ID {fromDictionaryId}",
-							Indentation = 6
-						});
-					}
+						LogMessage = $"New Phrase ID {fromPhraseId} created for Dictionary ID {fromDictionaryId}",
+						Indentation = 6
+					});
 				}
-					
-				// if (!translation.LanguageCode.Equals(toLanguageCode, StringComparison.OrdinalIgnoreCase))
-				// {
-				// 	throw new ImportException($"Translation language does not equal target Language");
-				// }
 				
 				int? toPhraseId = await GetPhraseInDictionary(httpClient,translation.Translation, translation.LanguageCode, toDictionaryId);
 				if (!toPhraseId.HasValue)
@@ -216,40 +207,40 @@ public class PhraseTranslationImportSession : IImportSession
 
 	}
 
-	private async Task<int?> GetPhraseByOriginalId(HttpClient httpClient, int originalPhraseId, string languageCode)
-	{
-		string externalId = $"Taggloo2-Phrase-{originalPhraseId}";
-		string url = $"/api/v4/phrases?externalId={externalId}";
-		HttpResponseMessage response = await httpClient.GetAsync(url);
-		if (response.StatusCode == HttpStatusCode.NotFound)
-			throw new InvalidOperationException($"Cannot resolve imported Phrase for External ID {externalId}");
-
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException(
-				$"Error resolving imported Phrase for External ID {externalId}");
-		}
-
-		GetPhrasesResult? getPhrasesResult = await response.Content.ReadFromJsonAsync<GetPhrasesResult>();
-		if (getPhrasesResult == null) throw new NullReferenceException("getPhrasesResult");
-
-		IEnumerable<GetPhraseResultItem> matchingLanguage=getPhrasesResult.Results.Where(q =>
-			!string.IsNullOrWhiteSpace(q.IetfLanguageTag) &&
-			!q.IetfLanguageTag.Equals(languageCode, StringComparison.OrdinalIgnoreCase)); // not this language implies the other language
-		
-		switch (matchingLanguage.Count())
-		{
-			case 0:
-				// phrase hasn't been previously imported
-				return null;
-			case 1:
-				return getPhrasesResult.Results.Single().Id;
-			default:
-				// ambiguous result. 
-				return null;
-		}
-
-	}
+	// private async Task<int?> GetPhraseByOriginalId(HttpClient httpClient, int originalPhraseId, string languageCode)
+	// {
+	// 	string externalId = $"Taggloo2-Phrase-{originalPhraseId}";
+	// 	string url = $"/api/v4/phrases?externalId={externalId}";
+	// 	HttpResponseMessage response = await httpClient.GetAsync(url);
+	// 	if (response.StatusCode == HttpStatusCode.NotFound)
+	// 		throw new InvalidOperationException($"Cannot resolve imported Phrase for External ID {externalId}");
+	//
+	// 	if (!response.IsSuccessStatusCode)
+	// 	{
+	// 		throw new InvalidOperationException(
+	// 			$"Error resolving imported Phrase for External ID {externalId}");
+	// 	}
+	//
+	// 	GetPhrasesResult? getPhrasesResult = await response.Content.ReadFromJsonAsync<GetPhrasesResult>();
+	// 	if (getPhrasesResult == null) throw new NullReferenceException("getPhrasesResult");
+	//
+	// 	IEnumerable<GetPhraseResultItem> matchingLanguage=getPhrasesResult.Results.Where(q =>
+	// 		!string.IsNullOrWhiteSpace(q.IetfLanguageTag) &&
+	// 		!q.IetfLanguageTag.Equals(languageCode, StringComparison.OrdinalIgnoreCase)); // not this language implies the other language
+	// 	
+	// 	switch (matchingLanguage.Count())
+	// 	{
+	// 		case 0:
+	// 			// phrase hasn't been previously imported
+	// 			return null;
+	// 		case 1:
+	// 			return getPhrasesResult.Results.Single().Id;
+	// 		default:
+	// 			// ambiguous result. 
+	// 			return null;
+	// 	}
+	//
+	// }
 
 	private async Task<CreatePhraseTranslationResult?> PostTranslationBetweenPhrases(HttpClient httpClient, 
 		int fromPhraseId, 
@@ -258,7 +249,7 @@ public class PhraseTranslationImportSession : IImportSession
 		DateTime createdAt,
 		string createdBy)
 	{
-		string url = "/api/v4/translations/phrase";
+		string url = "/api/v4/phrasetranslations";
 		CreatePhraseTranslation createPhraseTranslation = new CreatePhraseTranslation()
 		{
 			DictionaryId = dictionaryId,

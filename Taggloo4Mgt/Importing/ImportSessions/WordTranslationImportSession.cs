@@ -187,41 +187,6 @@ public class WordTranslationImportSession : IImportSession
 
 	}
 
-	private async Task<int?> GetWordByOriginalId(HttpClient httpClient, int originalWordId, string languageCode)
-	{
-		string externalId = $"Taggloo2-Word-{originalWordId}";
-		string url = $"/api/v4/words?externalId={externalId}";
-		HttpResponseMessage response = await httpClient.GetAsync(url);
-		if (response.StatusCode == HttpStatusCode.NotFound)
-			throw new InvalidOperationException($"Cannot resolve imported Word for External ID {externalId}");
-
-		if (!response.IsSuccessStatusCode)
-		{
-			throw new InvalidOperationException(
-				$"Error resolving imported Word for External ID {externalId} ({response.ReasonPhrase})");
-		}
-
-		GetWordsResult? getWordsResult = await response.Content.ReadFromJsonAsync<GetWordsResult>();
-		if (getWordsResult == null) throw new NullReferenceException("getWordsResult");
-
-		IEnumerable<GetWordResultItem> matchingLanguage=getWordsResult.Results.Where(q =>
-			!string.IsNullOrWhiteSpace(q.IetfLanguageTag) &&
-			!q.IetfLanguageTag.Equals(languageCode, StringComparison.OrdinalIgnoreCase)); // not this language implies the other language
-		
-		switch (matchingLanguage.Count())
-		{
-			case 0:
-				// word hasn't been previously imported
-				return null;
-			case 1:
-				return getWordsResult.Results.Single().Id;
-			default:
-				// ambiguous result. 
-				return null;
-		}
-
-	}
-
 	private async Task<CreateWordTranslationResult> PostTranslationBetweenWords(HttpClient httpClient, 
 		int fromWordId, 
 		int toWordId, 
