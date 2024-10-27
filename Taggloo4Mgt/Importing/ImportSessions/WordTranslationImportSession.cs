@@ -45,6 +45,9 @@ public class WordTranslationImportSession : IImportSession
 				$"Importing {wordTranslationsInLanguage.Count()} Word Translations for Language {fromLanguageCode}",
 			Indentation = 4
 		});
+
+		int numberOfWordsCreated = 0;
+		int numberOfWordseferenced = 0;
 		
 		foreach (WordTranslation translation in wordTranslationsInLanguage)
 		{
@@ -58,25 +61,26 @@ public class WordTranslationImportSession : IImportSession
 			
 			try
 			{
-				// if word is already present, get the existing ID, otherwise, create new for language
-				int? fromWordId = await GetWordByOriginalId(httpClient, translation.FromWordId, fromLanguageCode);
+				// does word already exist? In which case, we can link to that
+				int? fromWordId = await GetWordInDictionary(httpClient, translation.FromWord.Trim(), fromLanguageCode,
+					fromDictionaryId);
+
 				if (!fromWordId.HasValue)
 				{
-					// try and get ID of Word using alternative lookup method
-					fromWordId = await GetWordInDictionary(httpClient, translation.FromWord.Trim(), fromLanguageCode,
-						fromDictionaryId);
-
-					if (!fromWordId.HasValue)
+					// word does not exist, so create new
+					CreateWordResult postWordToTargetResult = await PostWordToTarget(httpClient, translation.FromWord,
+						translation.CreatedAt, translation.CreatedByUserName, fromDictionaryId, translation.Id);
+					fromWordId = postWordToTargetResult.WordId;
+					LogMessage?.Invoke(this,new ImportEventArgs()
 					{
-						CreateWordResult postWordToTargetResult = await PostWordToTarget(httpClient, translation.FromWord,
-							translation.CreatedAt, translation.CreatedByUserName, fromDictionaryId, translation.Id);
-						fromWordId = postWordToTargetResult.WordId;
-						LogMessage?.Invoke(this,new ImportEventArgs()
-						{
-							LogMessage = $"New Word ID {fromWordId} created for Dictionary ID {fromDictionaryId}",
-							Indentation = 6
-						});
-					}
+						LogMessage = $"New Word ID {fromWordId} created for Dictionary ID {fromDictionaryId}",
+						Indentation = 6
+					});
+					numberOfWordsCreated++;
+				}
+				else
+				{
+					numberOfWordseferenced++;
 				}
 
 				if (!translation.ToLanguageCode.Equals(toLanguageCode, StringComparison.OrdinalIgnoreCase))
@@ -139,6 +143,12 @@ public class WordTranslationImportSession : IImportSession
 				MillisecondsBetweenImports = delta.TotalMilliseconds,
 			});
 		}
+		
+		LogMessage?.Invoke(this,new ImportEventArgs()
+		{
+			LogMessage = $"Referenced {numberOfWordseferenced} existing Words, created {numberOfWordsCreated} new Words",
+			Indentation = 5
+		});
 
 	}
 
@@ -219,13 +229,13 @@ public class WordTranslationImportSession : IImportSession
 		DateTime createdAt,
 		string createdBy)
 	{
-		string url = "/api/v4/translations/word";
+		string url = "/api/v4/wordtranslations";
 		CreateWordTranslation createWordTranslation = new CreateWordTranslation()
 		{
 			DictionaryId = dictionaryId,
 			FromWordId = fromWordId,
 			ToWordId = toWordId,
-			CreatedAt = createdAt, //TODO is this date correct?
+			CreatedAt = createdAt, 
 			CreatedByUserName = createdBy
 		};
 
