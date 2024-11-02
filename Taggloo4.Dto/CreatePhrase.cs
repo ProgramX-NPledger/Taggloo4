@@ -40,5 +40,8 @@ public class CreatePhrase
 	/// <remarks>This should be externally consistent and unique. Taggloo cannot guarantee or assume uniqueness.</remarks>
 	public string? ExternalId { get; set; }
 	
+	/// <summary>
+	/// IETF Language Tag.
+	/// </summary>
 	public required string IetfLanguageTag { get; set; }
 }

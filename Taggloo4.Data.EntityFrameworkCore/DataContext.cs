@@ -88,6 +88,12 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// Summary of Dictionaries.
 	/// </summary>
 	public DbSet<DictionariesSummary> DictionariesSummaries { get; set; }
+
+	public DbSet<CommunityContentItem> CommunityContentItems { get; set; }
+
+	public DbSet<CommunityContentCollection> CommunityContentCollections { get; set; }
+
+	public DbSet<CommunityContentDiscoverer> CommunityContentDiscoverers { get; set; }
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -113,7 +119,7 @@ public class DataContext : IdentityDbContext<AppUser,
 		ConfigureWordTranslations(builder);
 		ConfigurePhrases(builder);
 		ConfigurePhraseTranslations(builder);
-
+		ConfigureCommunityContentItems(builder);
 
 		// builder.Entity<Phrase>()
 		// 	.HasMany(p => p.Words)
@@ -180,6 +186,29 @@ public class DataContext : IdentityDbContext<AppUser,
 			.ToView("vw_WordsInDictionaries")
 			.HasKey(t => t.WordId);
 
+	}
+
+	private void ConfigureCommunityContentItems(ModelBuilder builder)
+	{
+		builder.Entity<Dictionary>()
+			.HasMany(d => d.CommunityContentItems)
+			.WithOne(pt => pt.Dictionary)
+			.HasForeignKey(wt => wt.DictionaryId)
+			.IsRequired();
+		
+		builder.Entity<CommunityContentCollection>()
+			.HasMany(ccc => ccc.CommunityContentItems)
+			.WithOne(cci => cci.CommunityContentCollection)
+			.HasForeignKey(cci => cci.CommunityContentCollectionId)
+			.IsRequired();
+
+		builder.Entity<CommunityContentDiscoverer>()
+			.HasMany(ccd => ccd.CommunityContentCollections)
+			.WithOne(ccc => ccc.CommunityContentDiscoverer)
+			.HasForeignKey(ccc => ccc.CommunityContentDiscovererId)
+			.IsRequired();
+
+		
 	}
 
 	private void ConfigurePhraseTranslations(ModelBuilder builder)

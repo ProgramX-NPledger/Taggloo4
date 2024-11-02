@@ -77,6 +77,11 @@ public class Dictionary
 	/// <seealso cref="PhraseTranslation"/>s in Dictionary.
 	/// </summary>
 	public ICollection<PhraseTranslation>? PhraseTranslations { get; set; }
+	
+	/// <summary>
+	/// <seealso cref="CommunityContentItem"/>s in Dictionary.
+	/// </summary>
+	public ICollection<CommunityContentItem>? CommunityContentItems { get; set; }
 
 	/// <summary>
 	/// Identifier of Content Type

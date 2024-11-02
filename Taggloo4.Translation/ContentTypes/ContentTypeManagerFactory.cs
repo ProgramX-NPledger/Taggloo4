@@ -40,7 +40,7 @@ public class ContentTypeManagerFactory
         if (instance is IContentTypeManager)
         {
             IContentTypeManager contentTypeManager = (IContentTypeManager)instance;
-            contentTypeManager.Initialise(dataContext, dictionary);
+            _ = contentTypeManager.Initialise(dataContext, dictionary);
             
             return contentTypeManager;
         }

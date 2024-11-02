@@ -5,7 +5,7 @@ namespace Taggloo4.Translation;
 
 public interface IContentTypeManager
 {
-    void Initialise(DataContext dataContext, Dictionary dictionary);
+    IContentTypeManager Initialise(DataContext dataContext, Dictionary dictionary);
     Task DeleteDictionaryAndContentsAsync();
     Task<int> GetNumberOfItemsAsync();
 }

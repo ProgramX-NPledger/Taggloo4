@@ -8,11 +8,16 @@ public class WordsContentTypeManager : IContentTypeManager
 {
     private DataContext _dataContext;
     private Dictionary _dictionary;
-    
-    public void Initialise(DataContext dataContext, Dictionary dictionary)
+
+    private WordsContentTypeManager(DataContext dataContext, Dictionary dictionary)
     {
         _dataContext = dataContext;
         _dictionary = dictionary;
+    }
+
+    public IContentTypeManager Initialise(DataContext dataContext, Dictionary dictionary)
+    {
+        return new WordsContentTypeManager(dataContext, dictionary);
     }
 
     public async Task DeleteDictionaryAndContentsAsync()
