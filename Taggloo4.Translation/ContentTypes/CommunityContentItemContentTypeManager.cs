@@ -4,12 +4,12 @@ using Taggloo4.Model;
 
 namespace Taggloo4.Translation.ContentTypes;
 
-public class WordsContentTypeManager : IContentTypeManager
+public class CommunityContentItemContentTypeManager : IContentTypeManager
 {
     private DataContext _dataContext;
     private Dictionary _dictionary;
 
-    private WordsContentTypeManager(DataContext dataContext, Dictionary dictionary)
+    private CommunityContentItemContentTypeManager(DataContext dataContext, Dictionary dictionary)
     {
         _dataContext = dataContext;
         _dictionary = dictionary;
@@ -17,19 +17,18 @@ public class WordsContentTypeManager : IContentTypeManager
 
     public IContentTypeManager Initialise(DataContext dataContext, Dictionary dictionary)
     {
-        return new WordsContentTypeManager(dataContext, dictionary);
+        return new CommunityContentItemContentTypeManager(dataContext, dictionary);
     }
 
     public async Task DeleteDictionaryAndContentsAsync()
     {
-        
         _dataContext.Dictionaries.RemoveRange(_dictionary);
         await _dataContext.SaveChangesAsync();
     }
 
     public async Task<int> GetNumberOfItemsAsync()
     {
-        return await _dataContext.Words
-            .CountAsync(q=>(q.Dictionaries ?? Enumerable.Empty<Dictionary>()).Select(qq=>qq.Id).Contains(_dictionary.Id));
+        return await _dataContext.CommunityContentItems
+            .CountAsync(q=>q.DictionaryId == _dictionary.Id);
     }
 }

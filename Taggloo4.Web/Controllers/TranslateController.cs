@@ -59,7 +59,7 @@ public class TranslateController : Controller
     /// Site home page.
     /// </summary>
     /// <returns>View <c>Index</c>.</returns>
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
         // return full translation search form
         return View();

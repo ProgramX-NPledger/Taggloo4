@@ -43,8 +43,10 @@ public static class ApplicationServiceExtensions
 		services.AddScoped<IDatabaseManagement, DatabaseManagement>();
 		services.AddScoped<IWordInPhraseRepository, WordInPhraseRepository>();
 		services.AddScoped<ITranslatorConfigurationRepository, TranslatorConfigurationRepository>();
+		services.AddScoped<ICommunityContentItemRepository, CommunityContentItemRepository>();
 		services.AddSingleton<TranslationFactoryService, TranslationFactoryService>();
 		services.AddSingleton<TranslatorConfigurationCache, TranslatorConfigurationCache>();
+		
 		
 		
 		services.AddLogging(loggingBuilder =>

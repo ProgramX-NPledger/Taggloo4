@@ -75,7 +75,7 @@ public class PhraseTranslator : ITranslator
                     FromPhraseId = phraseTranslation.FromPhraseId,
                     ToPhraseId = phraseTranslation.ToPhraseId,
                     Translation = phraseTranslation.ToPhrase!.ThePhrase,
-                    FromPhrase = phraseTranslation.FromPhrase?.ThePhrase, // this is null
+                    FromPhrase = phraseTranslation.FromPhrase?.ThePhrase ?? string.Empty, // this is null
                     PercentageMatch = 100 // TODO
                 };
                 

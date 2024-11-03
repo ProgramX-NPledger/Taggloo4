@@ -88,6 +88,21 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// Summary of Dictionaries.
 	/// </summary>
 	public DbSet<DictionariesSummary> DictionariesSummaries { get; set; }
+
+	/// <summary>
+	/// Community Content Items.
+	/// </summary>
+	public DbSet<CommunityContentItem> CommunityContentItems { get; set; }
+
+	/// <summary>
+	/// Community Content Collections. Contains Community Content Items.
+	/// </summary>
+	public DbSet<CommunityContentCollection> CommunityContentCollections { get; set; }
+
+	/// <summary>
+	/// CommunityContent Discoverers. Discoverers retrieve the Community Content Items and place in Community Content Collections.
+	/// </summary>
+	public DbSet<CommunityContentDiscoverer> CommunityContentDiscoverers { get; set; }
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -113,7 +128,7 @@ public class DataContext : IdentityDbContext<AppUser,
 		ConfigureWordTranslations(builder);
 		ConfigurePhrases(builder);
 		ConfigurePhraseTranslations(builder);
-
+		ConfigureCommunityContentItems(builder);
 
 		// builder.Entity<Phrase>()
 		// 	.HasMany(p => p.Words)
@@ -179,6 +194,32 @@ public class DataContext : IdentityDbContext<AppUser,
 		builder.Entity<WordInDictionary>()
 			.ToView("vw_WordsInDictionaries")
 			.HasKey(t => t.WordId);
+
+	}
+
+	private void ConfigureCommunityContentItems(ModelBuilder builder)
+	{
+		builder.Entity<Dictionary>()
+			.HasMany(d => d.CommunityContentItems)
+			.WithOne(pt => pt.Dictionary)
+			.HasForeignKey(wt => wt.DictionaryId)
+			.IsRequired();
+		
+		builder.Entity<CommunityContentCollection>()
+			.HasMany(ccc => ccc.CommunityContentItems)
+			.WithOne(cci => cci.CommunityContentCollection)
+			.HasForeignKey(cci => cci.CommunityContentCollectionId)
+			.IsRequired();
+
+		builder.Entity<CommunityContentDiscoverer>()
+			.HasMany(ccd => ccd.CommunityContentCollections)
+			.WithOne(ccc => ccc.CommunityContentDiscoverer)
+			.HasForeignKey(ccc => ccc.CommunityContentDiscovererId)
+			.IsRequired();
+		
+		builder.Entity<CommunityContentDiscoverer>()
+			.HasIndex(m=>m.Name)
+			.IsUnique();
 
 	}
 
@@ -282,6 +323,16 @@ public class DataContext : IdentityDbContext<AppUser,
 			NameSingular = "Phrase",
 			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
 			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhrasesContentTypeManager",
+		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 5,
+			Controller = "communitycontentitems",
+			ContentTypeKey = "CommunityContentItem",
+			NamePlural = "Community Content Items",
+			NameSingular = "Community Content Item",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.CommunityContentItemContentTypeManager",
 		});
 	}
 
