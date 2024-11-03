@@ -89,10 +89,19 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// </summary>
 	public DbSet<DictionariesSummary> DictionariesSummaries { get; set; }
 
+	/// <summary>
+	/// Community Content Items.
+	/// </summary>
 	public DbSet<CommunityContentItem> CommunityContentItems { get; set; }
 
+	/// <summary>
+	/// Community Content Collections. Contains Community Content Items.
+	/// </summary>
 	public DbSet<CommunityContentCollection> CommunityContentCollections { get; set; }
 
+	/// <summary>
+	/// CommunityContent Discoverers. Discoverers retrieve the Community Content Items and place in Community Content Collections.
+	/// </summary>
 	public DbSet<CommunityContentDiscoverer> CommunityContentDiscoverers { get; set; }
 	
 	/// <summary>
