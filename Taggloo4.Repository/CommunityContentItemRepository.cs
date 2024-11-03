@@ -104,10 +104,28 @@ public class CommunityContentItemRepository : RepositoryBase<CommunityContentIte
 	/// <inheritdoc cref="ICommunityContentItemRepository.CreateCommunityContentCollection"/>
 	public CommunityContentCollection CreateCommunityContentCollection(string name, string? searchUrl)
 	{
+		// try and get a Discoverer by name
+		string key = $"Imported/{name}";
+		
+		CommunityContentDiscoverer? communityContentDiscoverer = DataContext.CommunityContentDiscoverers.SingleOrDefault(c => c.Key == key);
+		
+		// if new, create one, but without .NET reflected types
+		if (communityContentDiscoverer == null)
+		{
+			communityContentDiscoverer = new CommunityContentDiscoverer()
+			{
+				Key = key,
+				Name = name,
+				Description = $"Created during import for Collection '{name}'"
+			};
+			DataContext.CommunityContentDiscoverers.Add(communityContentDiscoverer);
+		}
+		
 		CommunityContentCollection communityContentCollection = new CommunityContentCollection()
 		{
 			Name = name,
 			SearchUrl = searchUrl,
+			CommunityContentDiscoverer = communityContentDiscoverer, 
 			IsPollingEnabled = false,
 			LastPolledAt = null
 		};

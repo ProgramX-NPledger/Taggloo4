@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taggloo4.Data.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using Taggloo4.Data.EntityFrameworkCore;
 namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241103155437_Remove null constraints for Discoverer to allow default creation, added columns and index")]
+    partial class RemovenullconstraintsforDiscoverertoallowdefaultcreationaddedcolumnsandindex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -326,8 +329,7 @@ namespace Taggloo4.Data.EntityFrameworkCore.Migrations
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()

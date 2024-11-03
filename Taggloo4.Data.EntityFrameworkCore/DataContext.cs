@@ -216,8 +216,11 @@ public class DataContext : IdentityDbContext<AppUser,
 			.WithOne(ccc => ccc.CommunityContentDiscoverer)
 			.HasForeignKey(ccc => ccc.CommunityContentDiscovererId)
 			.IsRequired();
-
 		
+		builder.Entity<CommunityContentDiscoverer>()
+			.HasIndex(m=>m.Name)
+			.IsUnique();
+
 	}
 
 	private void ConfigurePhraseTranslations(ModelBuilder builder)
