@@ -21,7 +21,7 @@ public class CommunityContentItem
     /// <summary>
     /// Short synopsis of item.
     /// </summary>
-    [MaxLength(512)]
+    [MaxLength(4096)]
     public required string SynopsisText { get; set; }
     
     /// <summary>
@@ -68,7 +68,7 @@ public class CommunityContentItem
     /// <summary>
     /// Short synopsis of item, using original HTML.
     /// </summary>
-    [MaxLength(1024)]
+    [MaxLength(4096)]
     public required string OriginalSynopsisHtml { get; set; }
 
     /// <summary>
