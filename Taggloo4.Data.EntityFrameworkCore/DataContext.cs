@@ -321,6 +321,16 @@ public class DataContext : IdentityDbContext<AppUser,
 			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
 			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhrasesContentTypeManager",
 		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 5,
+			Controller = "communitycontentitems",
+			ContentTypeKey = "CommunityContentItem",
+			NamePlural = "Community Content Items",
+			NameSingular = "Community Content Item",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.CommunityContentItemContentTypeManager",
+		});
 	}
 
 	private void ConfigureDictionaries(ModelBuilder builder)
