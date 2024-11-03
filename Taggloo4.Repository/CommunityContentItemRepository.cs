@@ -34,7 +34,6 @@ public class CommunityContentItemRepository : RepositoryBase<CommunityContentIte
 	public async Task<IEnumerable<CommunityContentItem>> GetCommunityContentItemsAsync(int? dictionaryId, string? containingText, string? hash, string? hashAlgorithm, string? externalId, string? languageCode)
 	{
 		IQueryable<CommunityContentItem> query = DataContext.CommunityContentItems
-			.Include("CommunityContentItems")
 			.Include(m=>m.Dictionary).ThenInclude(m=>m.Language)
 			.Include(m=>m.CommunityContentCollection).ThenInclude(m=>m.CommunityContentDiscoverer)
 			.AsQueryable();
