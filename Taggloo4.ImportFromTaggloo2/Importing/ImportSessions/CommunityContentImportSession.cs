@@ -61,24 +61,14 @@ public class CommunityContentImportSession : IImportSession
 
         	try
         	{
-		       // verify that phrase doesn't already exist
-		        bool communityContentItemAlreadyExists = await IsCommunityContentItemExtant(httpClient, communityContentItem.Hash, dictionaryId);
-		        if (!communityContentItemAlreadyExists)
+		        _ = await PostCommunityContentItemToTarget(httpClient, communityContentItem, dictionaryId);
+		        Imported?.Invoke(this,new ImportedEventArgs()
 		        {
-			        _ = await PostCommunityContentItemToTarget(httpClient, communityContentItem, dictionaryId);
-			        Imported?.Invoke(this,new ImportedEventArgs()
-			        {
-				        LanguageCode = languageCode,
-				        CurrentItem = communityContentItem.Title,
-				        IsSuccess = true,
-				        SourceId = communityContentItem.ID
-			        });
-		        }
-		        else
-		        {
-			        throw new ImportException(
-				        $"Phrase '{communityContentItem}' already exists in Dictionary ID {dictionaryId}");
-		        }
+			        LanguageCode = languageCode,
+			        CurrentItem = communityContentItem.Title,
+			        IsSuccess = true,
+			        SourceId = communityContentItem.ID
+		        });
         	}
         	catch (Exception ex)
         	{
@@ -113,19 +103,7 @@ public class CommunityContentImportSession : IImportSession
         }
 		        
     }
-
-    private async Task<bool> IsCommunityContentItemExtant(HttpClient httpClient, string hash, int dictionaryId)
-    {
-	    string url = $"/api/v4/communitycontentitems?hash={hash}&dictionaryId={dictionaryId}";
-	    HttpResponseMessage response = await httpClient.GetAsync(url);
-	    response.EnsureSuccessStatusCode();
-	    
-	    GetCommunityContentItemsResult? getCommunityContentItemsResult = await response.Content.ReadFromJsonAsync<GetCommunityContentItemsResult>();
-	    if (getCommunityContentItemsResult == null) throw new NullReferenceException("getCommunityContentItemsResult");
-	    
-	    return getCommunityContentItemsResult.Results.Any();
-    }
-
+    
 
     private async Task<CreateCommunityContentItemResult> PostCommunityContentItemToTarget(HttpClient httpClient, CommunityContentItem communityContentItem,
 	    int dictionaryId)
