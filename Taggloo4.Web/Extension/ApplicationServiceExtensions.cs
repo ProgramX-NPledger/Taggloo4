@@ -44,6 +44,7 @@ public static class ApplicationServiceExtensions
 		services.AddScoped<IWordInPhraseRepository, WordInPhraseRepository>();
 		services.AddScoped<ITranslatorConfigurationRepository, TranslatorConfigurationRepository>();
 		services.AddScoped<ICommunityContentItemRepository, CommunityContentItemRepository>();
+		services.AddScoped<ICommunityContentCollectionRepository, CommunityContentCollectionRepository>();
 		services.AddSingleton<TranslationFactoryService, TranslationFactoryService>();
 		services.AddSingleton<TranslatorConfigurationCache, TranslatorConfigurationCache>();
 		
