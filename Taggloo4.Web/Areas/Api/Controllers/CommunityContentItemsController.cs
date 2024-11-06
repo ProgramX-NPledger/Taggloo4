@@ -10,6 +10,8 @@ using Taggloo4.Data.EntityFrameworkCore.Identity;
 using Taggloo4.Dto;
 using Taggloo4.Model;
 using Taggloo4.Web.Controllers;
+using CommunityContentCollection = Taggloo4.Model.CommunityContentCollection;
+using CommunityContentItem = Taggloo4.Model.CommunityContentItem;
 
 namespace Taggloo4.Web.Areas.Api.Controllers;
 
@@ -20,20 +22,23 @@ namespace Taggloo4.Web.Areas.Api.Controllers;
 public class CommunityContentItemsController : BaseApiController
 {
 	private readonly ICommunityContentItemRepository _communityContentItemRepository;
+	private readonly ICommunityContentCollectionRepository _communityContentCollectionRepository;
 	private readonly IDictionaryRepository _dictionaryRepository;
 
 	/// <summary>
 	/// Constructor with injected parameters.
 	/// </summary>
 	/// <param name="communityContentItemRepository">Implementation of <seealso cref="ICommunityContentItemRepository"/></param>
+	/// <param name="communityContentCollectionRepository">Implementation of <seealso cref="ICommunityContentCollectionRepository"/></param>
 	/// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
 	public CommunityContentItemsController(ICommunityContentItemRepository communityContentItemRepository,
+		ICommunityContentCollectionRepository communityContentCollectionRepository,
 		IDictionaryRepository dictionaryRepository)
 	{
 		_communityContentItemRepository = communityContentItemRepository;
+		_communityContentCollectionRepository = communityContentCollectionRepository;
 		_dictionaryRepository = dictionaryRepository;
 	}
-	
 	
 	/// <summary>
 	/// Return a Community Content Item by ID.
@@ -286,7 +291,7 @@ public class CommunityContentItemsController : BaseApiController
 		{
 			// is a new collection, so create
 			communityContentCollection =
-				_communityContentItemRepository.CreateCommunityContentCollection(createCommunityContentItem
+				_communityContentCollectionRepository.CreateCommunityContentCollection(createCommunityContentItem
 					.CollectionName,null);
 			createdNewCollection = true;
 		}

@@ -4,6 +4,7 @@ using Taggloo4.Dto;
 using Taggloo4.Model.Exceptions;
 using Taggloo4Mgt.Importing.Importers;
 using Taggloo4Mgt.Importing.Model;
+using CommunityContentItem = Taggloo4Mgt.Importing.Model.CommunityContentItem;
 
 namespace Taggloo4Mgt.Importing.ImportSessions;
 

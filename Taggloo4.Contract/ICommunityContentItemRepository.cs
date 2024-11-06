@@ -43,13 +43,6 @@ public interface ICommunityContentItemRepository : IRepositoryBase<CommunityCont
 	Task<IEnumerable<CommunityContentCollection>> GetCommunityContentCollectionsAsync(
 		string? containingText, int? id);
 
-	/// <summary>
-	/// Create a Community Content Collection and schedule for addition.
-	/// </summary>
-	/// <param name="name">Name of collection.</param>
-	/// <param name="searchUrl">Search URL to apply to collection.</param>
-	/// <returns>The created <seealso cref="CommunityContentCollection"/>.</returns>
-	CommunityContentCollection CreateCommunityContentCollection(string name, string? searchUrl);
 
 	/// <summary>
 	/// Create a Communitu Contact Item and schedule for addition.
