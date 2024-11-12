@@ -1,0 +1,108 @@
+﻿@using Taggloo4.Contract.Criteria
+@model Taggloo4.Web.Areas.Admin.ViewModels.Words.DetailsViewModel
+
+@{
+    ViewBag.Title = Model.TheWord;
+    Layout = "_Layout";
+}
+
+<div class="admin">
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>@Model.TheWord</h2>
+            <p><a href="@Url.Action("Index","Words")">&lt; Back to Words</a></p>
+            <div class="panel">
+                <h3>General</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="panel">
+                <fieldset>
+                    <p>
+                        @Html.LabelFor(m=>m.Id)
+                        @Html.TextBoxFor(m=>m.Id, new { @readonly= "readonly" })
+                    </p>
+                    <p>
+                        @Html.LabelFor(m=>m.TheWord)
+                        @Html.TextBoxFor(m=>m.TheWord, new { @readonly= "readonly" })
+                    </p>
+                </fieldset>
+                <fieldset>
+                    <p>
+                        @Html.LabelFor(m=>m.ExternalId)
+                        @Html.TextBoxFor(m=>m.ExternalId, new { @readonly= "readonly" })
+                    </p>
+                </fieldset>
+            </div>
+        </div>   
+        <div class="col-md-5">
+            <div class="panel">
+                <fieldset>
+                    <p>
+                        @Html.LabelFor(m=>m.CreatedAt)
+                        @Html.TextBoxFor(m=>m.CreatedAt, new { @readonly= "readonly" })
+                    </p>
+                    <p>
+                        @Html.LabelFor(m=>m.CreatedOn)
+                        @Html.TextBoxFor(m=>m.CreatedOn, new { @readonly= "readonly" })
+                    </p>
+                    <p>
+                        @Html.LabelFor(m=>m.CreatedByUserName)
+                        @Html.TextBoxFor(m=>m.CreatedByUserName, new { @readonly= "readonly" })
+                    </p>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="panel">
+                <div class="panel">
+                    <h3>Dictionaries</h3>
+                    <table>
+                        <tr>
+                            <th id="thDictionaryName">Name</th>
+                            <th id="thIetfLanguageTag">IETF Language Tag</th>
+                            <th id="thLanguageNme">Language</th>
+                        </tr>
+                        @foreach (var dictionaryViewModel in Model.Dictionaries)
+                        {
+                            <tr>
+                                <td headers="thDictionaryName"><a href="@Url.Action("Details","Dictionaries",new { id=dictionaryViewModel.Id})">@dictionaryViewModel.Name</a></td>
+                                <td headers="thIetfLanguageTag">@dictionaryViewModel.IetfLanguageTag</td>
+                                <td headers="thLanguageName"><a href="@Url.Action("Details","Languages",new { id=dictionaryViewModel.IetfLanguageTag})">@dictionaryViewModel.LanguageName</a></td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="panel">
+                <div class="panel">
+                </div>
+            </div>
+
+
+        </div>
+
+      
+    </div>
+    <div class="panel">
+        <h3>Translations</h3>
+        <!-- grid -->
+        <!-- to -->
+        <!-- from -->
+    </div>
+    <div class="panel">
+        <h3>Phrases</h3>
+    </div>
+    
+</div>

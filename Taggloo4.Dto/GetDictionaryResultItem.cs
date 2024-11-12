@@ -61,8 +61,13 @@ public class GetDictionaryResultItem
 	public string? ContentTypeKey { get; set; }
 
 	/// <summary>
-	/// Human-suitable name of Content Type.
+	/// Human-suitable name of Content Type (singular).
 	/// </summary>
-	public string? ContentTypeFriendlyName { get; set; }
-	
+	public string? NameSingular { get; set; }
+
+	/// <summary>
+	/// Human-suitable name of Content Type (plural).
+	/// </summary>
+	public string? NamePlural { get; set; }
+
 }

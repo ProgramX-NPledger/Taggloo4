@@ -59,7 +59,7 @@ public class TranslateController : Controller
     /// Site home page.
     /// </summary>
     /// <returns>View <c>Index</c>.</returns>
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
         // return full translation search form
         return View();
@@ -74,7 +74,7 @@ public class TranslateController : Controller
     /// are returned by SignaLR.</remarks>
     [HttpGet]
     [HttpPost]
-    public async Task<IActionResult> Translate(TranslateViewModel viewModel)
+    public IActionResult Translate(TranslateViewModel viewModel)
     {
         return View("Translate", new TranslateViewModel()
         {
@@ -94,7 +94,7 @@ public class TranslateController : Controller
         DateTime startTimeStamp = DateTime.Now;
         AssertValidTranslators(viewModel.Translators!);
         
-        ITranslatorFactory translatorFactory = await GetTranslatorFactoryAsync(viewModel.Translators!.Single());
+        ITranslatorFactory translatorFactory = GetTranslatorFactory(viewModel.Translators!.Single());
 
         ITranslatorConfiguration translatorConfiguration =
             await _translatorConfigurationCache.GetTranslatorConfiguration(translatorFactory.GetTranslatorName(),_translatorConfigurationRepository);
@@ -149,10 +149,10 @@ public class TranslateController : Controller
         return View(detailsViewModel);
     }
 
-    private async Task<ITranslatorFactory> GetTranslatorFactoryAsync(string translatorKey)
+    private ITranslatorFactory GetTranslatorFactory(string translatorKey)
     {
         // have to pass the ITranslatorRepository because it is scoped
-        var translatorFactories =await _translationFactoryService.GetTranslatorFactoriesAsync(_translatorRepository);
+        IEnumerable<ITranslatorFactory> translatorFactories =_translationFactoryService.GetTranslatorFactories(_translatorRepository);
 
         ITranslatorFactory? matchingTranslator = translatorFactories.SingleOrDefault(q =>
             q.GetTranslatorName().Equals(translatorKey, StringComparison.OrdinalIgnoreCase));
@@ -162,35 +162,6 @@ public class TranslateController : Controller
         
         return matchingTranslator;
     }
-    //
-    // private async Task<ITranslatorFactory> GetTranslatorFactoryAsync(string translatorKey)
-    // {
-    //     Model.Translator? translator = (await _translatorRepository.GetAllTranslatorsAsync(translatorKey, null, null, true)).FirstOrDefault();
-    //     if (translator == null)
-    //         throw new InvalidOperationException($"Could not resolve {nameof(ITranslatorFactory)} '{translatorKey}'");
-    //     
-    //     // get the assembly
-    //     Assembly assembly = Assembly.Load(translator.DotNetFactoryAssembly);
-    //     
-    //     // get the type
-    //     Type? type = assembly.GetType(translator.DotNetFactoryType);
-    //     if (type == null)
-    //         throw new InvalidOperationException(
-    //             $"Failed to locate {nameof(ITranslatorFactory)} '{translator.DotNetFactoryType}'.");
-    //     
-    //     // instantiate the type
-    //     object? o = Activator.CreateInstance(type);
-    //     if (o == null)
-    //         throw new InvalidOperationException($"Failed to activate '{type.Name}");
-    //     
-    //     // return the type
-    //     ITranslatorFactory? iTranslatorFactory=o as ITranslatorFactory;
-    //     if (iTranslatorFactory == null)
-    //         throw new InvalidOperationException(
-    //             $"Implementation of {o.GetType().Name} does not implement {nameof(ITranslatorFactory)}");
-    //
-    //     return iTranslatorFactory;
-    // }
 
 
     private void AssertValidTranslators(IEnumerable<string> translators)

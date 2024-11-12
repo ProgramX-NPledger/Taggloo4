@@ -30,7 +30,7 @@ public class GetPhraseTranslationResultItem
 	/// <summary>
 	/// Host from which the Phrase Translation was created.
 	/// </summary>
-	public required string CreatedOn { get; set; }
+	public string? CreatedOn { get; set; }
 	
 	/// <summary>
 	/// Identifier of owning <seealso cref="Dictionary"/>.

@@ -36,14 +36,18 @@ public static class ApplicationServiceExtensions
 		services.AddScoped<IUserRepository, UserRepository>();
 		services.AddScoped<ILanguageRepository, LanguageRepository>();
 		services.AddScoped<IDictionaryRepository, DictionaryRepository>();
+		services.AddScoped<IContentTypeRepository, ContentTypeRepository>();
 		services.AddScoped<IWordRepository, WordRepository>();
 		services.AddScoped<IPhraseRepository, PhraseRepository > ();
 		services.AddScoped<ITranslationRepository, TranslationRepository>();
 		services.AddScoped<IDatabaseManagement, DatabaseManagement>();
 		services.AddScoped<IWordInPhraseRepository, WordInPhraseRepository>();
 		services.AddScoped<ITranslatorConfigurationRepository, TranslatorConfigurationRepository>();
+		services.AddScoped<ICommunityContentItemRepository, CommunityContentItemRepository>();
+		services.AddScoped<ICommunityContentCollectionRepository, CommunityContentCollectionRepository>();
 		services.AddSingleton<TranslationFactoryService, TranslationFactoryService>();
 		services.AddSingleton<TranslatorConfigurationCache, TranslatorConfigurationCache>();
+		
 		
 		
 		services.AddLogging(loggingBuilder =>

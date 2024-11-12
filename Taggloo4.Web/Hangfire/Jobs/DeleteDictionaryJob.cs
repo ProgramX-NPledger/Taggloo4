@@ -1,5 +1,7 @@
 ﻿using Taggloo4.Contract;
+using Taggloo4.Data.EntityFrameworkCore;
 using Taggloo4.Model;
+using Taggloo4.Translation;
 
 namespace Taggloo4.Web.Hangfire.Jobs;
 
@@ -9,14 +11,18 @@ namespace Taggloo4.Web.Hangfire.Jobs;
 public class DeleteDictionaryJob
 {
     private readonly IDictionaryRepository _dictionaryRepository;
+    private readonly DataContext _dataContext;
 
     /// <summary>
     /// Constructor with injected parameters.
     /// </summary>
     /// <param name="dictionaryRepository">Implementation of <see cref="IDictionaryRepository"/>.</param>
-    public DeleteDictionaryJob(IDictionaryRepository dictionaryRepository)
+    /// <param name="dataContext">Entity Framework Data Context providing full access to the datastore without requiring a
+    /// Repository interface.</param>
+    public DeleteDictionaryJob(IDictionaryRepository dictionaryRepository, DataContext dataContext)
     {
         _dictionaryRepository = dictionaryRepository;
+        _dataContext = dataContext;
     }
     
     /// <summary>
@@ -32,7 +38,11 @@ public class DeleteDictionaryJob
 
         try
         {
-            _dictionaryRepository.Delete(dictionaryId).Wait();
+            // get the Content Type Manager for the Dictionary
+            IContentTypeManager contentTypeManager = ContentTypeManagerFactory.CreateContentTypeManager(_dataContext,dictionary);
+            
+            // have the Content Type Manager delete the Dictionary
+            contentTypeManager.DeleteDictionaryAndContentsAsync().Wait();
         }
         catch (Exception e)
         {

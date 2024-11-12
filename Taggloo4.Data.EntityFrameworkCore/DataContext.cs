@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Taggloo4.Data.EntityFrameworkCore.Identity;
 using Taggloo4.Model;
+using Taggloo4.Model.Exceptions;
 
 namespace Taggloo4.Data.EntityFrameworkCore;
 
@@ -63,6 +64,45 @@ public class DataContext : IdentityDbContext<AppUser,
 	/// </summary>
 	public DbSet<TranslatorConfiguration> TranslatorConfigurations { get; set; }
 
+	/// <summary>
+	/// Summary of Words in Dictionaries.
+	/// </summary>
+	public DbSet<WordsInDictionariesSummary> WordsInDictionariesSummaries { get; set; }
+
+	/// <summary>
+	/// Words in Dictionaries.
+	/// </summary>
+	public DbSet<WordInDictionary> WordsInDictionaries { get; set; }
+
+	/// <summary>
+	/// Content Types for Dictionaries.
+	/// </summary>
+	public DbSet<ContentType> ContentTypes { get; set; }
+
+	/// <summary>
+	/// Dictionaries with Content Type and Language.
+	/// </summary>
+	public DbSet<DictionaryWithContentTypeAndLanguage> DictionariesWithContentTypeAndLanguage { get; set; }
+	
+	/// <summary>
+	/// Summary of Dictionaries.
+	/// </summary>
+	public DbSet<DictionariesSummary> DictionariesSummaries { get; set; }
+
+	/// <summary>
+	/// Community Content Items.
+	/// </summary>
+	public DbSet<CommunityContentItem> CommunityContentItems { get; set; }
+
+	/// <summary>
+	/// Community Content Collections. Contains Community Content Items.
+	/// </summary>
+	public DbSet<CommunityContentCollection> CommunityContentCollections { get; set; }
+
+	/// <summary>
+	/// CommunityContent Discoverers. Discoverers retrieve the Community Content Items and place in Community Content Collections.
+	/// </summary>
+	public DbSet<CommunityContentDiscoverer> CommunityContentDiscoverers { get; set; }
 	
 	/// <summary>
 	/// Constructor with options parameter.
@@ -79,66 +119,16 @@ public class DataContext : IdentityDbContext<AppUser,
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
 		base.OnModelCreating(builder);
-
-		builder.Entity<AppUser>()
-			.HasMany(ur => ur.UserRoles)
-			.WithOne(u => u.User)
-			.HasForeignKey(ur => ur.UserId)
-			.IsRequired();
-
-		builder.Entity<AppRole>()
-			.HasMany(ur => ur.UserRoles)
-			.WithOne(r => r.Role)
-			.HasForeignKey(ur => ur.RoleId)
-			.IsRequired();
-
-		builder.Entity<Language>()
-			.HasMany(l => l.Dictionaries)
-			.WithOne(d => d.Language)
-			.HasForeignKey(d => d.IetfLanguageTag)
-			.IsRequired();
-
-		// words
-		builder.Entity<Dictionary>()
-			.HasMany(d => d.Words)
-			.WithOne(w => w.Dictionary)
-			.HasForeignKey(w => w.DictionaryId)
-			.IsRequired();
-
-		builder.Entity<Dictionary>()
-			.HasMany(d => d.WordTranslations)
-			.WithOne(wt => wt.Dictionary)
-			.HasForeignKey(wt => wt.DictionaryId)
-			.IsRequired();
 		
-		builder.Entity<Word>()
-			.HasIndex(a =>
-				new
-				{
-					a.DictionaryId,
-					a.TheWord
-				}).IsUnique();
-
-		// phrases
-		builder.Entity<Dictionary>()
-			.HasMany(d => d.Phrases)
-			.WithOne(w => w.Dictionary)
-			.HasForeignKey(w => w.DictionaryId)
-			.IsRequired();
-
-		builder.Entity<Phrase>()
-			.HasIndex(a =>
-				new
-				{
-					a.DictionaryId,
-					a.ThePhrase
-				}).IsUnique();
-		
-		builder.Entity<Dictionary>()
-			.HasMany(d => d.PhraseTranslations)
-			.WithOne(pt => pt.Dictionary)
-			.HasForeignKey(wt => wt.DictionaryId)
-			.IsRequired();
+		ConfigureDictionaries(builder);
+		SeedContentTypes(builder);
+		ConfigureIdentity(builder);
+		ConfigureLanguages(builder);
+		ConfigureWords(builder);
+		ConfigureWordTranslations(builder);
+		ConfigurePhrases(builder);
+		ConfigurePhraseTranslations(builder);
+		ConfigureCommunityContentItems(builder);
 
 		// builder.Entity<Phrase>()
 		// 	.HasMany(p => p.Words)
@@ -194,5 +184,178 @@ public class DataContext : IdentityDbContext<AppUser,
 			IsEnabled = true,
 			NumberOfItemsInSummary = 6
 		});
+		
+		// views
+
+		builder.Entity<WordsInDictionariesSummary>()
+			.ToView("vw_WordsInDictionariesSummary")
+			.HasKey(t => t.DictionaryId);
+
+		builder.Entity<WordInDictionary>()
+			.ToView("vw_WordsInDictionaries")
+			.HasKey(t => t.WordId);
+
+	}
+
+	private void ConfigureCommunityContentItems(ModelBuilder builder)
+	{
+		builder.Entity<Dictionary>()
+			.HasMany(d => d.CommunityContentItems)
+			.WithOne(pt => pt.Dictionary)
+			.HasForeignKey(wt => wt.DictionaryId)
+			.IsRequired();
+		
+		builder.Entity<CommunityContentCollection>()
+			.HasMany(ccc => ccc.CommunityContentItems)
+			.WithOne(cci => cci.CommunityContentCollection)
+			.HasForeignKey(cci => cci.CommunityContentCollectionId)
+			.IsRequired();
+
+		builder.Entity<CommunityContentDiscoverer>()
+			.HasMany(ccd => ccd.CommunityContentCollections)
+			.WithOne(ccc => ccc.CommunityContentDiscoverer)
+			.HasForeignKey(ccc => ccc.CommunityContentDiscovererId)
+			.IsRequired();
+		
+		builder.Entity<CommunityContentDiscoverer>()
+			.HasIndex(m=>m.Name)
+			.IsUnique();
+
+	}
+
+	private void ConfigurePhraseTranslations(ModelBuilder builder)
+	{
+		builder.Entity<Dictionary>()
+			.HasMany(d => d.PhraseTranslations)
+			.WithOne(pt => pt.Dictionary)
+			.HasForeignKey(wt => wt.DictionaryId)
+			.IsRequired();
+	}
+
+	private void ConfigurePhrases(ModelBuilder builder)
+	{
+		builder.Entity<Phrase>()
+			.HasMany(word => word.Dictionaries)
+			.WithMany(dictionary => dictionary.Phrases)
+			.LeftNavigation.ForeignKey!.DeleteBehavior = DeleteBehavior.Restrict; // do not delete dictionary if word is deleted
+	}
+
+	private void ConfigureWordTranslations(ModelBuilder builder)
+	{
+		builder.Entity<Dictionary>()
+			.HasMany(d => d.WordTranslations)
+			.WithOne(wt => wt.Dictionary)
+			.HasForeignKey(wt => wt.DictionaryId)
+			.IsRequired();
+	}
+
+	private void ConfigureWords(ModelBuilder builder)
+	{
+		builder.Entity<Word>()
+			.HasMany(word => word.Dictionaries)
+			.WithMany(dictionary => dictionary.Words)
+			.LeftNavigation.ForeignKey!.DeleteBehavior = DeleteBehavior.Restrict; // do not delete dictionary if word is deleted
+	}
+
+	private void ConfigureLanguages(ModelBuilder builder)
+	{
+		builder.Entity<Language>()
+			.HasMany(l => l.Dictionaries)
+			.WithOne(d => d.Language)
+			.HasForeignKey(d => d.IetfLanguageTag)
+			.IsRequired();
+	}
+
+	private void ConfigureIdentity(ModelBuilder builder)
+	{
+		builder.Entity<AppUser>()
+			.HasMany(ur => ur.UserRoles)
+			.WithOne(u => u.User)
+			.HasForeignKey(ur => ur.UserId)
+			.IsRequired();
+
+		builder.Entity<AppRole>()
+			.HasMany(ur => ur.UserRoles)
+			.WithOne(r => r.Role)
+			.HasForeignKey(ur => ur.RoleId)
+			.IsRequired();
+
+	}
+
+	private void SeedContentTypes(ModelBuilder builder)
+	{
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 1,
+			Controller = "words",
+			ContentTypeKey = "Word",
+			NamePlural = "Words",
+			NameSingular = "Word",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.WordsContentTypeManager",
+		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 2,
+			Controller = "wordTranslations",
+			ContentTypeKey = "WordTranslation",
+			NamePlural = "Word Translations",
+			NameSingular = "Word Translation",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.WordTranslationsContentTypeManager",
+		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 3,
+			Controller = "phraseTranslations",
+			ContentTypeKey = "PhraseTranslation",
+			NamePlural = "Phrase Translations",
+			NameSingular = "Phrase Translation",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhraseTranslationsContentTypeManager",
+		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 4,
+			Controller = "phrases",
+			ContentTypeKey = "Phrase",
+			NamePlural = "Phrases",
+			NameSingular = "Phrase",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.PhrasesContentTypeManager",
+		});
+		builder.Entity<ContentType>().HasData(new ContentType()
+		{
+			Id = 5,
+			Controller = "communitycontentitems",
+			ContentTypeKey = "CommunityContentItem",
+			NamePlural = "Community Content Items",
+			NameSingular = "Community Content Item",
+			ContentTypeManagerDotNetAssemblyName = "Taggloo4.Translation",
+			ContentTypeManagerDotNetTypeName = "Taggloo4.Translation.ContentTypes.CommunityContentItemContentTypeManager",
+		});
+	}
+
+	private void ConfigureDictionaries(ModelBuilder builder)
+	{
+		builder.Entity<Dictionary>()
+			.HasOne(dictionary => dictionary.ContentType)
+			.WithMany(contentType => contentType.Dictionaries)
+			.HasForeignKey(d => d.ContentTypeId)
+			.IsRequired(); 
+		
+		builder.Entity<DictionaryWithContentTypeAndLanguage>()
+			.ToView("vw_DictionariesWithContentTypeAndLanguage")
+			.HasKey(t => t.DictionaryId);
+		
+		builder.Entity<DictionariesSummary>()
+			.ToView("vw_DictionariesSummary")
+			.HasKey(t => new
+			{
+				t.NumberOfDictionaries,
+				t.NumberOfContentTypes,
+				t.NumberOfLanguagesInDictionaries,
+			});
+		
 	}
 }

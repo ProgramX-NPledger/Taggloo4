@@ -13,39 +13,80 @@
   <div class="row">
     <div class="col-sm-3 admin-tile">
       <h3>Languages</h3>
-      <p><span class="taggloo-red">@Model.AllLanguages?.Count()</span> Languages configured across <span class="taggloo-red">@Model.AllLanguages?.Sum(q=>q.DictionariesCount)</span> Dictionaries.</p>
-      <p class="admin-tile-bottom"><a href="@Url.Action("Index","Languages", new { area = "Admin" })">Manage &gt;</a></p>
+      <p><span class="taggloo-red">@Model.AllLanguages?.Count()</span> Languages configured across <span class="taggloo-red">@Model.AllLanguages?.Sum(q => q.DictionariesCount)</span> Dictionaries.</p>
+      <p class="admin-tile-bottom"><a href="@Url.Action("Index", "Languages", new { area = "Admin" })">Manage &gt;</a></p>
     </div>
     <div class="col-sm-3 admin-tile">
       <h3>Dictionaries</h3>
-      <p>Lorem ipsum dolor..</p>
+      <p><span class="taggloo-red">@Model.NumberOfDictionaries</span> Dictionaries configured across <span class="taggloo-red">@Model.NumberOfLanguagesInDictionaries</span> Languages with
+        <span class="taggloo-red">@Model.NumberOfContentTypes</span> Content Types.</p>
+      <p class="admin-tile-bottom"><a href="@Url.Action("Index", "Dictionaries", new { area = "Admin" })">Manage &gt;</a></p>
+    </div> 
+    @if (Model.IsAdministrator)
+    {
+      <div class="col-sm-3 admin-tile">
+        <h3>Users</h3>
+        <p>Lorem ipsum dolor..</p>
+      </div>
+    }
+    else
+    {
+      <div class="col-sm-3 admin-tile">
+      </div>
+    }
+    @if (Model.IsAdministrator)
+    {
+      <div class="col-sm-3 admin-tile">
+        <h3>Hangfire</h3>
+        <p><span class="taggloo-red">@Model.NumberOfRecurringJobs</span> recurring jobs configured.
+          @if (Model.LastJobExecution.HasValue)
+          {
+            <text>The most recent execution was <span class="taggloo-red">@Model.LastJobExecution.Value.ToString("R")</span>.</text>
+          }
+          else
+          {
+            <text>No Jobs have ever run.</text>
+          }
+          @if (Model.NextJobExecution.HasValue)
+          {
+            <text>The next scheduled execution is <span class="taggloo-red">@(Model.NextJobExecution.Value.ToString("R"))</span>.</text>
+          }
+          else
+          {
+            <text>There are no more scheduled executions.</text>
+          }
+        </p>
+
+        <p class="admin-tile-bottom"><a href="/admin/hangfire">Dashboard &gt;</a></p>
+      </div>
+    }
+    else
+    {
+      <div class="col-sm-3 admin-tile">
+      </div>
+    }
+  </div>
+
+  <div class="row">
+    <div class="col-sm-3 admin-tile">
+      <h3>Words</h3>
+      <p><span class="taggloo-red">@Model.TotalWords.ToString("N0")</span> Words configured across <span class="taggloo-red">@Model.AcrossDictionariesCount.ToString("N0")</span> Dictionaries.
+        @if (Model.LastWordCreatedTimeStamp.HasValue)
+        {
+          <text>The most recently created Word was created on <span class="taggloo-red">@(Model.LastWordCreatedTimeStamp.Value.ToString("R"))</span></text>
+        }
+        </p>
+      <p class="admin-tile-bottom"><a href="@Url.Action("Index","Words", new { area = "Admin" })">Manage &gt;</a></p>
     </div>
     <div class="col-sm-3 admin-tile">
-      <h3>Users</h3>
-      <p>Lorem ipsum dolor..</p>
+
     </div>
     <div class="col-sm-3 admin-tile">
-      <h3>Hangfire</h3>
-      <p><span class="taggloo-red">@Model.NumberOfRecurringJobs</span> recurring jobs configured. 
-        @if (Model.LastJobExecution.HasValue)
-        {
-          <text>The most recent execution was <span class="taggloo-red">@Model.LastJobExecution.Value.ToString("R")</span>.</text>
-        }
-        else
-        {
-          <text>No Jobs have ever run.</text>
-        }
-        @if (Model.NextJobExecution.HasValue)
-        {
-          <text>The next scheduled execution is <span class="taggloo-red">@(Model.NextJobExecution.Value.ToString("R"))</span>.</text>
-        }
-        else
-        {
-          <text>There are no more scheduled executions.</text>
-        }
-        </p> 
-         
-      <p class="admin-tile-bottom"><a href="/admin/hangfire">Dashboard &gt;</a></p>
+
+    </div>
+    <div class="col-sm-3 admin-tile">
+
     </div>
   </div>
+  
 </div>

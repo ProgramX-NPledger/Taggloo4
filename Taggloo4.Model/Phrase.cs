@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Taggloo4.Model;
 
@@ -33,12 +34,11 @@ public class Phrase
 	/// Host from which the Phrase was created.
 	/// </summary>
 	public required string CreatedOn { get; set; }
-
+	
 	/// <summary>
-	/// The owning Dictionary.
+	/// The owning <seealso cref="Dictionary"/> items.
 	/// </summary>
-	/// <seealso cref="Dictionary"/>.
-	public Dictionary? Dictionary { get; set; }
+	public required ICollection<Dictionary> Dictionaries { get; set; } = [];
 	
 	/// <summary>
 	/// Identifier of owning Dictionary.

@@ -26,4 +26,9 @@ public class LoginViewModel
     /// </summary>
     [Display(Name = "Remember Me")]
     public bool RememberMe { get; set; }
+
+    /// <summary>
+    /// <c>True</c> if the User has just been successfully logged out.
+    /// </summary>
+    public bool LogoutSuccessful { get; set; } = false;
 }

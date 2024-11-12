@@ -1,4 +1,6 @@
-﻿using Taggloo4.Model;
+﻿using Taggloo4.Contract;
+using Taggloo4.Model;
+using Taggloo4.Model.Exceptions;
 using Taggloo4.Web.ViewModels.Home;
 using Taggloo4.Web.ViewModels.Home.Factory;
 using Taggloo4.Web.Contract;
@@ -11,19 +13,26 @@ namespace Taggloo4.Web.Areas.Admin.ViewModels.Home.Factory;
 /// </summary>
 public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
 {
+    private readonly bool _isAdministrator;
     private readonly LanguageSummaryViewModelFactory _languageSummaryViewModelFactory;
     private readonly HangfireSummaryViewModelFactory _hangfireSummaryViewModelFactory;
+    private readonly WordSummaryViewModelFactory _wordSummaryViewModelFactory;
+    private readonly DictionariesSummaryViewModelFactory _dictionariesSummaryViewModelFactory;
     
     /// <summary>
     /// Default constructor.
     /// </summary>
     public IndexViewModelFactory(IEnumerable<Language> allLanguages,
-        int numberOfRecurringHangfireJobs, DateTime? lastHangfireJobExecution, DateTime? nextHangfireJobExecution)
+        int numberOfRecurringHangfireJobs, DateTime? lastHangfireJobExecution, DateTime? nextHangfireJobExecution,
+        WordsSummary wordsSummary,
+        DictionariesSummary dictionariesSummary, bool isAdministrator)
     {
+        _isAdministrator = isAdministrator;
         _languageSummaryViewModelFactory = new LanguageSummaryViewModelFactory(allLanguages);
         _hangfireSummaryViewModelFactory = new HangfireSummaryViewModelFactory(numberOfRecurringHangfireJobs,
             lastHangfireJobExecution, nextHangfireJobExecution);
-
+        _wordSummaryViewModelFactory = new WordSummaryViewModelFactory(wordsSummary);
+        _dictionariesSummaryViewModelFactory = new DictionariesSummaryViewModelFactory(dictionariesSummary);
     }
     
     /// <inheritdoc cref="IViewModelFactory{TViewModelType}"/>
@@ -43,6 +52,14 @@ public class IndexViewModelFactory : IViewModelFactory<IndexViewModel>
         
         IHangfireSummaryViewModel iHangfireSummaryViewModel = (IHangfireSummaryViewModel)viewModel;
         _hangfireSummaryViewModelFactory.Configure(ref iHangfireSummaryViewModel);
+        
+        IWordSummaryViewModel iWordSummaryViewModel = (IWordSummaryViewModel)viewModel;
+        _wordSummaryViewModelFactory.Configure(ref iWordSummaryViewModel);
+        
+        IDictionariesSummaryViewModel iDictionariesSummaryViewModel = (IDictionariesSummaryViewModel)viewModel;
+        _dictionariesSummaryViewModelFactory.Configure(ref iDictionariesSummaryViewModel);
+        
+        viewModel.IsAdministrator = _isAdministrator;
         
     }
 }

@@ -16,12 +16,13 @@ public class Word
 	/// The Word.
 	/// </summary>
 	[Required] 
+	[MaxLength(450)]
 	public required string TheWord { get; set; }
 	
 	/// <summary>
 	/// UserName of creator of the Word.
 	/// </summary>
-	public required string? CreatedByUserName { get; set; }
+	public required string CreatedByUserName { get; set; }
 
 	/// <summary>
 	/// Timestamp of creation of the Word.
@@ -36,12 +37,8 @@ public class Word
 	/// <summary>
 	/// The owning <seealso cref="Dictionary"/>.
 	/// </summary>
-	public Dictionary? Dictionary { get; set; }
-	
-	/// <summary>
-	/// Identifier of owning <seealso cref="Dictionary"/>.
-	/// </summary>
-	public int DictionaryId { get; set; }
+	public required ICollection<Dictionary> Dictionaries { get; set; } = [];
+
 
 	/// <summary>
 	/// Translations of the Word.

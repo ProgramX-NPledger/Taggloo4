@@ -1,0 +1,186 @@
+﻿@using Taggloo4.Contract.Criteria
+@model Taggloo4.Web.Areas.Admin.ViewModels.Dictionaries.IndexViewModel
+
+@{
+    ViewBag.Title = "Dictionaries";
+    Layout = "_Layout";
+}
+
+<div class="admin">
+    <h2>Dictionaries</h2>
+    <p>This is the admin area.</p>
+    <!-- there should be warnings here -->
+
+    <div class="filtered-paged-datagrid">
+        @using (Html.BeginForm(FormMethod.Get))
+        {
+        <ul class="filters">
+            <li>@Html.TextBoxFor(m=>m.Query, new
+                {
+                placeholder="Filter"
+                })</li>
+            <li>@Html.DropDownListFor(m=>m.ContentType,Model.AllContentTypeOptions)</li>
+            <li>@Html.DropDownListFor(m=>m.IetfLanguageTag,Model.AllLanguagesOptions)</li>
+            <li><input type="submit" value="Search"></li>
+            <li><a href="@Url.Action("Index", "Dictionaries", new {
+                from = 0,
+                itemsPerPage = Model.ItemsPerPage,
+                sortBy = DictionariesSortColumn.DictionaryId,
+                sortDirection = SortDirection.Ascending})">Clear filters</a></li>
+        </ul>
+        }
+
+        <table class="datagrid">
+            <tr>
+                <th id="thId">
+                    <a href="@Url.Action("Index", "Dictionaries", new {
+                    from = (Model.CurrentPageNumber-1) * Model.ItemsPerPage,
+                    itemsPerPage = Model.ItemsPerPage,
+                    sortBy = DictionariesSortColumn.DictionaryId,
+                    sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: DictionariesSortColumn.DictionaryId } ? SortDirection.Descending : SortDirection.Ascending,
+                    query=Model.Query,
+                    contentType=Model.ContentType,
+                    ietfLanguageTag=Model.IetfLanguageTag })">Id
+                        @if (Model.SortBy == DictionariesSortColumn.DictionaryId)
+                        {
+                        if (Model.SortDirection == SortDirection.Ascending)
+                        {
+                        <text><img src="../../img/sort-asc.png" /></text>
+                        }
+                        else
+                        {
+                        <text><img src="../../img/sort-desc.png" /></text>
+                        }
+                        }
+                    </a>
+                </th>
+                <th id="thName">
+                    <a href="@Url.Action("Index", "Dictionaries", new {
+                    from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage,
+                    itemsPerPage = Model.ItemsPerPage,
+                    sortBy = DictionariesSortColumn.Name,
+                    sortDirection =  Model is { SortDirection: SortDirection.Ascending, SortBy: DictionariesSortColumn.Name } ? SortDirection.Descending : SortDirection.Ascending,
+                    query=Model.Query,
+                    contentType=Model.ContentType,
+                    ietfLanguageTag=Model.IetfLanguageTag })">Name
+                        @if (Model.SortBy == DictionariesSortColumn.Name)
+                        {
+                        if (Model.SortDirection == SortDirection.Ascending)
+                        {
+                        <text><img src="../../img/sort-asc.png" /></text>
+                        }
+                        else
+                        {
+                        <text><img src="../../img/sort-desc.png" /></text>
+                        }
+                        }
+                    </a>
+                </th>
+                <th id="thContentType">
+                    <a href="@Url.Action("Index", "Dictionaries", new {
+                                 from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage,
+                                 itemsPerPage = Model.ItemsPerPage,
+                                 sortBy = DictionariesSortColumn.ContentType,
+                                 sortDirection =  Model is { SortDirection: SortDirection.Ascending, SortBy: DictionariesSortColumn.ContentType } ? SortDirection.Descending : SortDirection.Ascending,
+                                 query=Model.Query,
+                                 contentType=Model.ContentType,
+                                 ietfLanguageTag=Model.IetfLanguageTag })">Content Type
+                        @if (Model.SortBy == DictionariesSortColumn.ContentType)
+                        {
+                        if (Model.SortDirection == SortDirection.Ascending)
+                        {
+                        <text><img src="../../img/sort-asc.png" /></text>
+                        }
+                        else
+                        {
+                        <text><img src="../../img/sort-desc.png" /></text>
+                        }
+                        }
+                    </a>
+                </th>
+                <th id="thLanguage">
+                    <a href="@Url.Action("Index", "Dictionaries", new {
+                    from = (Model.CurrentPageNumber - 1) * Model.ItemsPerPage,
+                    itemsPerPage = Model.ItemsPerPage,
+                    sortBy = DictionariesSortColumn.Language, sortDirection = Model is { SortDirection: SortDirection.Ascending, SortBy: DictionariesSortColumn.Language } ? SortDirection.Descending : SortDirection.Ascending,
+                    query=Model.Query,
+                    contentType=Model.ContentType,
+                    ietfLanguageTag=Model.IetfLanguageTag })">Language
+                        @if (Model.SortBy == DictionariesSortColumn.Language)
+                        {
+                        if (Model.SortDirection == SortDirection.Ascending)
+                        {
+                        <text><img src="../../img/sort-asc.png"/></text>
+                        }
+                        else
+                        {
+                        <text><img src="../../img/sort-desc.png"/></text>
+                        }
+                        }
+                    </a>
+                </th>
+            </tr>
+
+            @foreach (var result in Model.Results)
+            {
+            <tr>
+                <td headers="thId">
+                    <a href="@Url.Action("Details","Dictionaries",new { id = result.DictionaryId })">
+                        @result.DictionaryId
+                    </a>
+                </td>
+                <td headers="thName">
+                    @result.Name
+                </td>
+                <td headers="thContentType">
+                    @result.NamePlural
+                </td>
+                <td headers="thLanguage">
+                    <a href="@Url.Action("Details","Languages",new { id = result.IetfLanguageTag })">
+                        @result.LanguageName
+                    </a>
+                </td>
+            </tr>
+            }
+        </table>
+
+        <ol class="page-numbers">
+            @{
+            bool haveInsertedEllipsis = false;
+            for (int i = 1; i <= Model.NumberOfPages; i++)
+            {
+            if (i <= 3 ||
+            (i >= Model.CurrentPageNumber - 3 && i <= Model.CurrentPageNumber + 3) ||
+            i >= Model.NumberOfPages - 3
+            )
+            {
+            haveInsertedEllipsis = false;
+            if (i == Model.CurrentPageNumber)
+            {
+            <li class="current-page"><strong>@i</strong></li>
+            }
+            else
+            {
+            <li>
+                <a href="@Url.Action("Index", "Dictionaries", new {
+                from = (i - 1) * Model.ItemsPerPage,
+                itemsPerPage = Model.ItemsPerPage,
+                sortBy = Model.SortBy,
+                sortDirection = Model.SortDirection,
+                query=Model.Query,
+                contentType=Model.ContentType,
+                ietfLanguageTag=Model.IetfLanguageTag })">@i</a></li>
+            }
+            }
+            else if (!haveInsertedEllipsis)
+            {
+            <li>...</li>
+            haveInsertedEllipsis = true;
+            }
+            }
+            }
+        </ol>
+
+        <p><strong>@Model.TotalUnpagedItems.ToString("N0")</strong> items</p>
+    </div>
+</div>

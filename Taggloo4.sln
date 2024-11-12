@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4.Web", "Taggloo4.Web\Taggloo4.Web.csproj", "{2F70C2A9-31F7-411F-A13B-401BE6C2A147}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4Mgt", "Taggloo4Mgt\Taggloo4Mgt.csproj", "{B28A6BD6-9954-4314-8140-B8A5CF1A8D72}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4.ImportFromTaggloo2", "Taggloo4.ImportFromTaggloo2\Taggloo4.ImportFromTaggloo2.csproj", "{B28A6BD6-9954-4314-8140-B8A5CF1A8D72}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4.Dto", "Taggloo4.Dto\Taggloo4.Dto.csproj", "{85198731-09BB-40F1-99CD-DC315DDFCBCA}"
 EndProject
@@ -25,6 +25,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4.Translation", "Taggloo4.Translation\Taggloo4.Translation.csproj", "{E7671A8B-233F-4D42-8224-42D4DBACCF2C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4.Contract.Translation", "Taggloo4.Contract.Translation\Taggloo4.Contract.Translation.csproj", "{E84487C1-9D1A-478B-9FD8-7DEB3935E153}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taggloo4.Utility", "Taggloo4.Utility\Taggloo4.Utility.csproj", "{0D3EA361-61CC-4B6B-AF14-31F4C5ACD102}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,5 +73,9 @@ Global
 		{E84487C1-9D1A-478B-9FD8-7DEB3935E153}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E84487C1-9D1A-478B-9FD8-7DEB3935E153}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E84487C1-9D1A-478B-9FD8-7DEB3935E153}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D3EA361-61CC-4B6B-AF14-31F4C5ACD102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D3EA361-61CC-4B6B-AF14-31F4C5ACD102}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D3EA361-61CC-4B6B-AF14-31F4C5ACD102}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D3EA361-61CC-4B6B-AF14-31F4C5ACD102}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

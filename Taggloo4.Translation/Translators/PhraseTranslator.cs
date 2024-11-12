@@ -40,12 +40,12 @@ public class PhraseTranslator : ITranslator
         foreach (string wordToMatch in individualWords)
         {
             WordInPhrase[] untranslatedWordInPhrases = _entityFrameworkCoreDatabaseContext.WordsInPhrases
-                .Include(m => m.Word.Dictionary)
-                .Include(m => m.InPhrase.Dictionary)
+                .Include(m => m.Word.Dictionaries)
+                .Include(m => m.InPhrase.Dictionaries)
                 .AsNoTracking()
                 .Where(q => q.Word.TheWord == wordToMatch &&
-                            q.Word.Dictionary!.IetfLanguageTag == translationRequest.FromLanguageCode &&
-                            q.InPhrase.Dictionary!.IetfLanguageTag == translationRequest.FromLanguageCode)
+                            q.Word.Dictionaries!.Select(q=>q.IetfLanguageTag).Contains(translationRequest.FromLanguageCode) &&
+                            q.InPhrase.Dictionaries!.Select(q=>q.IetfLanguageTag).Contains(translationRequest.FromLanguageCode)) 
                 .ToArray();
             // add to collection of phrases the word appears in (we're processing in phrases not words)
             untranslatedWordAppearsInPhrases.AddRange(untranslatedWordInPhrases.Select(q=>q.InPhrase));
@@ -75,7 +75,7 @@ public class PhraseTranslator : ITranslator
                     FromPhraseId = phraseTranslation.FromPhraseId,
                     ToPhraseId = phraseTranslation.ToPhraseId,
                     Translation = phraseTranslation.ToPhrase!.ThePhrase,
-                    FromPhrase = phraseTranslation.FromPhrase?.ThePhrase, // this is null
+                    FromPhrase = phraseTranslation.FromPhrase?.ThePhrase ?? string.Empty, // this is null
                     PercentageMatch = 100 // TODO
                 };
                 

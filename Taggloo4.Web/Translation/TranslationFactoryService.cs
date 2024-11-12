@@ -49,7 +49,7 @@ public class TranslationFactoryService
     /// may be used to access configurational data for the <seealso cref="ITranslatorFactory"/>.</param>
     /// <returns>A list of matching instances of <seealso cref="ITranslatorFactory"/> which may be used to provide
     /// translations.</returns>
-    public async Task<IEnumerable<ITranslatorFactory>> GetTranslatorFactoriesAsync(ITranslatorConfigurationRepository translatorRepository)
+    public IEnumerable<ITranslatorFactory> GetTranslatorFactories(ITranslatorConfigurationRepository translatorRepository)
     {
         if (_compositionHost == null) throw new InvalidOperationException($"{nameof(_compositionHost)} cannot be null");
         

@@ -136,7 +136,7 @@ public class ReindexJob
 				    {
 					    ordinal++;
 					    
-					    IList<Word> matchingWords = _wordRepository.GetWordsAsync(wordString, dictionary.Id, null).Result.ToList();
+					    IList<Word> matchingWords = _wordRepository.GetWordsAsync(wordString, dictionary.Id, null,dictionary.IetfLanguageTag).Result.ToList();
 					    if (!matchingWords.Any())
 					    {
 						    // no matching words, so create it and add it to the collection
@@ -153,7 +153,10 @@ public class ReindexJob
 							    CreatedOn =Environment.MachineName,
 							    TheWord = wordString,
 							    CreatedByUserName = $"{Environment.UserDomainName}\\{Environment.UserName}",
-							    Dictionary = dictionary
+							    Dictionaries = new List<Dictionary>()
+							    {
+								    dictionary
+							    }
 						    };
 						    _wordRepository.Create(newWord);
 						    _wordRepository.SaveAllAsync().Wait();

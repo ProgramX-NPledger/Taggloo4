@@ -1,4 +1,6 @@
-﻿using Taggloo4.Model;
+﻿using Taggloo4.Contract.Criteria;
+using Taggloo4.Model;
+using Taggloo4.Model.Exceptions;
 
 namespace Taggloo4.Contract;
 
@@ -33,6 +35,13 @@ public interface IDictionaryRepository : IRepositoryBase<Dictionary>
 	Task<IEnumerable<Dictionary>> GetDictionariesAsync(int? id, string? ietfLanguageTag);
 
 	/// <summary>
+	/// Get Dictionaries matching criteria.
+	/// </summary>
+	/// <param name="criteria">Criteria of Dictionaries to return.</param>
+	/// <returns>List of <seealso cref="Dictionary"/> items.</returns>
+	Task<PagedResults<DictionaryWithContentTypeAndLanguage>> GetDictionariesByCriteriaAsync(GetDictionariesCriteria criteria);
+	
+	/// <summary>
 	/// Deletes the specified Dictionary, and all related content.
 	/// </summary>
 	/// <param name="dictionaryId">ID of Dictionary to delete.</param>
@@ -40,5 +49,10 @@ public interface IDictionaryRepository : IRepositoryBase<Dictionary>
 	/// <exception cref="InvalidOperationException">Thrown if deletion fails.</exception>
 	Task Delete(int dictionaryId);
 	
+	/// <summary>
+	/// Get Dictionaries summary.
+	/// </summary>
+	/// <returns>A summary of Dictionaries.</returns>
+	Task<DictionariesSummary> GetDictionariesSummaryAsync();
 
 }
